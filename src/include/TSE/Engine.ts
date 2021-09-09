@@ -5,27 +5,35 @@ import { m4 } from "../util/math";
 import { Camera } from "./Camera";
 import { Shader } from "./Shader";
 
+interface Props  {
+    width: number;
+    height: number;
+}
+
 export class Engine {
     private canvas: HTMLCanvasElement | null;
     private shader: Shader;
     private camera: Camera;
     private uniformLocations: WebGLUniformLocation[] = [];
     private scene: Scene;
+    private size: {width: number, height: number};
 
     private lastFrame = 0;
 
-    public constructor() {
+    public constructor(props: Props) {
         this.canvas = null;
+        this.size = {
+            width: props.width,
+            height: props.height
+        };
     }
 
     public resize(): void {
         if ( this.canvas !== undefined ) {
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            this.canvas.width = width;
-            this.canvas.height = height;
+            this.canvas.width = this.size.width;
+            this.canvas.height = this.size.height;
 
-            gl.viewport(0, 0, width, height);
+            gl.viewport(0, 0, this.size.width, this.size.height);
         }
     }
 

@@ -2,8 +2,13 @@ import React, { ReactElement, useEffect } from 'react';
 import './App.css';
 import * as TSE from './include/TSE/Engine';
 
-function Game(): ReactElement {
-  const engine = new TSE.Engine();
+interface Props  {
+    width: number;
+    height: number;
+}
+
+function Game(props: Props): ReactElement<Props> {
+  const engine = new TSE.Engine(props);
 
   useEffect(()=> {
     engine.start();
@@ -13,7 +18,7 @@ function Game(): ReactElement {
   }, []);
   
   return (
-    <div id="container">
+    <div id="container" style={{width:'500px', height: '500px'}}>
       
     </div>
   );

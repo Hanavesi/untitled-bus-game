@@ -18,7 +18,7 @@ export class GLUtilities {
                 document.getElementById('container')?.appendChild(canvas);
             }
         }
-
+        canvas.id = 'gameCanvas';
         gl = canvas.getContext('webgl2');
         if ( gl === null ) {
             throw new Error("Unable to initialize WebGl");
