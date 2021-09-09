@@ -1,21 +1,10 @@
-import React, { ReactElement, useEffect } from 'react';
+import React, { ReactElement } from 'react';
 import './App.css';
-import * as TSE from './include/TSE/Engine';
+import Game from './Game';
 
-function App(): ReactElement {
-  const engine = new TSE.Engine();
-
-  useEffect(()=> {
-    engine.start();
-    window.onresize = function() {
-      engine.resize();
-    }
-  }, []);
-  
+function App(): ReactElement {  
   return (
-    <div id="container">
-      
-    </div>
+    <Game />
   );
 }
 
