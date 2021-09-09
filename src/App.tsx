@@ -28,6 +28,7 @@ function App(): ReactElement {
       dPressed = true;
     }
   }
+  
 
   function keyUpHandler(event: { keyCode: number; }) {
     if (event.keyCode == KeyboardHelper.w) {
