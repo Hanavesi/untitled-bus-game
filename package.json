@@ -1,5 +1,6 @@
 {
-  "name": "bussipeli",
+  "name": "tsengine",
+  "homepage": "https://juusokalliomaki.com",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -12,8 +13,8 @@
     "@types/react-dom": "^17.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-game-engine": "^1.0.0",
     "react-scripts": "4.0.3",
+    "twgl.js": "^4.19.1",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1"
   },
