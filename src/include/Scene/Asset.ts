@@ -4,15 +4,15 @@ import { m4 } from "../util/math";
 import { AiNode } from "./AiNode";
 import { Mesh } from "./Mesh";
 
-export interface Asset {
+export interface AssetData {
     root: AiNode;
     // Maybe don't need these buffers after implementing skinning and animations
     buffers: ArrayBuffer[];
     animations?: Animation[];
 }
 
-export class Scene {
-    private assets: Asset[] = [];
+export class Asset {
+    private assets: AssetData[] = [];
     private isLoaded = false;
     // Add shaders to scene or to engine?
 
@@ -24,7 +24,7 @@ export class Scene {
         return this.isLoaded;
     }
 
-    public addAsset = (asset: Asset): void => {
+    public addAsset = (asset: AssetData): void => {
         this.assets.push(asset);
     }
 

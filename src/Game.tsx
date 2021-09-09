@@ -11,7 +11,7 @@ function Game(props: Props): ReactElement<Props> {
   const engine = new TSE.Engine(props);
 
   useEffect(()=> {
-    engine.start();
+    engine.Awake();
     window.onresize = function() {
       engine.resize();
     }

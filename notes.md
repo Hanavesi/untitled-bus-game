@@ -74,3 +74,7 @@ Needs to be calculcated for all joints before any draw calls by looping through 
     - If not use another shader program
     - Pass local transform as a mat4 uniform
     - draw()
+
+### ECS
+Keep entity and component so that it is possible to check is en entity has a component.
+Create systems that update specific components on update calls.

@@ -1,26 +1,29 @@
 import { GLTFImporter } from "../Scene/GLTFImporter";
-import { Scene } from "../Scene/Scene";
+import { Asset } from "../Scene/Asset";
 import { gl, GLUtilities } from "../util/GL";
 import { m4 } from "../util/math";
 import { Camera } from "./Camera";
 import { Shader } from "./Shader";
+import { Entity } from "../util/ecs/entity";
 
 interface Props  {
     width: number;
     height: number;
 }
 
-export class Engine {
+export class Engine extends Entity{
     private canvas: HTMLCanvasElement | null;
     private shader: Shader;
     private camera: Camera;
     private uniformLocations: WebGLUniformLocation[] = [];
-    private scene: Scene;
+    private asset: Asset;
     private size: {width: number, height: number};
-
     private lastFrame = 0;
 
+    public Entities: Entity[] = [];
+
     public constructor(props: Props) {
+        super();
         this.canvas = null;
         this.size = {
             width: props.width,
@@ -37,11 +40,17 @@ export class Engine {
         }
     }
 
-    public start(): void {
+    public Awake(): void {
+        super.Awake();
+
+        for (const entity of this.Entities) {
+            entity.Awake();
+        }
+
         this.canvas = GLUtilities.initialize();
-        this.scene = new Scene();
+        this.asset = new Asset();
         const importer = new GLTFImporter();
-        importer.importModel(this.scene, 'resources/dude.gltf').then(this.scene.setLoaded);
+        importer.importModel(this.asset, 'resources/dude.gltf').then(this.asset.setLoaded);
         this.camera = new Camera([0, 5, 5]);
         this.camera.setTarget([0, 0, 0]);
         gl.enable(gl.DEPTH_TEST);
@@ -59,7 +68,11 @@ export class Engine {
 
         const deltaTime = now - this.lastFrame;
         this.lastFrame = now;
-        //console.log(deltaTime);
+        super.Update(deltaTime);
+
+        for (const entity of this.Entities) {
+            entity.Update(deltaTime);
+        }
 
         this.shader.use();
         const projection = m4.perspective(this.camera.Zoom, this.canvas.width / this.canvas.height, 0.1, 100.0);
@@ -68,8 +81,8 @@ export class Engine {
         gl.uniformMatrix4fv(this.uniformLocations[0], false, model);
         gl.uniformMatrix4fv(this.uniformLocations[1], false, view);
         gl.uniformMatrix4fv(this.uniformLocations[2], false, projection);
-        if (this.scene.checkLoaded()) {
-            this.scene.draw(this.shader);
+        if (this.asset.checkLoaded()) {
+            this.asset.draw(this.shader);
         }
         requestAnimationFrame(this.loop.bind( this ));
     }

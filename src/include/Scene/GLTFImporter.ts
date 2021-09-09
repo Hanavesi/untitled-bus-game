@@ -2,7 +2,7 @@ import { Mesh } from "./Mesh";
 import { gltfStructure } from "../util/gltf";
 import { AiNode } from "./AiNode";
 import { loadModel } from "./GLTFLoader";
-import { Asset, Scene } from "./Scene";
+import { AssetData, Asset } from "./Asset";
 import { gl } from "../util/GL";
 
 export class GLTFImporter {
@@ -11,11 +11,11 @@ export class GLTFImporter {
 
     /**
      * 
-     * @param scene 
+     * @param asset 
      * @param URI 
      * @returns - a promise with the value true when the asset is loaded and added to the scene object
      */
-    public async importModel(scene: Scene, URI: string): Promise<boolean> {
+    public async importModel(asset: Asset, URI: string): Promise<boolean> {
         const data = await loadModel(URI);
         this.gltf = data.gltf;
         this.buffers = data.buffers;
@@ -23,12 +23,12 @@ export class GLTFImporter {
         // Expecting only a single scene per file for now
         const root = this.gltf.scenes[0].nodes[0];
 
-        const asset: Asset = {
+        const assetData: AssetData = {
             root: this.parseNode(root),
             buffers: this.buffers
         };
 
-        scene.addAsset(asset);
+        asset.addAsset(assetData);
 
         return true;
     }
