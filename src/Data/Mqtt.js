@@ -3,9 +3,6 @@ import mqtt from 'mqtt';
 
 
 const mqttConnection = () => {
-    const [connectionStatus, setConnectionStatus] = useState(false);
-    const [messages, setMessages] = useState([]);
-    var count = 0;
 
     useEffect(() => {
         const client = mqtt.connect('wss://mqtt.hsl.fi:443/')
@@ -13,7 +10,6 @@ const mqttConnection = () => {
 
         client.on('connect', () => {
             console.log('connected', client.connected);
-            setConnectionStatus(true)
         });
 
         client.on('error', (err) => {
@@ -25,13 +21,9 @@ const mqttConnection = () => {
             console.log("topic is " + topic);
         });
 
-
-
-        var options = {
-            retain: true,
-            qos: 1
-        };
-        var topic = "/hfp/v2/journey/ongoing/+/bus/+/+/2104/1/#";
+        //JOS ei printtaa consoliin, bussi ei välttämättä ole ollenkaan liikkellä,
+        // kokeile vaihtaa topic: "/hfp/v2/journey/ongoing/+/bus/+/+/2104/1/#"
+        var topic = "/hfp/v2/journey/ongoing/+/bus/+/+/2104/2/#";
 
         client.subscribe(topic, { qos: 1 }); //single topic
 

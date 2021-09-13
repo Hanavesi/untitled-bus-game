@@ -15,6 +15,7 @@ function App() {
   React.useEffect(() => {
     fetchData();
   }, []);
+
   return (
     <Game width={800} height={500} />
   );
