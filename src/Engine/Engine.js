@@ -3,10 +3,12 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { InputManager } from "./InputManager";
 
 export class Engine {
 
     constructor(canvas, width, height, onReady) {
+        this.inputManager = new InputManager();
         this.lastFrame = 0;
         this.world = new World(); // ecsy world object
         this.camera = new THREE.PerspectiveCamera(45, width / height, 0.005, 10000);
@@ -81,6 +83,21 @@ export class Engine {
         now *= 0.001;
         const deltaTime = now - this.lastFrame;
         this.lastFrame = now;
+
+        if (this.inputManager.keys.left.justPressed) {
+            console.log("left")
+        };
+        if (this.inputManager.keys.right.justPressed) {
+            console.log("right")
+        };
+        if (this.inputManager.keys.up.justPressed) {
+            console.log("up")
+        };
+        if (this.inputManager.keys.down.justPressed) {
+            console.log("down")
+        };
+
+        this.inputManager.update();
 
         for (const mixer of this.animationMixers) {
             mixer.update(deltaTime);
