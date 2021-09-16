@@ -26,15 +26,20 @@ export class Mqtt {
         this.client.unsubscribe(topic, { qos: 1 });
     }
 
-    getBuses() {
+    getBuses(setBuses) {
         const topic = "/hfp/v2/journey/ongoing/+/bus/+/+/1021/2/#";
+        const topic2 = "/hfp/v2/journey/ongoing/+/bus/+/+/2104/2/#";
 
         this.client.subscribe(topic, { qos: 1 });
+        this.client.subscribe(topic2, { qos: 1 });
         this.client.on('message', (_, message) => {
             const data = JSON.parse(message);
             const subData = data[Object.keys(data)[0]];
             console.log(this.buses);
             this.buses[subData.veh] = {long: subData.long, lat: subData.lat};
+            setBuses(prev => ({
+                ...prev, [subData.veh]: {long: subData.long, lat: subData.lat}
+            }))
         })
     }
 }

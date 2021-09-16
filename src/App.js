@@ -3,24 +3,24 @@ import './App.css';
 import Game from './Game';
 import React from 'react';
 import { Mqtt } from './Data/Mqtt';
+import BusList from './Data/BusList';
 
 function App() {
-
-  const mqtt = new Mqtt();
-
 
   const fetchData = async () => {
     const data = await fetchBusRoutes();
     console.log('bus route data', data);
   }
+
   React.useEffect(() => {
-    mqtt.connect();
-    mqtt.getBuses();
     fetchData();
   }, []);
 
   return (
-    <Game width={800} height={500} />
+    <div>
+      <Game width={800} height={500} />
+      <BusList />
+    </div>
   );
 }
 
