@@ -36,16 +36,16 @@ export class Mqtt {
             const data = JSON.parse(message);
             const subData = data[Object.keys(data)[0]];
             console.log(this.buses);
-            this.buses[subData.veh] = {long: subData.long, lat: subData.lat};
+            this.buses[subData.veh] = { position: Object.keys(data)[0], start: subData.start, long: subData.long, lat: subData.lat };
             setBuses(prev => ({
-                ...prev, [subData.veh]: {long: subData.long, lat: subData.lat}
+                ...prev, [subData.veh]: { position: Object.keys(data)[0], start: subData.start, long: subData.long, lat: subData.lat }
             }))
         })
     }
 }
 
 // /hfp/v2/journey/ongoing/vp/bus/0017/00051/1021/2/Kamppi/12:50/1310105/5/60;24/18/68/02
-/* 
+/*
 const mqttConnection = () => {
 
     const client = mqtt.connect('wss://mqtt.hsl.fi:443/')
