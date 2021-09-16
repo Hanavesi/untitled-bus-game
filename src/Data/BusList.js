@@ -13,7 +13,7 @@ const BusList = () => {
     return (
         <ul>
             {Object.keys(buses).map(bus => {
-                return <li>{bus}: {buses[bus].lat}, {buses[bus].long}</li>
+                return <li>{bus}: {buses[bus].position}, {buses[bus].lat}, {buses[bus].long}, {buses[bus].start}</li>
             })}
         </ul>
     )
