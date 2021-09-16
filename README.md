@@ -13,4 +13,5 @@ The player plays as the character Pepe and is living in a post-apocalytpic world
 
 The game's course is based on [HSL](https://www.hsl.fi/) bus data gathered from [Digitransit](https://digitransit.fi/) with mqtt and possibly other to be decided methods. The player is put into a bus and while the bus is travelling, he must fight off monsters. When the bus stops, the player gets to rest and gather/buy power-ups.
 
+## [Plan](Current-plan.md)
 ## [Notes](notes.md)

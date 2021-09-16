@@ -1,11 +1,11 @@
-### User Stories
+## User Stories
 - As a user I want to be able to reach the website where I can play the game
 - As a user I want to know the ongoing buses so I can choose the one to play along with
 - As a user I wanto to be able to control the events of the game
     - input affects game events
 - As a user I want to move the player character using the keyboard
 
-### ECS
+## ECS
 We are using ecsy to imlement an entity component system. It allows easier creation of components and systems and provides tools to query entities based on their components.
 
 ## Components
