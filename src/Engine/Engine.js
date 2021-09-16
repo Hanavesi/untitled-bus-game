@@ -96,6 +96,12 @@ export class Engine {
         if (this.inputManager.keys.down.justPressed) {
             console.log("down")
         };
+        if (this.inputManager.keys.a.justPressed) {
+            console.log("a")
+        };
+        if (this.inputManager.keys.b.justPressed) {
+            console.log("b")
+        };
 
         this.inputManager.update();
 
