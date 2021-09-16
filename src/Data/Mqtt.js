@@ -1,7 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import mqtt from 'mqtt';
 
+export class Mqtt {
 
+    constructor() {
+        this.buses = {};
+        this.messageCount = 0;
+    }
+
+    connect() {
+        this.client = mqtt.connect('wss://mqtt.hsl.fi:443/');
+        this.client.on('connect', () => {
+            console.log('client connected');
+        });
+        this.client.on('error', (err) => {
+            console.log('connection error', err);
+        });
+    }
+
+    subscribe(topic) {
+        this.client.subscribe(topic, { qos: 1 });
+    }
+
+    unSubscribe(topic) {
+        this.client.unsubscribe(topic, { qos: 1 });
+    }
+
+    getBuses() {
+        const topic = "/hfp/v2/journey/ongoing/+/bus/+/+/1021/2/#";
+
+        this.client.subscribe(topic, { qos: 1 });
+        this.client.on('message', (_, message) => {
+            const data = JSON.parse(message);
+            const subData = data[Object.keys(data)[0]];
+            console.log(this.buses);
+            this.buses[subData.veh] = {long: subData.long, lat: subData.lat};
+        })
+    }
+}
+
+// /hfp/v2/journey/ongoing/vp/bus/0017/00051/1021/2/Kamppi/12:50/1310105/5/60;24/18/68/02
+/* 
 const mqttConnection = () => {
 
     const client = mqtt.connect('wss://mqtt.hsl.fi:443/')
@@ -18,7 +57,7 @@ const mqttConnection = () => {
     useEffect(() => {
         client.on('message', function (topic, message, packet) {
             //console.log("message is " + message);
-            //console.log("topic is " + topic);
+            console.log("topic is " + topic);
             if (topic.toString().includes('dep')) {
                 console.log(`Bus has left the stop: ${dateTime()} / ${topic}`);
             }
@@ -51,4 +90,4 @@ const mqttConnection = () => {
 
 }
 
-export default mqttConnection;
+export default mqttConnection; */

@@ -2,17 +2,20 @@ import { fetchBusRoutes } from './Data/RouteData';
 import './App.css';
 import Game from './Game';
 import React from 'react';
-import mqttConnection from './Data/Mqtt';
+import { Mqtt } from './Data/Mqtt';
 
 function App() {
 
-  mqttConnection();
+  const mqtt = new Mqtt();
+
 
   const fetchData = async () => {
     const data = await fetchBusRoutes();
     console.log('bus route data', data);
   }
   React.useEffect(() => {
+    mqtt.connect();
+    mqtt.getBuses();
     fetchData();
   }, []);
 
