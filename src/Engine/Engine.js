@@ -34,6 +34,7 @@ export class Engine {
         this.test = new SkinInstance(this.modelManager.models['knight'], this.scene);
         this.knight.setAnimation('Run');
         this.test.setAnimation('Idle');
+        this.test.animRoot.position.x = 2;
 
         this.addLight(5, 5, 2);
         this.addLight(-5, 5, 2);
