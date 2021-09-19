@@ -1,9 +1,9 @@
 import { World } from "ecsy";
 import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { clone } from "three/examples/jsm/utils/SkeletonUtils";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { InputManager } from "./InputManager";
+import { ModelManager } from "./ModelManager";
+import { SkinInstance } from "./SkinInstance";
 
 export class Engine {
 
@@ -20,58 +20,20 @@ export class Engine {
         this.scene.background = new THREE.Color('white');
         this.renderer = new THREE.WebGLRenderer({ canvas });
         this.renderer.render(this.scene, this.camera);
-        this.animationMixers = [];
-        this.assetLoader(onReady);
-    }
 
-    assetLoader(onReady) {
-        const manager = new THREE.LoadingManager();
-        const models = [];
-        models.push({ url: 'assets/knight.gltf', gltf: undefined, animations: [] });
-
-        manager.onLoad = () => {
-            this.init(models);
+        this.modelManager = new ModelManager();
+        this.modelManager.setModels(['knight.gltf']);
+        this.modelManager.load(() => {
+            this.init();
             onReady(true);
-        };
-        const loader = new GLTFLoader(manager);
-
-        for (const model of models) {
-            loader.load(model.url, (gltf) => {
-                model.gltf = gltf;
-            });
-        }
-        console.log(models);
-    }
-
-    prepModelsAndAnimations(models) {
-        models.forEach(model => {
-            const animsByName = {};
-            console.log(model);
-            model.gltf.animations.forEach(clip => {
-                animsByName[clip.name] = clip;
-            });
-            model.animations = animsByName;
         });
     }
 
-    init(models) {
-        console.log('done');
-        this.prepModelsAndAnimations(models);
-
-        models.forEach((model, index) => {
-            console.log(index);
-            const clonedScene = clone(model.gltf.scene);
-            const root = new THREE.Object3D();
-            root.add(clonedScene);
-            this.scene.add(root);
-            root.position.x = 0;
-
-            const mixer = new THREE.AnimationMixer(clonedScene);
-            const firstClip = Object.values(model.animations)[3];
-            const action = mixer.clipAction(firstClip);
-            action.play();
-            this.animationMixers.push(mixer);
-        });
+    init() {
+        this.knight = new SkinInstance(this.modelManager.models['knight'], this.scene);
+        this.test = new SkinInstance(this.modelManager.models['knight'], this.scene);
+        this.knight.setAnimation('Run');
+        this.test.setAnimation('Idle');
 
         this.addLight(5, 5, 2);
         this.addLight(-5, 5, 2);
@@ -104,10 +66,8 @@ export class Engine {
         };
 
         this.inputManager.update();
-
-        for (const mixer of this.animationMixers) {
-            mixer.update(deltaTime);
-        }
+        this.knight.update(deltaTime);
+        this.test.update(deltaTime);
 
         this.renderer.render(this.scene, this.camera);
         requestAnimationFrame(this.loop.bind(this));
