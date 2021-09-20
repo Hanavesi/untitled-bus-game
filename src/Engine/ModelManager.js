@@ -52,7 +52,6 @@ export class ModelManager {
         }
         return null;
     }
-
 }
 
 const prepModels = (models) => {

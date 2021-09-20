@@ -14,6 +14,7 @@ export class Engine {
         this.lastFrame = 0;
         this.world = initWorld();
         this.camera = new THREE.PerspectiveCamera(45, width / height, 0.005, 10000);
+        //this.camera = new THREE.OrthographicCamera(width / -20, width / 20, height / 20, height / -20, 1, 1000);
         this.camera.position.set(0, 20, 40);
         const controls = new OrbitControls(this.camera, canvas);
         controls.target.set(0, 0, 0);
@@ -24,7 +25,7 @@ export class Engine {
         this.renderer.render(this.scene, this.camera);
 
         this.modelManager = new ModelManager();
-        this.modelManager.setModels(['knight.gltf']);
+        this.modelManager.setModels(['knight.gltf', 'checkers.gltf']);
         this.modelManager.load(() => {
             this.init();
             onReady(true);
@@ -33,12 +34,14 @@ export class Engine {
 
     init() {
         const knight = new SkinInstance(this.modelManager.models['knight'], this.scene);
-        console.log(knight);
-        const entity = this.world.createEntity();
+        let entity = this.world.createEntity();
         entity
-            .addComponent(Vectors, { direction: new THREE.Vector3(1,0,0), speed: 10 })
-            .addComponent(Object3D, { object:  knight.animRoot })
-            .addComponent(Playable);
+        .addComponent(Vectors, { direction: new THREE.Vector3(1,0,0), speed: 10 })
+        .addComponent(Object3D, { object:  knight.animRoot })
+        .addComponent(Playable);
+        
+        const checkers = this.modelManager.getModel('checkers');
+        this.scene.add(checkers);
 
         const inputEntity = this.world.createEntity()
         inputEntity
