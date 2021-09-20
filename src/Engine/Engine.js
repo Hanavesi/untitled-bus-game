@@ -6,6 +6,8 @@ import { initWorld } from "./ECS/initializer";
 import { InputManager } from "./InputManager";
 import { ModelManager } from "./ModelManager";
 import { SkinInstance } from "./SkinInstance";
+import { mapToMeshes } from "./TileGen";
+import { MAP_TEST } from "./TileMap";
 
 export class Engine {
 
@@ -13,9 +15,9 @@ export class Engine {
         this.inputManager = new InputManager();
         this.lastFrame = 0;
         this.world = initWorld();
-        this.camera = new THREE.PerspectiveCamera(45, width / height, 0.005, 10000);
-        //this.camera = new THREE.OrthographicCamera(width / -20, width / 20, height / 20, height / -20, 1, 1000);
-        this.camera.position.set(0, 20, 40);
+        //this.camera = new THREE.PerspectiveCamera(45, width / height, 0.005, 10000);
+        this.camera = new THREE.OrthographicCamera(width / -20, width / 20, height / 20, height / -20, 1, 1000);
+        this.camera.position.set(0, 0, 20);
         const controls = new OrbitControls(this.camera, canvas);
         controls.target.set(0, 0, 0);
         controls.update();
@@ -40,8 +42,10 @@ export class Engine {
         .addComponent(Object3D, { object:  knight.animRoot })
         .addComponent(Playable);
         
-        const checkers = this.modelManager.getModel('checkers');
-        this.scene.add(checkers);
+        const tilemap = mapToMeshes(MAP_TEST);
+        for (const tile of tilemap) {
+            this.scene.add(tile);
+        }
 
         const inputEntity = this.world.createEntity()
         inputEntity

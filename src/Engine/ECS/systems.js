@@ -24,8 +24,8 @@ export class MoveSystem extends System {
             let newDir = new Vector3(0, 0, 0);
             if (inputState.left.down) newDir.x -= 1;
             if (inputState.right.down) newDir.x += 1;
-            if (inputState.up.down) newDir.z -= 1;
-            if (inputState.down.down) newDir.z += 1;
+            if (inputState.up.down) newDir.y += 1;
+            if (inputState.down.down) newDir.y -= 1;
             vectors.direction = newDir.normalize();
         }
     }
