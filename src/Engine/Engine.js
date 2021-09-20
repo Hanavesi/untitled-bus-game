@@ -38,10 +38,10 @@ export class Engine {
         const knight = new SkinInstance(this.modelManager.models['knight'], this.scene);
         let entity = this.world.createEntity();
         entity
-        .addComponent(Vectors, { direction: new THREE.Vector3(1,0,0), speed: 10 })
-        .addComponent(Object3D, { object:  knight.animRoot })
-        .addComponent(Playable);
-        
+            .addComponent(Vectors, { direction: new THREE.Vector3(1, 0, 0), speed: 10 })
+            .addComponent(Object3D, { object: knight.animRoot })
+            .addComponent(Playable);
+
         const tilemap = mapToMeshes(MAP_TEST);
         for (const tile of tilemap) {
             this.scene.add(tile);
@@ -53,6 +53,9 @@ export class Engine {
 
         this.addLight(5, 5, 2);
         this.addLight(-5, 5, 2);
+
+        const light = new THREE.AmbientLight(0x404040); // soft white light
+        this.scene.add(light);
 
         this.loop(0);
     }
