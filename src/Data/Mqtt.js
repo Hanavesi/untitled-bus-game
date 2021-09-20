@@ -36,14 +36,16 @@ export class Mqtt {
         //this.client.subscribe(topic2, { qos: 1 });
         this.client.on('message', (_, message) => {
             const data = JSON.parse(message);
+            console.log(data);
             const subData = data[Object.keys(data)[0]];
             console.log(this.buses);
             const vehicleNumber = subData.veh.toString().padStart(5, '0');
-            const topic = `/hfp/v2/journey/ongoing/+/bus/+/${vehicleNumber}/#`
+            const operatorId = subData.oper.toString().padStart(4, '0');
+            const topic = `/hfp/v2/journey/ongoing/+/bus/${operatorId}/${vehicleNumber}/#`
             this.subscribe(topic);
             if (Object.keys(this.buses).length === 4) {
                 this.unSubscribe(basicTopic)
-                console.log('unsubscribed');
+                console.log('unsubscribed basic topic');
             }
             this.buses[subData.veh] = { position: Object.keys(data)[0], start: subData.start, long: subData.long, lat: subData.lat, topic: topic };
             setBuses(prev => ({
