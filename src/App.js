@@ -18,7 +18,6 @@ function App() {
 
   return (
     <div>
-      <Game width={800} height={500} />
       <BusList />
     </div>
   );
