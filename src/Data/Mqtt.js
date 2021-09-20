@@ -26,19 +26,33 @@ export class Mqtt {
         this.client.unsubscribe(topic, { qos: 1 });
     }
 
+    close() {
+        this.client.end();
+    }
+
+    singleTopic(topic, callBack) {
+        this.client.subscribe(topic, { qos: 1 });
+        this.client.on('message', (_, message) => {
+            const data = JSON.parse(message);
+            const subData = data[Object.keys(data)[0]];
+            console.log(data);
+            callBack(prev => ({
+                ...prev, [subData.veh]: { position: Object.keys(data)[0], start: subData.start, long: subData.long, lat: subData.lat, topic: topic }
+            }))
+        })
+    }
+
     getBuses(setBuses) {
         const date = new Date();
         const time = date.getHours() + ':' + date.getMinutes();
-        const basicTopic = `/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/${time}/#`;
-        //const topic2 = "/hfp/v2/journey/ongoing/+/bus/+/+/2104/2/#";
+        //const basicTopic = `/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/${time}/#`;
+        const basicTopic = "/hfp/v2/journey/ongoing/+/bus/#";
 
         this.client.subscribe(basicTopic, { qos: 1 });
         //this.client.subscribe(topic2, { qos: 1 });
         this.client.on('message', (_, message) => {
             const data = JSON.parse(message);
-            console.log(data);
             const subData = data[Object.keys(data)[0]];
-            console.log(this.buses);
             const vehicleNumber = subData.veh.toString().padStart(5, '0');
             const operatorId = subData.oper.toString().padStart(4, '0');
             const topic = `/hfp/v2/journey/ongoing/+/bus/${operatorId}/${vehicleNumber}/#`
@@ -46,6 +60,7 @@ export class Mqtt {
             if (Object.keys(this.buses).length === 4) {
                 this.unSubscribe(basicTopic)
                 console.log('unsubscribed basic topic');
+                this.close();
             }
             this.buses[subData.veh] = { position: Object.keys(data)[0], start: subData.start, long: subData.long, lat: subData.lat, topic: topic };
             setBuses(prev => ({

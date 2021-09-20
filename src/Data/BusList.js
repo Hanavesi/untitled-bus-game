@@ -10,10 +10,16 @@ const BusList = () => {
         mqtt.getBuses(setBuses);
     }, []);
 
+    const clickEvent = (topic) => {
+        mqtt.connect();
+        mqtt.singleTopic(topic, setBuses);
+        setBuses({});
+    }
+
     return (
         <ul>
             {Object.keys(buses).map(bus => {
-                return <li>{bus}: {buses[bus].position}, {buses[bus].lat}, {buses[bus].long}, {buses[bus].start}, {buses[bus].topic}</li>
+                return <li onClick={() => clickEvent(buses[bus].topic)}>{bus}: {buses[bus].position}, {buses[bus].lat}, {buses[bus].long}, {buses[bus].start}, {buses[bus].topic}</li>
             })}
         </ul>
     )
