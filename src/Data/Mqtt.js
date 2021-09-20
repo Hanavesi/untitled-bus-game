@@ -40,6 +40,7 @@ export class Mqtt {
             console.log(this.buses);
             const vehicleNumber = subData.veh.toString().padStart(5, '0');
             const topic = `/hfp/v2/journey/ongoing/+/bus/+/${vehicleNumber}/#`
+            this.subscribe(topic);
             if (Object.keys(this.buses).length === 4) {
                 this.unSubscribe(basicTopic)
                 console.log('unsubscribed');
