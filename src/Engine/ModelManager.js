@@ -1,5 +1,6 @@
 import { LoadingManager } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { clone } from "three/examples/jsm/utils/SkeletonUtils";
 
 
 export class ModelManager {
@@ -37,6 +38,19 @@ export class ModelManager {
                 model.gltf = gltf;
             });
         })
+    }
+
+    /**
+     * 
+     * @param {string} name 
+     * @returns clone of a model's Object3D
+     */
+    getModel(name) {
+        const model = this.models[name];
+        if (model !== undefined) {
+            return clone(model.gltf.scene);
+        }
+        return null;
     }
 
 }

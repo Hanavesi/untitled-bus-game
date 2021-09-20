@@ -1,6 +1,8 @@
 import { World } from "ecsy";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { Input, Object3D, Playable, Vectors } from "./ECS/components";
+import { initWorld } from "./ECS/initializer";
 import { InputManager } from "./InputManager";
 import { ModelManager } from "./ModelManager";
 import { SkinInstance } from "./SkinInstance";
@@ -10,7 +12,7 @@ export class Engine {
     constructor(canvas, width, height, onReady) {
         this.inputManager = new InputManager();
         this.lastFrame = 0;
-        this.world = new World(); // ecsy world object
+        this.world = initWorld();
         this.camera = new THREE.PerspectiveCamera(45, width / height, 0.005, 10000);
         this.camera.position.set(0, 20, 40);
         const controls = new OrbitControls(this.camera, canvas);
@@ -30,11 +32,17 @@ export class Engine {
     }
 
     init() {
-        this.knight = new SkinInstance(this.modelManager.models['knight'], this.scene);
-        this.test = new SkinInstance(this.modelManager.models['knight'], this.scene);
-        this.knight.setAnimation('Run');
-        this.test.setAnimation('Idle');
-        this.test.animRoot.position.x = 2;
+        const knight = new SkinInstance(this.modelManager.models['knight'], this.scene);
+        console.log(knight);
+        const entity = this.world.createEntity();
+        entity
+            .addComponent(Vectors, { direction: new THREE.Vector3(1,0,0), speed: 10 })
+            .addComponent(Object3D, { object:  knight.animRoot })
+            .addComponent(Playable);
+
+        const inputEntity = this.world.createEntity()
+        inputEntity
+            .addComponent(Input, { state: this.inputManager.keys })
 
         this.addLight(5, 5, 2);
         this.addLight(-5, 5, 2);
@@ -66,9 +74,8 @@ export class Engine {
             console.log("b")
         };
 
+        this.world.execute(deltaTime, now);
         this.inputManager.update();
-        this.knight.update(deltaTime);
-        this.test.update(deltaTime);
 
         this.renderer.render(this.scene, this.camera);
         requestAnimationFrame(this.loop.bind(this));
