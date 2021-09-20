@@ -1,17 +1,20 @@
 import { World } from "ecsy";
 import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { clone } from "three/examples/jsm/utils/SkeletonUtils";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { Input, Object3D, Playable, Vectors } from "./ECS/components";
+import { initWorld } from "./ECS/initializer";
 import { InputManager } from "./InputManager";
+import { ModelManager } from "./ModelManager";
+import { SkinInstance } from "./SkinInstance";
 
 export class Engine {
 
     constructor(canvas, width, height, onReady) {
         this.inputManager = new InputManager();
         this.lastFrame = 0;
-        this.world = new World(); // ecsy world object
+        this.world = initWorld();
         this.camera = new THREE.PerspectiveCamera(45, width / height, 0.005, 10000);
+        //this.camera = new THREE.OrthographicCamera(width / -20, width / 20, height / 20, height / -20, 1, 1000);
         this.camera.position.set(0, 20, 40);
         const controls = new OrbitControls(this.camera, canvas);
         controls.target.set(0, 0, 0);
@@ -20,58 +23,29 @@ export class Engine {
         this.scene.background = new THREE.Color('white');
         this.renderer = new THREE.WebGLRenderer({ canvas });
         this.renderer.render(this.scene, this.camera);
-        this.animationMixers = [];
-        this.assetLoader(onReady);
-    }
 
-    assetLoader(onReady) {
-        const manager = new THREE.LoadingManager();
-        const models = [];
-        models.push({ url: 'assets/knight.gltf', gltf: undefined, animations: [] });
-
-        manager.onLoad = () => {
-            this.init(models);
+        this.modelManager = new ModelManager();
+        this.modelManager.setModels(['knight.gltf', 'checkers.gltf']);
+        this.modelManager.load(() => {
+            this.init();
             onReady(true);
-        };
-        const loader = new GLTFLoader(manager);
-
-        for (const model of models) {
-            loader.load(model.url, (gltf) => {
-                model.gltf = gltf;
-            });
-        }
-        console.log(models);
-    }
-
-    prepModelsAndAnimations(models) {
-        models.forEach(model => {
-            const animsByName = {};
-            console.log(model);
-            model.gltf.animations.forEach(clip => {
-                animsByName[clip.name] = clip;
-            });
-            model.animations = animsByName;
         });
     }
 
-    init(models) {
-        console.log('done');
-        this.prepModelsAndAnimations(models);
+    init() {
+        const knight = new SkinInstance(this.modelManager.models['knight'], this.scene);
+        let entity = this.world.createEntity();
+        entity
+        .addComponent(Vectors, { direction: new THREE.Vector3(1,0,0), speed: 10 })
+        .addComponent(Object3D, { object:  knight.animRoot })
+        .addComponent(Playable);
+        
+        const checkers = this.modelManager.getModel('checkers');
+        this.scene.add(checkers);
 
-        models.forEach((model, index) => {
-            console.log(index);
-            const clonedScene = clone(model.gltf.scene);
-            const root = new THREE.Object3D();
-            root.add(clonedScene);
-            this.scene.add(root);
-            root.position.x = 0;
-
-            const mixer = new THREE.AnimationMixer(clonedScene);
-            const firstClip = Object.values(model.animations)[3];
-            const action = mixer.clipAction(firstClip);
-            action.play();
-            this.animationMixers.push(mixer);
-        });
+        const inputEntity = this.world.createEntity()
+        inputEntity
+            .addComponent(Input, { state: this.inputManager.keys })
 
         this.addLight(5, 5, 2);
         this.addLight(-5, 5, 2);
@@ -96,12 +70,15 @@ export class Engine {
         if (this.inputManager.keys.down.justPressed) {
             console.log("down")
         };
+        if (this.inputManager.keys.a.justPressed) {
+            console.log("a")
+        };
+        if (this.inputManager.keys.b.justPressed) {
+            console.log("b")
+        };
 
+        this.world.execute(deltaTime, now);
         this.inputManager.update();
-
-        for (const mixer of this.animationMixers) {
-            mixer.update(deltaTime);
-        }
 
         this.renderer.render(this.scene, this.camera);
         requestAnimationFrame(this.loop.bind(this));
