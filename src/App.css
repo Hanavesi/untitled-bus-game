@@ -2,6 +2,7 @@
   text-align: center;
 }
 
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -27,7 +28,14 @@
 .App-link {
   color: #61dafb;
 }
-
+ 
+img {
+  height: 32px;
+  width: 32px;
+  transform: scaleX(1);
+  transform: scaleY(1.15)
+}
+ 
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
