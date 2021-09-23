@@ -22,11 +22,10 @@ export class InputManager {
       setKey(keyName, pressed);
     };
 
-    addKey(37, 'left');
-    addKey(39, 'right');
-    addKey(38, 'up');
-    addKey(40, 'down');
-    addKey(65, 'a');
+    addKey(65, 'left');
+    addKey(68, 'right');
+    addKey(87, 'up');
+    addKey(83, 'down');
     addKey(66, 'b');
 
     window.addEventListener('keydown', (e) => {
