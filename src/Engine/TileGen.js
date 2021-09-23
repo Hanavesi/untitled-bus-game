@@ -33,6 +33,10 @@ const idToSrc = (id) => {
             return "images/bench.png";
         case 5:
             return "images/door.png";
+        case 6:
+            return "images/back_window.png"
+        case 7:
+            return "images/rear_window.png"
 
         default:
             return "images/floor.png";
