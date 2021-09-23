@@ -1,5 +1,5 @@
 import { clone } from "three/examples/jsm/utils/SkeletonUtils";
-import { AnimationMixer } from "three";
+import { AnimationMixer, Group } from "three";
 
 
 export class SkinInstance {
@@ -9,9 +9,11 @@ export class SkinInstance {
      */
     constructor(model, scene) {
         this.model = model;
+        this.moveRoot = new Group();
         this.animRoot = clone(this.model.gltf.scene);
         this.mixer = new AnimationMixer(this.animRoot);
-        scene.add(this.animRoot);
+        this.moveRoot.add(this.animRoot);
+        scene.add(this.moveRoot);
         this.actions = {};
     }
 
