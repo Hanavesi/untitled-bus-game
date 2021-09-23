@@ -35,14 +35,29 @@ MoveSystem.queries = {
     entities: { components: [Object3D, Vectors, Playable] },
     inputState: { components: [Input] }
 }
-
+// TODO: move animation handling to a different system and maybe component
 export class UpdateVectorsSystem extends System {
     execute(delta) {
         const entities = this.queries.entities.results;
         for (const entity of entities) {
-            const object = entity.getComponent(Object3D).object;
+            const skin = entity.getComponent(Object3D).skin;
+            const moveRoot = skin.moveRoot;
             const vectors = entity.getComponent(Vectors);
-            object.translateOnAxis(vectors.direction, vectors.speed * delta);
+            const animRoot = skin.animRoot;
+            moveRoot.translateOnAxis(vectors.direction, vectors.speed * delta);
+            skin.update(delta);
+
+            // wacky solution to rotate moving objects according to direction
+            const x = vectors.direction.x;
+            const y = vectors.direction.y;
+
+            if (x === 0 && y === 0) { // If standing still, look "down"
+                animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), Math.PI*2);
+            } else {
+                const angle = Math.atan2(x,-y);
+                animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), angle);    
+            }
+            animRoot.rotateOnWorldAxis(new Vector3(1,0,0), 0.8);
         }
     }
 }

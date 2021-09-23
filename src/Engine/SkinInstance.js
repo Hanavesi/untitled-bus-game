@@ -19,6 +19,7 @@ export class SkinInstance {
 
     setAnimation(animName) {
         const clip = this.model.animations[animName];
+        
         // turn off all current actions
         for (const action of Object.values(this.actions)) {
             action.enabled = false;

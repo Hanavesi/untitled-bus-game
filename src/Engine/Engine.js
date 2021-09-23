@@ -36,12 +36,11 @@ export class Engine {
 
     init() {
         const knight = new SkinInstance(this.modelManager.models['knight'], this.scene);
-        knight.animRoot.rotateOnWorldAxis(new THREE.Vector3(0,1,0), Math.PI/2);
-        knight.animRoot.rotateOnWorldAxis(new THREE.Vector3(1,0,0), 0.8);
+        knight.setAnimation('Run');
         let entity = this.world.createEntity();
         entity
             .addComponent(Vectors, { direction: new THREE.Vector3(1, 0, 0), speed: 20 })
-            .addComponent(Object3D, { object: knight.moveRoot })
+            .addComponent(Object3D, { skin: knight })
             .addComponent(Playable);
 
         const tilemap = mapToMeshes(MAP_TEST);
