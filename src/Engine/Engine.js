@@ -38,7 +38,7 @@ export class Engine {
         const knight = new SkinInstance(this.modelManager.models['knight'], this.scene);
         let entity = this.world.createEntity();
         entity
-            .addComponent(Vectors, { direction: new THREE.Vector3(1, 0, 0), speed: 10 })
+            .addComponent(Vectors, { direction: new THREE.Vector3(1, 0, 0), speed: 20 })
             .addComponent(Object3D, { object: knight.animRoot })
             .addComponent(Playable);
 
