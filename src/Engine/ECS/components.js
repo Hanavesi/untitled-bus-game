@@ -13,9 +13,8 @@ Object3D.schema = {
 export class Tile extends Component { }
 
 Tile.schema = {
-    x: { type: Types.Number },
-    y: { type: Types.Number },
-    size: { type: Types.Number }
+    position: { type: Types.Ref },
+    size: { type: Types.Ref }
 };
 
 // Position component
@@ -44,5 +43,5 @@ Input.schema = {
 export class HitBox extends Component { }
 
 HitBox.schema = {
-    size: { type: Types.Number }
+    size: { type: Types.Ref }
 };

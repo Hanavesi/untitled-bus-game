@@ -1,6 +1,6 @@
 import { World } from "ecsy";
 import { Vectors, Object3D, Playable, Input, Tile, HitBox } from "./components";
-import { CollisionSystem, MoveSystem, UpdateVectorsSystem } from "./systems";
+import { MoveSystem, UpdateVectorsSystem } from "./systems";
 
 export const initWorld = () => {
     const world = new World();
@@ -15,7 +15,6 @@ export const initWorld = () => {
 
     world
         .registerSystem(MoveSystem)
-        .registerSystem(CollisionSystem)
         .registerSystem(UpdateVectorsSystem)
 
     return world;
