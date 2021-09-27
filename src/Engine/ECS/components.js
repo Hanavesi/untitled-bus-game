@@ -40,3 +40,9 @@ export class Input extends Component { }
 Input.schema = {
     state: { type: Types.Ref }
 };
+
+export class HitBox extends Component { }
+
+HitBox.schema = {
+    size: { type: Types.Number }
+};

@@ -1,5 +1,5 @@
 import { clone } from "three/examples/jsm/utils/SkeletonUtils";
-import { AnimationMixer, Group } from "three";
+import { AnimationMixer, Group, Mesh, MeshBasicMaterial, PlaneGeometry } from "three";
 
 
 export class SkinInstance {
@@ -15,6 +15,7 @@ export class SkinInstance {
         this.moveRoot.add(this.animRoot);
         scene.add(this.moveRoot);
         this.actions = {};
+        this.setHitBoxVisible();
     }
 
     setAnimation(animName) {
@@ -34,5 +35,12 @@ export class SkinInstance {
 
     update(deltaTime) {
         this.mixer.update(deltaTime);
+    }
+
+    setHitBoxVisible() {
+        const material = new MeshBasicMaterial({ color: 0xff0000 });
+        const geometry = new PlaneGeometry(2, 2);
+        const plane = new Mesh( geometry, material );
+        this.moveRoot.add(plane);
     }
 }

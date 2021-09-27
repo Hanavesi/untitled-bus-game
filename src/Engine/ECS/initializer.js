@@ -1,5 +1,5 @@
 import { World } from "ecsy";
-import { Vectors, Object3D, Playable, Input, Position, Tile } from "./components";
+import { Vectors, Object3D, Playable, Input, Tile, HitBox } from "./components";
 import { CollisionSystem, MoveSystem, UpdateVectorsSystem } from "./systems";
 
 export const initWorld = () => {
@@ -10,13 +10,13 @@ export const initWorld = () => {
         .registerComponent(Object3D)
         .registerComponent(Playable)
         .registerComponent(Input)
-        .registerComponent(Position)
+        .registerComponent(HitBox)
         .registerComponent(Tile)
 
     world
         .registerSystem(MoveSystem)
-        .registerSystem(UpdateVectorsSystem)
         .registerSystem(CollisionSystem)
+        .registerSystem(UpdateVectorsSystem)
 
     return world;
 }

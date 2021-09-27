@@ -1,7 +1,7 @@
 import { World } from "ecsy";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Input, Object3D, Playable, Vectors, Position, Tile } from "./ECS/components";
+import { Input, Object3D, Playable, Vectors, HitBox, Tile } from "./ECS/components";
 import { initWorld } from "./ECS/initializer";
 import { InputManager } from "./InputManager";
 import { ModelManager } from "./ModelManager";
@@ -42,7 +42,8 @@ export class Engine {
         entity
             .addComponent(Vectors, { direction: new THREE.Vector3(1, 0, 0), speed: 20 })
             .addComponent(Object3D, { skin: this.knight })
-            .addComponent(Playable);
+            .addComponent(Playable)
+            .addComponent(HitBox, { size: 2 });
 
         const tilemap = mapToMeshes(MAP_TEST);
         for (const tile of tilemap) {
@@ -84,7 +85,6 @@ export class Engine {
         };
         if (this.inputManager.keys.down.justPressed) {
             console.log("down")
-            console.log(this.knight.moveRoot.position.x, this.knight.moveRoot.position.y);
         };
 
         if (this.inputManager.keys.b.justPressed) {
