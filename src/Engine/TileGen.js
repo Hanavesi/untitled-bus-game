@@ -14,7 +14,18 @@ export const mapToMeshes = (map) => {
             });
             const geometry = new PlaneGeometry(4, 4);
             const mesh = new Mesh(geometry, material);
-            mesh.position.set(-width * 2 + x*4, height*2 - y*4, -1);
+            mesh.position.set(-width * 2 + x * 4, height * 2 - y * 4, -1);
+            if (tileSrc.includes('floor')) {
+                mesh.name = 'floor';
+            } else if (tileSrc.includes('door')) {
+                mesh.name = 'door';
+            } else if (tileSrc.includes('window')) {
+                mesh.name = 'window';
+            } else if (tileSrc.includes('wall')) {
+                mesh.name = 'wall';
+            } else if (tileSrc.includes('bench')) {
+                mesh.name = 'bench';
+            }
             meshes.push(mesh);
         }
     }
