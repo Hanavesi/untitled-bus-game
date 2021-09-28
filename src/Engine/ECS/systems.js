@@ -1,6 +1,7 @@
 import { System } from "ecsy";
 import { Object3D, Playable, Vectors, Input, Tile, HitBox } from "./components";
 import { Vector3, Vector2 } from "three";
+import { DynamicRectToRect, ResolveDynamicRectToRect } from "../util/collisions";
 
 /* export class RenderingSystem extends System {
     execute(delta) {
@@ -109,120 +110,4 @@ export class UpdateVectorsSystem extends System {
 UpdateVectorsSystem.queries = {
     entities: { components: [Object3D, Vectors, HitBox] },
     tiles: { components: [Tile] }
-}
-
-/**
- * Returns whether point p is inside rect r.
- * @param {Vector2} p 
- * @param {{pos: Vector2, size: Vector2}} r 
- * @returns boolean
- */
-const PointToRect = (p, r) => {
-    return (p.x >= r.pos.x && p.y >= r.pos.y && p.x < r.pos.x + r.size.x && p.y < r.pos.y + r.size.y);
-}
-
-/**
- * 
- * @param {{pos: Vector2, size: Vector2}}} r1 
- * @param {{pos: Vector2, size: Vector2}}} r2 
- * @returns true if given rectangles overlap
- */
-const RectToRect = (r1, r2) => {
-    return (r1.pos.x < r2.pos.x + r2.size.x && r1.pos.x +r1.size.x > r2.pos.x && r1.pos.y < r2.pos.y + r2.size.y && r1.pos.y + r1.size.y > r2.pos.y);
-}
-
-/**
- * 
- * @param {Vector2} rayOrigin 
- * @param {Vector2} rayDir 
- * @param {{pos: Vector2, size: Vector2}} target 
- * @param {{contactNormal: Vector2, contactPoint: Vector2, tHitNear: number}} contactInfo 
- * @returns If the specified ray intersects the target rectangle and modifies the contactInfo object.
- */
-const RayToRect = (rayOrigin, rayDir, target, contactInfo) => {
-    const contactNormal = new Vector2();
-    const contactPoint = new Vector2();
-    let tHitNear;
-
-    const invDir = new Vector2(1 / rayDir.x, 1 / rayDir.y);
-
-    const tNear = new Vector2((target.pos.x - rayOrigin.x) * invDir.x, (target.pos.y - rayOrigin.y) * invDir.y);
-    const tFar = new Vector2((target.pos.x + target.size.x - rayOrigin.x) * invDir.x, (target.pos.y + target.size.y - rayOrigin.y) * invDir.y);
-
-    if (isNaN(tNear.x) || isNaN(tNear.y) || isNaN(tFar.x) || isNaN(tFar.y)) return false;
-
-    if (tNear.x > tFar.x) [tNear.x, tFar.x] = [ tFar.x, tNear.x];
-    if (tNear.y > tFar.y) [tNear.y, tFar.y] = [ tFar.y, tNear.y];
-
-    if (tNear.x > tFar.y || tNear.y > tFar.x) return false;
-
-    tHitNear = Math.max(tNear.x, tNear.y);
-
-    const tHitFar = Math.min(tFar.x, tFar.y);
-
-    if (tHitFar < 0) return false;
-
-    contactPoint.add(rayOrigin).add(new Vector2().add(rayDir).multiplyScalar(tHitNear));
-
-    if (tNear.x > tNear.y) {
-        if (invDir.x < 0) {
-            contactNormal.add(new Vector2(1, 0));
-        } else {
-            contactNormal.add(new Vector2(-1, 0));
-        }
-    } else if (tNear.x < tNear.y) {
-        if (invDir.y < 0) {
-            contactNormal.add(new Vector2(0, 1));
-        } else {
-            contactNormal.add(new Vector2(0, -1));
-        }
-    }
-
-    contactInfo.contactNormal = contactNormal;
-    contactInfo.contactPoint = contactPoint;
-    contactInfo.tHitNear = tHitNear;
-    return true;
-}
-
-/**
- * Checks whether a dynamic (moving) rectangle collides with a static rectangle and returns
- * collision data in contactInfo object. It contains the normal vector, the
- * contact point and the "time" of the collision.
- * @param {{pos: Vector2, size: Vector2}} dr dynamic rectangle that is moving
- * @param {Vector2} vel dynamic rectangle's velocity
- * @param {number} delta delta time
- * @param {{pos: Vector2, size: Vector2}} sr static rectangle
- * @param {{contactNormal: Vector2, contactPoint: Vector2, tHitNear: number}} contactInfo 
- * @returns true when colliding and modifies provided contactInfo object with collison data.
- */
-const DynamicRectToRect = (dr, vel, delta, sr, contactInfo) => {
-    if (vel.x === 0 && vel.y === 0) {
-        return false;
-    }
-    const expandedTarget = {
-        pos: new Vector2().addVectors(sr.pos.clone(), dr.size.clone().multiplyScalar(-0.5)),
-        size: new Vector2().addVectors(sr.size, dr.size)
-    };
-
-    if (RayToRect(new Vector2().addVectors(dr.pos, dr.size.clone().multiplyScalar(0.5)), vel.clone().multiplyScalar(delta), expandedTarget, contactInfo))
-        return (contactInfo.tHitNear >= 0 && contactInfo.tHitNear <= 1);
-    else
-        return false;
-}
-
-/**
- * Resolves collision of a dynamic rectangle on a static rectangle and modifies the velocity vector as nevessary.
- * @param {{pos: Vector2, size: Vector2}} dr dynamic rectangle that is moving
- * @param {Vector2} vel dynamic rectangle's velocity
- * @param {number} delta delta time
- * @param {{pos: Vector2, size: Vector2}} sr static rectangle
- * @returns boolean on whether collision happens or not
- */
-const ResolveDynamicRectToRect = (dr, vel, delta, sr) => {
-    const contactInfo = {contactNormal: null, contactPoint: null, tHitNear: null};
-    if (DynamicRectToRect(dr, vel, delta, sr, contactInfo)) {
-        vel.addVectors(vel, new Vector2(Math.abs(vel.x), Math.abs(vel.y)).multiply(contactInfo.contactNormal).multiplyScalar(1 - contactInfo.tHitNear));
-        return true;
-    }
-    return false;
 }
