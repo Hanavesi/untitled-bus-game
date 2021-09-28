@@ -44,39 +44,57 @@ export class UpdateVectorsSystem extends System {
             const skin = entity.getComponent(Object3D).skin;
             const moveRoot = skin.moveRoot;
             const vectors = entity.getComponent(Vectors);
-            const animRoot = skin.animRoot;
-            moveRoot.translateOnAxis(vectors.direction, vectors.speed * delta);
             skin.update(delta);
 
-            const hitBox = entity.getComponent(HitBox);
-            for (const obj of tiles) {
-                // bottomleft corner
-                let entityX = moveRoot.position.x - hitBox.size.x / 2;
-                let entityY = moveRoot.position.y - hitBox.size.y / 2;
-                const r1 = { pos: new Vector2(entityX, entityY), size: hitBox.size };
+            // initializing some arrays that hold collision data
+            const collisions = [];
+            const tileBoxes = [];
 
+            const hitBox = entity.getComponent(HitBox);
+            const vel = new Vector2(vectors.direction.x, vectors.direction.y).multiplyScalar(vectors.speed);
+            // gathering required data from moving entity for AABB collision calculations
+            let entityX = moveRoot.position.x - hitBox.size.x / 2;
+            let entityY = moveRoot.position.y - hitBox.size.y / 2;
+            const r1 = { pos: new Vector2(entityX, entityY), size: hitBox.size };
+
+            // First check for collision on the current frame
+            for (let i = 0, obj; obj=tiles[i]; i++) {
+                // gathering the same data for static collidable tiles
+                // TODO: optimize this by only checking tiles close to the entity
                 const tile = obj.getComponent(Tile);
                 let tileX = tile.position.x - tile.size.x / 2;
                 let tileY = tile.position.y - tile.size.y / 2;
                 const r2 = { pos: new Vector2(tileX, tileY), size: tile.size };
-                if (RectToRect(r1, r2)) {
-                    //console.log(r2, moveRoot.position);
-                }
 
-                const rayOrigin = new Vector2(moveRoot.position.x, moveRoot.position.y);
-                const rayDir = rayOrigin.clone().negate();
-                const contactInfo = {contactNormal: null, contactPoint: null, tHitNear: null};
+                // saving the tile bounding box for possible collision resolution
+                tileBoxes.push(r2);
 
-                if (RayToRect(rayOrigin, rayDir, r2, contactInfo)) {
-                    if (contactInfo.tHitNear >= 0 && contactInfo.tHitNear < 1)
-                        console.log(contactInfo, r2, rayDir);
+                // initializing contactInfo object that holds the data through collision caltulations
+                const contactInfo = {contactNormal: null, contactPoint: null, tHitNear: 0};
+
+                // If collision is detected, get tile index and collision "time" for collision resolution.
+                // The time is basically just a scalar value that tells when the first collision happens
+                // on one of the axes
+                if(DynamicRectToRect(r1, vel, delta, r2, contactInfo)) {
+                    collisions.push({ index: i, time: contactInfo.tHitNear });
                 }
             }
+
+            // sort the collisions based on collision time
+            collisions.sort((a, b) => a.time - b.time);
+            
+            // resolve the collisions in order
+            for (const collision of collisions) {
+                ResolveDynamicRectToRect(r1, vel, delta, tileBoxes[collision.index])
+            }
+            
+            moveRoot.translateX(vel.x * delta);
+            moveRoot.translateY(vel.y * delta);
 
             // wacky solution to rotate moving objects according to direction
             const x = vectors.direction.x;
             const y = vectors.direction.y;
-
+            const animRoot = skin.animRoot;
             if (x === 0 && y === 0) { // If standing still, look "down"
                 animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), Math.PI * 2);
             } else {
@@ -93,14 +111,34 @@ UpdateVectorsSystem.queries = {
     tiles: { components: [Tile] }
 }
 
+/**
+ * Returns whether point p is inside rect r.
+ * @param {Vector2} p 
+ * @param {{pos: Vector2, size: Vector2}} r 
+ * @returns boolean
+ */
 const PointToRect = (p, r) => {
     return (p.x >= r.pos.x && p.y >= r.pos.y && p.x < r.pos.x + r.size.x && p.y < r.pos.y + r.size.y);
 }
 
+/**
+ * 
+ * @param {{pos: Vector2, size: Vector2}}} r1 
+ * @param {{pos: Vector2, size: Vector2}}} r2 
+ * @returns true if given rectangles overlap
+ */
 const RectToRect = (r1, r2) => {
     return (r1.pos.x < r2.pos.x + r2.size.x && r1.pos.x +r1.size.x > r2.pos.x && r1.pos.y < r2.pos.y + r2.size.y && r1.pos.y + r1.size.y > r2.pos.y);
 }
 
+/**
+ * 
+ * @param {Vector2} rayOrigin 
+ * @param {Vector2} rayDir 
+ * @param {{pos: Vector2, size: Vector2}} target 
+ * @param {{contactNormal: Vector2, contactPoint: Vector2, tHitNear: number}} contactInfo 
+ * @returns If the specified ray intersects the target rectangle and modifies the contactInfo object.
+ */
 const RayToRect = (rayOrigin, rayDir, target, contactInfo) => {
     const contactNormal = new Vector2();
     const contactPoint = new Vector2();
@@ -144,4 +182,47 @@ const RayToRect = (rayOrigin, rayDir, target, contactInfo) => {
     contactInfo.contactPoint = contactPoint;
     contactInfo.tHitNear = tHitNear;
     return true;
+}
+
+/**
+ * Checks whether a dynamic (moving) rectangle collides with a static rectangle and returns
+ * collision data in contactInfo object. It contains the normal vector, the
+ * contact point and the "time" of the collision.
+ * @param {{pos: Vector2, size: Vector2}} dr dynamic rectangle that is moving
+ * @param {Vector2} vel dynamic rectangle's velocity
+ * @param {number} delta delta time
+ * @param {{pos: Vector2, size: Vector2}} sr static rectangle
+ * @param {{contactNormal: Vector2, contactPoint: Vector2, tHitNear: number}} contactInfo 
+ * @returns true when colliding and modifies provided contactInfo object with collison data.
+ */
+const DynamicRectToRect = (dr, vel, delta, sr, contactInfo) => {
+    if (vel.x === 0 && vel.y === 0) {
+        return false;
+    }
+    const expandedTarget = {
+        pos: new Vector2().addVectors(sr.pos.clone(), dr.size.clone().multiplyScalar(-0.5)),
+        size: new Vector2().addVectors(sr.size, dr.size)
+    };
+
+    if (RayToRect(new Vector2().addVectors(dr.pos, dr.size.clone().multiplyScalar(0.5)), vel.clone().multiplyScalar(delta), expandedTarget, contactInfo))
+        return (contactInfo.tHitNear >= 0 && contactInfo.tHitNear <= 1);
+    else
+        return false;
+}
+
+/**
+ * Resolves collision of a dynamic rectangle on a static rectangle and modifies the velocity vector as nevessary.
+ * @param {{pos: Vector2, size: Vector2}} dr dynamic rectangle that is moving
+ * @param {Vector2} vel dynamic rectangle's velocity
+ * @param {number} delta delta time
+ * @param {{pos: Vector2, size: Vector2}} sr static rectangle
+ * @returns boolean on whether collision happens or not
+ */
+const ResolveDynamicRectToRect = (dr, vel, delta, sr) => {
+    const contactInfo = {contactNormal: null, contactPoint: null, tHitNear: null};
+    if (DynamicRectToRect(dr, vel, delta, sr, contactInfo)) {
+        vel.addVectors(vel, new Vector2(Math.abs(vel.x), Math.abs(vel.y)).multiply(contactInfo.contactNormal).multiplyScalar(1 - contactInfo.tHitNear));
+        return true;
+    }
+    return false;
 }

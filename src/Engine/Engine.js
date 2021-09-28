@@ -40,7 +40,7 @@ export class Engine {
         this.knight.setAnimation('Run');
         let entity = this.world.createEntity();
         entity
-            .addComponent(Vectors, { direction: new THREE.Vector3(1, 0, 0), speed: 5 })
+            .addComponent(Vectors, { direction: new THREE.Vector3(1, 0, 0), speed: 300 })
             .addComponent(Object3D, { skin: this.knight })
             .addComponent(Playable)
             .addComponent(HitBox, { size: new THREE.Vector2(2, 2) });
@@ -50,13 +50,16 @@ export class Engine {
             this.scene.add(tile);
             if (tile.name === 'floor') continue;
             entity = this.world.createEntity();
-            entity.addComponent(Tile, { position: new THREE.Vector2(tile.position.x, tile.position.y), size: new THREE.Vector2(4, 4) });
-            const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            // Perhaps because of some black magic, the player may walk through s certain few of the tiles when
+            // tile size is set to 4. It may still happen but I haven't been able to recreate it
+            entity.addComponent(Tile, { position: new THREE.Vector2(tile.position.x, tile.position.y), size: new THREE.Vector2(3.8, 3.8) });
+            // debug collision tiles
+            /* const material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); 
             const geometry = new THREE.PlaneGeometry(4, 4);
             const plane = new THREE.Mesh(geometry, material);
             plane.position.x = tile.position.x;
             plane.position.y = tile.position.y;
-            this.scene.add(plane);
+            this.scene.add(plane); */
         }
 
 
@@ -70,10 +73,6 @@ export class Engine {
 
         const light = new THREE.AmbientLight(0x404040); // soft white light
         this.scene.add(light);
-        const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-        const geometry = new THREE.PlaneGeometry();
-        const plane = new THREE.Mesh(geometry, material);
-        this.scene.add(plane);
 
         this.loop(0);
     }
@@ -84,7 +83,7 @@ export class Engine {
         const deltaTime = now - this.lastFrame;
         this.lastFrame = now;
 
-        if (this.inputManager.keys.left.justPressed) {
+        /* if (this.inputManager.keys.left.justPressed) {
             console.log("left")
         };
         if (this.inputManager.keys.right.justPressed) {
@@ -99,7 +98,7 @@ export class Engine {
 
         if (this.inputManager.keys.b.justPressed) {
             console.log("b")
-        };
+        }; */
 
         this.world.execute(deltaTime, now);
         this.inputManager.update();
