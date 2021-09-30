@@ -39,7 +39,7 @@ export class SkinInstance {
 
     setHitBoxVisible() {
         const material = new MeshBasicMaterial({ color: 0xff0000 });
-        const geometry = new PlaneGeometry(2, 2);
+        const geometry = new PlaneGeometry(1.5,1.5);
         const plane = new Mesh( geometry, material );
         this.moveRoot.add(plane);
     }

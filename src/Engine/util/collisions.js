@@ -137,7 +137,7 @@ export const DynamicRectToRect = (dr, vel, delta, sr, contactInfo) => {
     }
     const expandedTarget = {
         pos: new Vector2().addVectors(sr.pos.clone(), dr.size.clone().multiplyScalar(-0.5)),
-        size: new Vector2().addVectors(sr.size.clone().multiplyScalar(0.01), dr.size)
+        size: new Vector2().addVectors(sr.size, dr.size)
     };
 
     if (RayToRect(new Vector2().addVectors(dr.pos, dr.size.clone().multiplyScalar(0.5)), vel.clone().multiplyScalar(delta), expandedTarget, contactInfo))
