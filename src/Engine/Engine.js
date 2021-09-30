@@ -40,7 +40,7 @@ export class Engine {
         this.knight.setAnimation('Run');
         let entity = this.world.createEntity();
         entity
-            .addComponent(Vectors, { direction: new THREE.Vector3(1, 0, 0), speed: 300 })
+            .addComponent(Vectors, { direction: new THREE.Vector3(1, 0, 0), speed: 20 })
             .addComponent(Object3D, { skin: this.knight })
             .addComponent(Playable)
             .addComponent(HitBox, { size: new THREE.Vector2(2, 2) });
@@ -52,7 +52,7 @@ export class Engine {
             entity = this.world.createEntity();
             // Perhaps because of some black magic, the player may walk through s certain few of the tiles when
             // tile size is set to 4. It may still happen but I haven't been able to recreate it
-            entity.addComponent(Tile, { position: new THREE.Vector2(tile.position.x, tile.position.y), size: new THREE.Vector2(3.8, 3.8) });
+            entity.addComponent(Tile, { position: new THREE.Vector2(tile.position.x, tile.position.y), size: new THREE.Vector2(4, 4) });
             // debug collision tiles
             /* const material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); 
             const geometry = new THREE.PlaneGeometry(4, 4);
