@@ -4,6 +4,7 @@ import Game from './Game';
 import React from 'react';
 import { Mqtt } from './Data/Mqtt';
 import BusList from './Data/BusList';
+import BusMap from './Data/BusMap';
 
 function App() {
 
@@ -18,7 +19,7 @@ function App() {
 
   return (
     <div>
-      <BusList />
+      <BusMap />
     </div>
   );
 }
