@@ -1,75 +1,69 @@
-import React, { useEffect, useState } from 'react';
 import mqtt from 'mqtt';
 
-export class Mqtt {
-
+export class MqttHandler {
     constructor() {
-        this.buses = [];
-        this.messageCount = 0;
+        this.client = null;
+        this.connectStatus = "Connect";
+        this.subscriptions = [];
     }
 
-    connect() {
-        this.client = mqtt.connect('wss://mqtt.hsl.fi:443/');
-        this.client.on('connect', () => {
-            console.log('client connected');
-        });
-        this.client.on('error', (err) => {
-            console.log('connection error', err);
-        });
+    connect = (host, connectCallback, messageCallback) => {
+        this.connectStatus = "Connecting";
+        this.client = mqtt.connect(host);
+
+        if (this.client) {
+            this.client.on("connect", () => {
+                this.connectStatus = "Connected";
+                connectCallback();
+            });
+            this.client.on("error", (err) => {
+                console.error("Connection error: ", err);
+                this.client.end();
+            });
+            this.client.on("reconnect", () => {
+                this.connectStatus = "Reconnecting";
+            });
+            this.client.on("message", (topic, message) => {
+                const payload = { topic, message: message.toString() };
+                if (payload.topic) {
+                    messageCallback(payload.message);
+                }
+            });
+        }
     }
 
-    subscribe(topic) {
-        this.client.subscribe(topic, { qos: 1 });
+    subscribe = (topic, qos = 1) => {
+        if (this.client) {
+            this.client.subscribe(topic, { qos }, (error) => {
+                if (error) {
+                    console.log(`Failed to subscribe to topic ${topic}`, error);
+                    return;
+                }
+                this.subscriptions.push(topic);
+            });
+        }
     }
 
-    unSubscribe(topic) {
-        console.log('unsubscribing -- ', topic)
-        this.client.unsubscribe(topic, { qos: 1 });
+    unsubscribe = (topic) => {
+        if (this.client) {
+            this.client.unsubscribe(topic, (error) => {
+                if (error) {
+                    console.log(`Failed to unsubscribe to topic ${topic}`, error);
+                    return;
+                }
+                this.subscriptions.filter(item => item !== topic);
+            });
+        }
     }
 
-    close() {
+    disconnect = (callback) => {
         console.log(this.client);
-    }
-
-    singleTopic(topic, callBack) {
-        this.client.subscribe(topic, { qos: 1 });
-        this.client.on('message', (_, message) => {
-            const data = JSON.parse(message);
-            const subData = data[Object.keys(data)[0]];
-            console.log(data);
-            callBack(prev => ({
-                ...prev, [subData.veh]: { position: Object.keys(data)[0], start: subData.start, long: subData.long, lat: subData.lat, topic: topic }
-            }))
-        })
-    }
-
-    getBuses(setBuses) {
-        const date = new Date();
-        const time = date.getHours() + ':' + date.getMinutes();
-        const basicTopic = `/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/${time}/#`;
-        //const basicTopic = "/hfp/v2/journey/ongoing/+/bus/#";
-
-        this.client.subscribe(basicTopic, { qos: 1 });
-        //this.client.subscribe(topic2, { qos: 1 });
-        this.client.on('message', (_, message) => {
-            const data = JSON.parse(message);
-            const subData = data[Object.keys(data)[0]];
-            const vehicleNumber = subData.veh.toString().padStart(5, '0');
-            const operatorId = subData.oper.toString().padStart(4, '0');
-            const topic = `/hfp/v2/journey/ongoing/+/bus/${operatorId}/${vehicleNumber}/#`;
-            if (!vehicleNumber in this.buses) {
-                console.log(this.buses);
-                this.buses.push(vehicleNumber);
-                this.subscribe(topic);
-            }
-            if (this.buses.length >= 4) {
-                this.unSubscribe(basicTopic);
-                this.buses = [];
-                console.log('unsubscribed basic topic');
-            }
-            setBuses(prev => ({
-                ...prev, [subData.veh]: { position: Object.keys(data)[0], start: subData.start, long: subData.long, lat: subData.lat, topic: topic }
-            }))
-        })
+        if (this.client) {
+            this.client.end(() => {
+                this.connectStatus = false;
+                this.subscriptions = [];
+                callback();
+            });
+        }
     }
 }
