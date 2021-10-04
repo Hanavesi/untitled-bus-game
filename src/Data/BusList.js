@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { MqttHandler } from "./Mqtt";
 
-var L = require('leaflet');
+const L = require('leaflet');
 const topicAreas = [
     '60;24/19/50', '60;24/19/51',
     '60;24/19/52', '60;24/19/53',
@@ -20,10 +20,11 @@ const topicAreas = [
 ];
 
 const BusList = () => {
-    const [buses, setBuses] = useState({});
+    //const [buses, setBuses] = useState({});
+    let buses = {};
     const topic = "/hfp/v2/journey/ongoing/+/+/+/+/+/+/+/+/+/+/60;24/19/85/#";
-    let map;
     const [mqttHandler, setMqtt] = useState(new MqttHandler);
+    let map;
 
     const onConnect = () => {
         console.log('Connected');
@@ -39,7 +40,6 @@ const BusList = () => {
     }
 
     const disconnect = () => {
-        console.log(mqttHandler);
         mqttHandler.disconnect(onDisconnect);
     }
 
@@ -53,11 +53,28 @@ const BusList = () => {
         const vehicleNumber = subData.veh.toString().padStart(5, '0');
         const operatorId = subData.oper.toString().padStart(4, '0');
         const busTopic = `/hfp/v2/journey/ongoing/+/bus/${operatorId}/${vehicleNumber}/#`;
+
+        let marker;
+        if (subData.veh in buses) {
+            marker = buses[subData.veh].marker;
+            marker.setLatLng([subData.lat, subData.long]);
+        } else {
+            marker = new L.Marker([subData.lat, subData.long]).addTo(map);
+        }
+
+        const newBus = {
+            position: Object.keys(data)[0],
+            start: subData.start,
+            long: subData.long,
+            lat: subData.lat,
+            topic: busTopic,
+            marker: marker
+        }
         // var marker = new L.Marker([subData.lat, subData.long]).addTo(map)
-        setBuses(prev => ({
-            ...prev, [subData.veh]: { position: Object.keys(data)[0], start: subData.start, long: subData.long, lat: subData.lat, topic: busTopic, marker: new L.Marker([subData.lat, subData.long]).addTo(map) }
-        }))
-        //L.Marker([subData.lat, subData.long]).update(marker);
+        /* setBuses(prev => ({
+            ...prev, [subData.veh]: newBus
+        })) */
+        buses = {...buses, [subData.veh]: newBus}
 
         //new L.Marker([subData.lat, subData.long]).addTo(map)
 
