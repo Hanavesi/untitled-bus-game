@@ -25,6 +25,12 @@ Position.schema = {
     y: { type: Types.Number }
 }
 
+export class CameraComponent extends Component { }
+
+CameraComponent.schema = {
+    camera: { type: Types.Ref }
+}
+
 export class Vectors extends Component { }
 
 Vectors.schema = {
@@ -44,4 +50,10 @@ export class HitBox extends Component { }
 
 HitBox.schema = {
     size: { type: Types.Ref }
+};
+
+export class StateMachine extends Component { }
+
+StateMachine.schema = {
+    fsm: { type: Types.Ref }
 };

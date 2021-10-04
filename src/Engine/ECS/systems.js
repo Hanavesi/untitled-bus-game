@@ -1,20 +1,7 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, Tile, HitBox } from "./components";
+import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent } from "./components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect } from "../util/collisions";
-
-/* export class RenderingSystem extends System {
-    execute(delta) {
-        const entities = this.queries.entities.results;
-        for (const entity of entities) {
-
-        }
-    }
-}
-
-RenderingSystem.queries = {
-    entities: { components: [Object3D] }
-} */
 
 export class MoveSystem extends System {
     execute() {
@@ -41,6 +28,7 @@ export class UpdateVectorsSystem extends System {
     execute(delta) {
         const entities = this.queries.entities.results;
         const tiles = this.queries.tiles.results;
+        const camera = this.queries.camera.results[0].getMutableComponent(CameraComponent).camera;
         for (const entity of entities) {
             const skin = entity.getComponent(Object3D).skin;
             const moveRoot = skin.moveRoot;
@@ -92,15 +80,25 @@ export class UpdateVectorsSystem extends System {
             moveRoot.translateX(vel.x * delta);
             moveRoot.translateY(vel.y * delta);
 
+            camera.position.set(moveRoot.position.x, moveRoot.position.y, 20);
+
             // wacky solution to rotate moving objects according to direction
+            // while keeping them titled on the screen
             const x = vectors.direction.x;
             const y = vectors.direction.y;
             const animRoot = skin.animRoot;
+            const fsm = entity.getComponent(StateMachine).fsm;
             if (x === 0 && y === 0) { // If standing still, look "down"
                 animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), Math.PI * 2);
+                if (fsm && fsm.state !== 'idle') {
+                    fsm.transition('idle');
+                }
             } else {
                 const angle = Math.atan2(x, -y);
                 animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), angle);
+                if (fsm && fsm.state !== 'run') {
+                    fsm.transition('run');
+                }
             }
             animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
         }
@@ -109,5 +107,6 @@ export class UpdateVectorsSystem extends System {
 
 UpdateVectorsSystem.queries = {
     entities: { components: [Object3D, Vectors, HitBox] },
-    tiles: { components: [Tile] }
+    tiles: { components: [Tile] },
+    camera: { components: [CameraComponent] }
 }

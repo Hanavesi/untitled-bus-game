@@ -1,8 +1,9 @@
 import { World } from "ecsy";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Input, Object3D, Playable, Vectors, HitBox, Tile } from "./ECS/components";
+import { Input, Object3D, Playable, Vectors, HitBox, Tile, StateMachine, CameraComponent } from "./ECS/components";
 import { initWorld } from "./ECS/initializer";
+import { FiniteStateMachine } from "./FSM";
 import { InputManager } from "./InputManager";
 import { ModelManager } from "./ModelManager";
 import { SkinInstance } from "./SkinInstance";
@@ -16,7 +17,9 @@ export class Engine {
         this.lastFrame = 0;
         this.world = initWorld();
         //this.camera = new THREE.PerspectiveCamera(45, width / height, 0.005, 10000);
-        this.camera = new THREE.OrthographicCamera(width / -30, width / 30, height / 30, height / -30, 1, 1000);
+        const aspectratio = width/height;
+        //this.camera = new THREE.OrthographicCamera(width / -30, width / 30, height / 30, height / -30, 1, 1000);
+        this.camera = new THREE.OrthographicCamera(-20 * aspectratio, 20 * aspectratio, 20, -20 , 1, 1000);
         this.camera.position.set(0, 0, 20);
         const controls = new OrbitControls(this.camera, canvas);
         controls.target.set(0, 0, 0);
@@ -36,14 +39,26 @@ export class Engine {
     }
 
     init() {
-        this.knight = new SkinInstance(this.modelManager.models['knight'], this.scene);
-        this.knight.setAnimation('Run');
+        const knight = new SkinInstance(this.modelManager.models['knight'], this.scene);
+        const knightFSM = new FiniteStateMachine({
+            idle: {
+                enter: () => {
+                    knight.setAnimation('Idle');
+                }
+            },
+            run: {
+                enter: () => {
+                    knight.setAnimation('Run');
+                }
+            }
+        }, 'idle');
         let entity = this.world.createEntity();
         entity
             .addComponent(Vectors, { direction: new THREE.Vector3(1, 0, 0), speed: 20 })
-            .addComponent(Object3D, { skin: this.knight })
+            .addComponent(Object3D, { skin: knight })
             .addComponent(Playable)
-            .addComponent(HitBox, { size: new THREE.Vector2(1.5, 1.5) });
+            .addComponent(HitBox, { size: new THREE.Vector2(1.5, 1.5) })
+            .addComponent(StateMachine, { fsm: knightFSM });
 
         const tilemap = mapToMeshes(MAP_TEST);
         for (const tile of tilemap) {
@@ -62,9 +77,10 @@ export class Engine {
             this.scene.add(plane);
         }
 
+        const cameraEntity = this.world.createEntity();
+        cameraEntity.addComponent(CameraComponent, { camera: this.camera  });
 
-
-        const inputEntity = this.world.createEntity()
+        const inputEntity = this.world.createEntity();
         inputEntity
             .addComponent(Input, { state: this.inputManager.keys })
 
