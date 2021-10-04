@@ -1,49 +1,70 @@
 import { useEffect, useState } from "react";
-import mqtt from 'mqtt';
+import { MqttHandler } from "./Mqtt";
+
 var L = require('leaflet');
+const topicAreas = [
+    '60;24/19/50', '60;24/19/51',
+    '60;24/19/52', '60;24/19/53',
+    '60;24/19/54', '60;24/19/55',
+    '60;24/19/56', '60;24/19/60',
+    '60;24/19/61', '60;24/19/62',
+    '60;24/19/63', '60;24/19/64',
+    '60;24/19/65', '60;24/19/66',
+    '60;24/19/70', '60;24/19/71',
+    '60;24/19/72', '60;24/19/73',
+    '60;24/19/74', '60;24/19/75',
+    '60;24/19/76', '60;24/19/80',
+    '60;24/19/81', '60;24/19/82',
+    '60;24/19/83', '60;24/19/84',
+    '60;24/19/85', '60;24/19/86'
+];
 
 const BusList = () => {
-    const [buses, setBuses] = useState([{}]);
-    const [client, setClient] = useState();
+    const [buses, setBuses] = useState({});
     const topic = "/hfp/v2/journey/ongoing/+/+/+/+/+/+/+/+/+/+/60;24/19/85/#";
     let map;
+    const [mqttHandler, setMqtt] = useState(new MqttHandler);
 
-    useEffect(() => {
-        const cl = mqtt.connect('wss://mqtt.hsl.fi:443/');
-        setClient(cl);
-        cl.on('connect', () => {
-            console.log('client connected');
-        });
-        cl.on('error', (err) => {
-            console.log('connection error', err);
-        });
-        getBuses(cl);
-    }, []);
+    const onConnect = () => {
+        console.log('Connected');
+        mqttHandler.subscribe(topic);
+    }
 
-    const getBuses = (client) => {
-        client.subscribe(topic, { qos: 1 });
+    const connect = () => {
+        mqttHandler.connect('wss://mqtt.hsl.fi:443/', onConnect, onMessage);
+    }
 
-        client.on('message', (_, message) => {
-            const data = JSON.parse(message);
-            const subData = data[Object.keys(data)[0]];
-            const vehicleNumber = subData.veh.toString().padStart(5, '0');
-            const operatorId = subData.oper.toString().padStart(4, '0');
-            const busTopic = `/hfp/v2/journey/ongoing/+/bus/${operatorId}/${vehicleNumber}/#`;
-            // var marker = new L.Marker([subData.lat, subData.long]).addTo(map)
-            setBuses(prev => ({
-                ...prev, [subData.veh]: { position: Object.keys(data)[0], start: subData.start, long: subData.long, lat: subData.lat, topic: busTopic, marker: new L.Marker([subData.lat, subData.long]).addTo(map) }
-            }))
-            L.Marker([subData.lat, subData.long]).update(marker);
+    const onDisconnect = () => {
+        console.log('disconnected');
+    }
 
-            //new L.Marker([subData.lat, subData.long]).addTo(map)
-        })
+    const disconnect = () => {
+        console.log(mqttHandler);
+        mqttHandler.disconnect(onDisconnect);
+    }
 
+    const compareBuses = (bus1, bus2) => {
+        return bus1.topic === bus2.topic;
+    }
 
+    const onMessage = (message) => {
+        const data = JSON.parse(message);
+        const subData = data[Object.keys(data)[0]];
+        const vehicleNumber = subData.veh.toString().padStart(5, '0');
+        const operatorId = subData.oper.toString().padStart(4, '0');
+        const busTopic = `/hfp/v2/journey/ongoing/+/bus/${operatorId}/${vehicleNumber}/#`;
+        // var marker = new L.Marker([subData.lat, subData.long]).addTo(map)
+        setBuses(prev => ({
+            ...prev, [subData.veh]: { position: Object.keys(data)[0], start: subData.start, long: subData.long, lat: subData.lat, topic: busTopic, marker: new L.Marker([subData.lat, subData.long]).addTo(map) }
+        }))
+        //L.Marker([subData.lat, subData.long]).update(marker);
+
+        //new L.Marker([subData.lat, subData.long]).addTo(map)
 
     }
 
     useEffect(() => {
-
+        connect();
         let current_lat = 60.183832;
         let current_long = 24.9538298;
         // BASIC LEAFLET WITH HSL TILELAYER
@@ -62,11 +83,9 @@ const BusList = () => {
 
     }, [])
 
+
     const clickEvent = (bus) => {
-        const newTopic = buses[bus].topic;
-        client.unsubscribe(topic);
-        client.subscribe(newTopic);
-        setBuses({ [bus]: buses[bus] });
+
     }
 
     return (
@@ -81,7 +100,7 @@ const BusList = () => {
                     })}
                 </ul>
             </div>
-        </div>
+        </div >
     )
 
 }
