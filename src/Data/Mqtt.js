@@ -26,7 +26,7 @@ export class MqttHandler {
             this.client.on("message", (topic, message) => {
                 const payload = { topic, message: message.toString() };
                 if (payload.topic) {
-                    messageCallback(payload.message);
+                    messageCallback(payload.message, payload.topic);
                 }
             });
         }

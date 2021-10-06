@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { MqttHandler } from "./Mqtt";
+import { fetchItinerary, fetchStop } from "./ItineraryData";
 
 const L = require('leaflet');
 const topicAreas = [
@@ -19,10 +20,19 @@ const topicAreas = [
     '60;24/19/85', '60;24/19/86'
 ];
 
+var busIcon = new L.Icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/4550/4550988.png',
+
+    iconSize: [40, 40],
+    iconAnchor: [10, 30],
+    popupAnchor: [10, -25]
+
+})
+
 const BusList = () => {
     //const [buses, setBuses] = useState({});
     let buses = {};
-    const topic = "/hfp/v2/journey/ongoing/+/+/+/+/+/+/+/+/+/+/60;24/19/85/#";
+    const topic = "/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/+/+/+/60;24/19/85/#";
     const [mqttHandler, setMqtt] = useState(new MqttHandler);
     let map;
 
@@ -47,7 +57,12 @@ const BusList = () => {
         return bus1.topic === bus2.topic;
     }
 
-    const onMessage = (message) => {
+
+
+    const onMessage = (message, topic) => {
+        // Haetaan topicista päätepysäkki
+        const array = topic.split('/');
+        const destination = array[11];
         const data = JSON.parse(message);
         const subData = data[Object.keys(data)[0]];
         const vehicleNumber = subData.veh.toString().padStart(5, '0');
@@ -55,12 +70,31 @@ const BusList = () => {
         const busTopic = `/hfp/v2/journey/ongoing/+/bus/${operatorId}/${vehicleNumber}/#`;
 
         let marker;
+        let timeToDestination;
+        let headSign;
+        let duration;
         if (subData.veh in buses) {
             marker = buses[subData.veh].marker;
             marker.setLatLng([subData.lat, subData.long]);
+            timeToDestination = buses[subData.veh].duration;
+            headSign = buses[subData.veh].destination;
         } else {
-            marker = new L.Marker([subData.lat, subData.long]).addTo(map);
+            //tän hetkinen sijainti
+            const from = { lat: subData.lat, long: subData.long }
+            if (from) {
+                // Haetaan aika
+                duration = fetchDuration(from, destination)
+                timeToDestination = duration;
+            }
+            // markerissa custom markkeri ja popup lisättynä
+            // tähän esim peliaika näkyviin jos sais kaua kestää vielä päättärille??
+            marker = new L.Marker([subData.lat, subData.long], { icon: busIcon }).addTo(map).bindPopup(
+                `To ${destination}, time to destination ${duration}`
+            );
         }
+
+        // AIKA-ARVIO KOHTEESEEN SAAPUMISEEN, ELI ARVIOITU PELIN KESTO??
+        // MARKERIN POISTAMINEN NÄKYVISTÄ KUN BUSSI SAAPUU PERILLE ??
 
         const newBus = {
             position: Object.keys(data)[0],
@@ -68,16 +102,23 @@ const BusList = () => {
             long: subData.long,
             lat: subData.lat,
             topic: busTopic,
-            marker: marker
+            destination: headSign,
+            marker: marker,
+            duration: timeToDestination,
         }
-        // var marker = new L.Marker([subData.lat, subData.long]).addTo(map)
-        /* setBuses(prev => ({
-            ...prev, [subData.veh]: newBus
-        })) */
-        buses = {...buses, [subData.veh]: newBus}
 
-        //new L.Marker([subData.lat, subData.long]).addTo(map)
-
+        buses = { ...buses, [subData.veh]: newBus }
+    }
+    // TÄN RETURNI ON VIELÄ PROMISESSA ??????
+    // Tässä haetaan päättärin koordinaatit ja sitte aikaa
+    const fetchDuration = async (from, destination) => {
+        let duration;
+        const to = await fetchStop(destination)
+        if (to) {
+            duration = fetchItinerary(from, to)
+            //console.log('duration', duration);
+            return duration;
+        }
     }
 
     useEffect(() => {
@@ -88,6 +129,7 @@ const BusList = () => {
 
         // The <div id="map"> must be added to the dom before calling L.map('map')
         map = L.map('map').setView([current_lat, current_long], 15);
+
 
         L.tileLayer("https://cdn.digitransit.fi/map/v1/{id}/{z}/{x}/{y}.png", {
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
