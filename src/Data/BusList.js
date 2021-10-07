@@ -28,10 +28,10 @@ const BusList = () => {
 
     const onConnect = () => {
         console.log('Connected');
-        mqttHandler.current.subscribe(topic);
-        /* for (const area of topicAreas) {
+        //mqttHandler.current.subscribe(topic);
+        for (const area of topicAreas) {
             mqttHandler.current.subscribe(`${topicStub}${area}/#`)
-        } */
+        }
     }
 
     const connect = () => {
@@ -100,7 +100,8 @@ const BusList = () => {
     }
 
     const updatePopups = async () => {
-        for (const key of Object.keys(buses)) {
+        // Parallel
+        await Promise.all(Object.keys(buses).map(async (key) => {
             const bus = buses[key];
             const from = { lat: bus.lat, long: bus.long };
             const timeToDestination = await fetchDuration(from, bus.destination);
@@ -111,7 +112,20 @@ const BusList = () => {
             }
 
             bus.marker.setPopupContent(`dest: ${bus.destination}; duration: ${bus.duration}; route: ${bus.route}`)
-        }
+        }));
+        // In sequence
+        /* for (const key of Object.keys(buses)) {
+            const bus = buses[key];
+            const from = { lat: bus.lat, long: bus.long };
+            const timeToDestination = await fetchDuration(from, bus.destination);
+            if (timeToDestination !== undefined && timeToDestination > 0) {
+                bus.duration = timeToDestination;
+            } else {
+                bus.duration = -1;
+            }
+
+            bus.marker.setPopupContent(`dest: ${bus.destination}; duration: ${bus.duration}; route: ${bus.route}`)
+        } */
     }
 
     useEffect(() => {
