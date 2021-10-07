@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MqttHandler } from "./Mqtt";
 
 const L = require('leaflet');
@@ -20,19 +20,31 @@ const topicAreas = [
 ];
 
 const BusList = () => {
-    //const [buses, setBuses] = useState({});
     let buses = {};
-    const topic = "/hfp/v2/journey/ongoing/+/+/+/+/+/+/+/+/+/+/60;24/19/85/#";
-    const [mqttHandler, setMqtt] = useState(new MqttHandler);
+    const topicStub = "/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/+/+/+/";
+    const topic = "/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/+/+/+/60;24/19/73/#";
+    const mqttHandler = useRef(null);
     let map;
+
+    var busIcon = new L.Icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/4550/4550988.png',
+
+        iconSize: [40, 40],
+        iconAnchor: [10, 30],
+        popupAnchor: [10, -25]
+
+    })
 
     const onConnect = () => {
         console.log('Connected');
-        mqttHandler.subscribe(topic);
+        //mqttHandler.current.subscribe(topic);
+        for (const area of topicAreas) {
+            mqttHandler.current.subscribe(`${topicStub}${area}/#`)
+        }
     }
 
     const connect = () => {
-        mqttHandler.connect('wss://mqtt.hsl.fi:443/', onConnect, onMessage);
+        mqttHandler.current.connect('wss://mqtt.hsl.fi:443/', onConnect, onMessage);
     }
 
     const onDisconnect = () => {
@@ -40,7 +52,7 @@ const BusList = () => {
     }
 
     const disconnect = () => {
-        mqttHandler.disconnect(onDisconnect);
+        mqttHandler.current.disconnect(onDisconnect);
     }
 
     const compareBuses = (bus1, bus2) => {
@@ -55,33 +67,28 @@ const BusList = () => {
         const busTopic = `/hfp/v2/journey/ongoing/+/bus/${operatorId}/${vehicleNumber}/#`;
 
         let marker;
+        let newBus;
         if (subData.veh in buses) {
-            marker = buses[subData.veh].marker;
+            newBus = buses[subData.veh];
+            marker = newBus.marker;
             marker.setLatLng([subData.lat, subData.long]);
         } else {
-            marker = new L.Marker([subData.lat, subData.long]).addTo(map);
+            marker = new L.Marker([subData.lat, subData.long], { icon: busIcon }).addTo(map)
+                    .bindPopup();
+            newBus = {
+                position: Object.keys(data)[0],
+                start: subData.start,
+                long: subData.long,
+                lat: subData.lat,
+                topic: busTopic,
+                marker: marker
+            }
         }
 
-        const newBus = {
-            position: Object.keys(data)[0],
-            start: subData.start,
-            long: subData.long,
-            lat: subData.lat,
-            topic: busTopic,
-            marker: marker
-        }
-        // var marker = new L.Marker([subData.lat, subData.long]).addTo(map)
-        /* setBuses(prev => ({
-            ...prev, [subData.veh]: newBus
-        })) */
-        buses = {...buses, [subData.veh]: newBus}
-
-        //new L.Marker([subData.lat, subData.long]).addTo(map)
-
+        buses = { ...buses, [subData.veh]: newBus }
     }
 
-    useEffect(() => {
-        connect();
+    const initMap = () => {
         let current_lat = 60.183832;
         let current_long = 24.9538298;
         // BASIC LEAFLET WITH HSL TILELAYER
@@ -97,7 +104,12 @@ const BusList = () => {
             zoomOffset: -1,
             id: 'hsl-map'
         }).addTo(map);
+    }
 
+    useEffect(() => {
+        mqttHandler.current = new MqttHandler();
+        connect();
+        initMap();
     }, [])
 
 
@@ -108,14 +120,6 @@ const BusList = () => {
     return (
         <div>
             <div id='map' style={{ height: '800px', width: '1000px' }}>
-
-            </div>
-            <div>
-                <ul>
-                    {Object.keys(buses).map(bus => {
-                        return <li onClick={() => clickEvent(bus)}>{bus}: {buses[bus].position}, {buses[bus].lat}, {buses[bus].long}, {buses[bus].start}, {buses[bus].topic}</li>
-                    })}
-                </ul>
             </div>
         </div >
     )
