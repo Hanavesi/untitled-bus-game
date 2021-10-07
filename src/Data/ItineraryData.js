@@ -47,7 +47,7 @@ export const fetchItinerary = async (from, to) => {
     const json = await resp.json();
     for (let i = 0; i < json.data.plan.itineraries[0].legs.length; i++) {
         if (json.data.plan.itineraries[0].legs[i].mode === 'BUS') {
-            const duration = json.data.plan.itineraries[0].legs[i].duration;
+            const duration = json.data.plan.itineraries[0].legs[i].endTime;
             //console.log(json.data.plan.itineraries[0].legs[i]);
             return duration;
         }

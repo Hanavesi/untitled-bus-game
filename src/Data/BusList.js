@@ -101,17 +101,19 @@ const BusList = () => {
 
     const updatePopups = async () => {
         // Parallel
+        const curr = new Date();
         await Promise.all(Object.keys(buses).map(async (key) => {
             const bus = buses[key];
             const from = { lat: bus.lat, long: bus.long };
             const timeToDestination = await fetchDuration(from, bus.destination);
             if (timeToDestination !== undefined && timeToDestination > 0) {
-                bus.duration = timeToDestination;
+                const timeRemaining = (timeToDestination - curr.getTime()) / 60000;
+                bus.duration = timeRemaining;
             } else {
                 bus.duration = -1;
             }
-
             bus.marker.setPopupContent(`dest: ${bus.destination}; duration: ${bus.duration}; route: ${bus.route}`)
+            
         }));
         // In sequence
         /* for (const key of Object.keys(buses)) {
