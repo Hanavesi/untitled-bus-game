@@ -1,19 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+import { fetchDuration } from "./ItineraryData";
 import { MqttHandler } from "./Mqtt";
 
 const L = require('leaflet');
 const topicAreas = [
-    '60;24/19/50', '60;24/19/51',
-    '60;24/19/52', '60;24/19/53',
-    '60;24/19/54', '60;24/19/55',
-    '60;24/19/56', '60;24/19/60',
-    '60;24/19/61', '60;24/19/62',
-    '60;24/19/63', '60;24/19/64',
-    '60;24/19/65', '60;24/19/66',
-    '60;24/19/70', '60;24/19/71',
-    '60;24/19/72', '60;24/19/73',
-    '60;24/19/74', '60;24/19/75',
-    '60;24/19/76', '60;24/19/80',
+
     '60;24/19/81', '60;24/19/82',
     '60;24/19/83', '60;24/19/84',
     '60;24/19/85', '60;24/19/86'
@@ -22,7 +13,7 @@ const topicAreas = [
 const BusList = () => {
     let buses = {};
     const topicStub = "/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/+/+/+/";
-    const topic = "/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/+/+/+/60;24/19/73/#";
+    //const topic = "/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/+/+/+/60;24/19/73/#";
     const mqttHandler = useRef(null);
     let map;
 
@@ -55,33 +46,33 @@ const BusList = () => {
         mqttHandler.current.disconnect(onDisconnect);
     }
 
-    const compareBuses = (bus1, bus2) => {
-        return bus1.topic === bus2.topic;
-    }
+    const onMessage = (message, topic) => {
+        const topicData = topic.split('/');
+        const destination = topicData[11];
 
-    const onMessage = (message) => {
         const data = JSON.parse(message);
         const subData = data[Object.keys(data)[0]];
         const vehicleNumber = subData.veh.toString().padStart(5, '0');
         const operatorId = subData.oper.toString().padStart(4, '0');
         const busTopic = `/hfp/v2/journey/ongoing/+/bus/${operatorId}/${vehicleNumber}/#`;
 
-        let marker;
         let newBus;
+        let marker;
         if (subData.veh in buses) {
             newBus = buses[subData.veh];
             marker = newBus.marker;
             marker.setLatLng([subData.lat, subData.long]);
         } else {
-            marker = new L.Marker([subData.lat, subData.long], { icon: busIcon }).addTo(map)
-                    .bindPopup();
+            marker = new L.Marker([subData.lat, subData.long], { icon: busIcon }).addTo(map).bindPopup('no data');
             newBus = {
                 position: Object.keys(data)[0],
                 start: subData.start,
                 long: subData.long,
                 lat: subData.lat,
                 topic: busTopic,
-                marker: marker
+                destination: destination,
+                duration: -1,
+                marker: marker,
             }
         }
 
@@ -106,10 +97,27 @@ const BusList = () => {
         }).addTo(map);
     }
 
+    const updatePopups = async () => {
+        for (const key of Object.keys(buses)) {
+            const bus = buses[key];
+            const from = { lat: bus.lat, long: bus.long };
+            const timeToDestination = await fetchDuration(from, bus.destination);
+            if (timeToDestination !== undefined && timeToDestination > 0) {
+                bus.duration = timeToDestination;
+            } else {
+                bus.duration = -1;
+            }
+
+            bus.marker.setPopupContent(`dest: ${bus.destination}; duration: ${bus.duration}`)
+        }
+    }
+
     useEffect(() => {
+        const interval = setInterval(updatePopups, 5000);
         mqttHandler.current = new MqttHandler();
         connect();
         initMap();
+        return(() => clearInterval(interval));
     }, [])
 
 
