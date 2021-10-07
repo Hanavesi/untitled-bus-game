@@ -13,7 +13,7 @@ const topicAreas = [
 const BusList = () => {
     let buses = {};
     const topicStub = "/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/+/+/+/";
-    //const topic = "/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/+/+/+/60;24/19/73/#";
+    const topic = "/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/+/+/+/60;24/19/73/#";
     const mqttHandler = useRef(null);
     let map;
 
@@ -28,10 +28,10 @@ const BusList = () => {
 
     const onConnect = () => {
         console.log('Connected');
-        //mqttHandler.current.subscribe(topic);
-        for (const area of topicAreas) {
+        mqttHandler.current.subscribe(topic);
+        /* for (const area of topicAreas) {
             mqttHandler.current.subscribe(`${topicStub}${area}/#`)
-        }
+        } */
     }
 
     const connect = () => {
@@ -55,6 +55,7 @@ const BusList = () => {
         const vehicleNumber = subData.veh.toString().padStart(5, '0');
         const operatorId = subData.oper.toString().padStart(4, '0');
         const busTopic = `/hfp/v2/journey/ongoing/+/bus/${operatorId}/${vehicleNumber}/#`;
+        const route = subData.desi;
 
         let newBus;
         let marker;
@@ -72,6 +73,7 @@ const BusList = () => {
                 topic: busTopic,
                 destination: destination,
                 duration: -1,
+                route: route,
                 marker: marker,
             }
         }
@@ -108,7 +110,7 @@ const BusList = () => {
                 bus.duration = -1;
             }
 
-            bus.marker.setPopupContent(`dest: ${bus.destination}; duration: ${bus.duration}`)
+            bus.marker.setPopupContent(`dest: ${bus.destination}; duration: ${bus.duration}; route: ${bus.route}`)
         }
     }
 
