@@ -112,6 +112,7 @@ const BusList = () => {
             } else {
                 bus.duration = -1;
             }
+            // TODO: https://stackoverflow.com/questions/13698975/click-link-inside-leaflet-popup-and-do-javascript
             bus.marker.setPopupContent(`dest: ${bus.destination}; duration: ${bus.duration}; route: ${bus.route}`)
             
         }));
