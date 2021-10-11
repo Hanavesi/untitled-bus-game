@@ -2,7 +2,7 @@ import { fetchBusRoutes } from './Data/RouteData';
 import './App.css';
 import Game from './Game';
 import React from 'react';
-import BusList from './Data/BusList';
+import BusMap from './Data/BusMap';
 /* import { Mqtt } from './Data/Mqtt';
 import BusList from './Data/BusList';
 import BusMap from './Data/BusMap'; */
@@ -21,7 +21,7 @@ function App() {
 
   return (
     <div>
-      <BusList />
+      <BusMap />
     </div>
   );
 }
