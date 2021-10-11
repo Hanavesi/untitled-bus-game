@@ -28,14 +28,14 @@ export class Engine {
         this.renderer = new THREE.WebGLRenderer({ canvas });
         this.renderer.setSize(width, height, false);
         this.renderer.render(this.scene, this.camera);
-
+        
         this.modelManager = new ModelManager();
         this.modelManager.setModels(['knight.gltf', 'checkers.gltf']);
         this.modelManager.load(() => {
             this.init();
             onReady(true);
         });
-        this.collisions = [];
+        this.onWindowResize(width, height);
     }
 
     onWindowResize(width, height) {
