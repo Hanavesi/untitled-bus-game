@@ -213,6 +213,9 @@ const BusMap = () => {
         mqttHandler.current.subscribe(bus.topic);
     }
 
+    // TODO: change outer div size according to props etc.
+    // If props, then buses needs to be a useState and only be updated
+    // every once in a while maybe??
     return (
         <div style={{ width:'100vw', height:'100vh' }} >
             <div id='map' style={{ height: '100%', width: '100%' }}>
