@@ -56,6 +56,12 @@ export class MqttHandler {
         }
     }
 
+    unsubscribeAll = () => {
+        this.subscriptions.forEach(sub => {
+            this.unsubscribe(sub);
+        });
+    }
+
     disconnect = (callback) => {
         console.log(this.client);
         if (this.client) {
