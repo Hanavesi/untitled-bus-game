@@ -1,18 +1,26 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Engine } from './Engine/Engine';
 
 function Game(props) {
-    const [ready, setReady] = React.useState(false);
+    const [ready, setReady] = useState(false);
+    const engine = useRef(null);
     const visible = { visibility: 'visible' };
     const hidden = { visibility: 'hidden' };
 
     React.useEffect(() => {
         const canvas = document.getElementById("gameCanvas");
-        canvas.width = props.width;
-        canvas.height = props.height;
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
+        engine.current = new Engine(canvas, width, height, setReady);
 
-        new Engine(canvas, props.width, props.height, setReady);
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById("gameCanvas");
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+            engine.current.onWindowResize(width, height);
+        });
     }, [props]);
+
 
     return (
         <div>

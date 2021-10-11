@@ -1,4 +1,3 @@
-import { World } from "ecsy";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Input, Object3D, Playable, Vectors, HitBox, Tile, StateMachine, CameraComponent } from "./ECS/components";
@@ -19,14 +18,15 @@ export class Engine {
         //this.camera = new THREE.PerspectiveCamera(45, width / height, 0.005, 10000);
         const aspectratio = width/height;
         //this.camera = new THREE.OrthographicCamera(width / -30, width / 30, height / 30, height / -30, 1, 1000);
-        this.camera = new THREE.OrthographicCamera(-20 * aspectratio, 20 * aspectratio, 20, -20 , 1, 1000);
+        this.camera = new THREE.OrthographicCamera(-15 * aspectratio, 15 * aspectratio, 15, -15 , 1, 1000);
         this.camera.position.set(0, 0, 20);
-        const controls = new OrbitControls(this.camera, canvas);
+        /* const controls = new OrbitControls(this.camera, canvas);
         controls.target.set(0, 0, 0);
-        controls.update();
+        controls.update(); */
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color('white');
         this.renderer = new THREE.WebGLRenderer({ canvas });
+        this.renderer.setSize(width, height, false);
         this.renderer.render(this.scene, this.camera);
 
         this.modelManager = new ModelManager();
@@ -36,6 +36,29 @@ export class Engine {
             onReady(true);
         });
         this.collisions = [];
+    }
+
+    onWindowResize(width, height) {
+        let bottom, top, left, right;
+        const ratio = width/height;
+        if (ratio > 1)  {
+            top = 30 / ratio;
+            bottom = -30 / ratio;
+            left = -30;
+            right = 30;
+        } else {
+            top = 30;
+            bottom = -30;
+            left = -30 * ratio;
+            right = 30 * ratio;
+        }
+        this.renderer.setSize(width, height, false);
+        this.camera.top = top;
+        this.camera.bottom = bottom;
+        this.camera.left = left;
+        this.camera.right = right;
+
+        this.camera.updateProjectionMatrix();
     }
 
     init() {
@@ -69,12 +92,12 @@ export class Engine {
             // tile size is set to 4. It may still happen but I haven't been able to recreate it
             entity.addComponent(Tile, { position: new THREE.Vector2(tile.position.x, tile.position.y), size: new THREE.Vector2(3.5, 3.5) });
             // debug collision tiles
-            const material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); 
+            /* const material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); 
             const geometry = new THREE.PlaneGeometry(3.5, 3.5);
             const plane = new THREE.Mesh(geometry, material);
             plane.position.x = tile.position.x;
             plane.position.y = tile.position.y;
-            this.scene.add(plane);
+            this.scene.add(plane); */
         }
 
         const cameraEntity = this.world.createEntity();
