@@ -57,21 +57,31 @@ const BusMap = () => {
     }
 
     const onMessage = (message, topic) => {
+        const timeStamp = Date.now();
         const topicData = topic.split('/');
         const destination = topicData[11];
 
         const data = JSON.parse(message);
-        const subData = data[Object.keys(data)[0]];
+        const eventType = Object.keys(data)[0];
+        if (eventType !== 'VP') return;
+        const subData = data[eventType];
         const vehicleNumber = subData.veh.toString().padStart(5, '0');
+        /**
+         * https://digitransit.fi/en/developers/apis/4-realtime-api/vehicle-positions/
+         * Operator id is not always the same as the id required for the topic so it is not
+         * a good indicator for selecting a good topic
+         */
         const operatorId = subData.oper.toString().padStart(4, '0');
-        const busId = vehicleNumber+operatorId;
-        const busTopic = `/hfp/v2/journey/ongoing/+/bus/${operatorId}/${vehicleNumber}/#`;
+        const busId = vehicleNumber + operatorId;
+        const busTopic = `/hfp/v2/journey/ongoing/+/bus/+/${vehicleNumber}/#`;
         const route = subData.desi;
 
         let newBus;
         let marker;
         if (busId in buses) {
             newBus = buses[busId];
+            newBus.lastUpdate = timeStamp;
+            newBus.drst = subData.drst;
             marker = newBus.marker;
             marker.setLatLng([subData.lat, subData.long]);
         } else {
@@ -86,10 +96,12 @@ const BusMap = () => {
                 duration: -1,
                 route: route,
                 marker: marker,
+                drst: subData.drst,
+                lastUpdate: timeStamp
             }
         }
 
-        buses = { ...buses, [busId]: newBus }
+        buses = { ...buses, [busId]: newBus };
     }
 
     const initMap = () => {
@@ -98,7 +110,7 @@ const BusMap = () => {
         // BASIC LEAFLET WITH HSL TILELAYER
 
         // The <div id="map"> must be added to the dom before calling L.map('map')
-        map = L.map('map').setView([current_lat, current_long], 15);
+        map = L.map('map', {dragging: false, zoomControl: false, scrollWheelZoom: false}).setView([current_lat, current_long], 14);
 
         L.tileLayer("https://cdn.digitransit.fi/map/v1/{id}/{z}/{x}/{y}.png", {
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
@@ -123,9 +135,8 @@ const BusMap = () => {
             } else {
                 bus.duration = -1;
             }
-            // TODO: https://stackoverflow.com/questions/13698975/click-link-inside-leaflet-popup-and-do-javascript
-            bus.marker.setPopupContent(`dest: ${bus.destination}; duration: ${bus.duration}; route: ${bus.route}`)
-            
+            const container = createPopupContent(bus);
+            bus.marker.setPopupContent(container);
         }));
         // In sequence
         /* for (const key of Object.keys(buses)) {
@@ -142,22 +153,69 @@ const BusMap = () => {
         } */
     }
 
+    /**
+     * Creates a div-element that contains bus info for leaflet popup
+     * @param {*} bus 
+     * @returns {HTMLDivElement}
+     */
+    const createPopupContent = (bus) => {
+        const container = document.createElement('div');
+        const info = document.createElement('div');
+        info.innerText = `dest: ${bus.destination}; duration: ${bus.duration}; route: ${bus.route}; door: ${bus.drst}`;
+        const button = document.createElement('button');
+        button.innerText = 'Press Me!';
+        button.onclick = () => clickEvent(bus);
+        container.append(info);
+        container.append(button);
+
+        return container;
+    }
+
+    /**
+     * Removes buses that have not received any new updates for 10 seconds
+     */
+    const removeOld = () => {
+        const timeStamp = Date.now();
+        Object.keys(buses).forEach(key => {
+            const bus = buses[key];
+            const lastUpdate = bus.lastUpdate;
+            const delta = (timeStamp - lastUpdate) / 1000;
+            if (delta > 10) {
+                bus.marker.remove();
+                delete buses[key];
+            };
+        });
+        console.log('Amount of buses: ' + Object.keys(buses).length);
+    }
+
+    const update = () => {
+        removeOld();
+        updatePopups();
+    }
+
     useEffect(() => {
-        const interval = setInterval(updatePopups, 5000);
+        const interval = setInterval(update, 5000);
         mqttHandler.current = new MqttHandler();
         connect();
         initMap();
-        return(() => clearInterval(interval));
-    }, [])
+        return (() => clearInterval(interval));
+    }, []);
 
-
+    // TODO: If no messages are received after selecting, Show all buses again.
+    /**
+     * Unsibscribes all current topics and subscribes to just the selected bus.
+     * @param {*} bus 
+     */
     const clickEvent = (bus) => {
-
+        mqttHandler.current.unsubscribeAll();
+        console.log(bus.topic);
+        // Sometimes subsctiption fails somehow and further messages from hte chosen bus are not received
+        mqttHandler.current.subscribe(bus.topic);
     }
 
     return (
-        <div>
-            <div id='map' style={{ height: '800px', width: '1000px' }}>
+        <div style={{ width:'100vw', height:'100vh' }} >
+            <div id='map' style={{ height: '100%', width: '100%' }}>
             </div>
         </div >
     )

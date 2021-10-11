@@ -5,7 +5,7 @@ export const fetchDuration = async (from, destination) => {
     const to = await fetchStop(destination);
     if (to === undefined) return undefined;
     duration = await fetchItinerary(from, to)
-    console.log('duration', duration);
+    //console.log('duration', duration);
     return duration;
 }
 
