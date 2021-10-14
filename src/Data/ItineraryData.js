@@ -1,8 +1,8 @@
 const url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
 
-export const fetchDuration = async (from, destination) => {
+export const fetchDuration = async (from, id) => {
     let duration = -1;
-    const to = await fetchStop(destination);
+    const to = await fetchStop(id);
     if (to === undefined) {
         console.log('undefined destination');
         return undefined;
@@ -48,13 +48,18 @@ export const fetchItinerary = async (from, to) => {
         return undefined;
     }
     const json = await resp.json();
+    //console.log(json.data);
+    if (json.data.plan === null) {
+        return undefined
+    }
+    let duration;
     for (let i = 0; i < json.data.plan.itineraries[0].legs.length; i++) {
         if (json.data.plan.itineraries[0].legs[i].mode === 'BUS') {
-            const duration = json.data.plan.itineraries[0].legs[i].endTime;
+            duration = json.data.plan.itineraries[0].legs[i].endTime;
             //console.log(json.data.plan.itineraries[0].legs[i]);
-            return duration;
         }
     }
+    return duration;
 }
 
 /**
@@ -63,7 +68,7 @@ export const fetchItinerary = async (from, to) => {
  * @returns {Promise<string>}
  */
 export const fuzzyTripQuery = async (data) => {
-    let id;
+    if (data === undefined) console.log('data undefined at fuzzyTripQuery');
     const { route, direction, date, time } = data;
     const requestBody = `{
     fuzzyTrip(route: "${route}", direction:${direction}, date: "${date}", time: ${time}) {
@@ -88,15 +93,55 @@ export const fuzzyTripQuery = async (data) => {
         return undefined;
     }
     const json = await resp.json();
-    if (!json.data.fuzzyTrip) console.log(requestBody);
-    //console.log(json.data.fuzzyTrip);
+    if (!json.data.fuzzyTrip) {
+        console.log(requestBody);
+        return undefined
+    };
+    const idIndex = json.data.fuzzyTrip.pattern.name.indexOf('HSL')
+    const hslId = json.data.fuzzyTrip.pattern.name.substring(idIndex, idIndex + 11)
+    return hslId
+    //console.log(hslId);
+
+}
+
+export const fetchEndStopId = async (name) => {
+    const requestBody = `{
+  routes(name: "${name}", transportModes: BUS) {
+    gtfsId
+    shortName
+  }
+}`;
+    const req = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/graphql' },
+        body: requestBody
+    }
+    let resp;
+    try {
+        resp = await fetch(url, req);
+    } catch (err) {
+        console.error('Failed to fetch gtfsId', err);
+        return undefined;
+    }
+
+    const json = await resp.json()
+    //console.log(json);
+    for (const route of json.data.routes) {
+        if (route.shortName === name) {
+            //console.log(route.shortName, route.gtfsId);
+            return route.gtfsId
+        }
+    }
+    console.log(name);
+    return undefined
 }
 
 // hakee päätepysäkin noin suurinpiirtein graphqlstä topicista tuodulla päätepysäkillä
-export const fetchStop = async (destination) => {
+export const fetchStop = async (id) => {
+    if (id === undefined) console.log('id undefined at fetchStop');
     let to;
     const requestBody = `{
-        stops(name: "${destination}") {
+        stops(ids: "${id}") {
             gtfsId
             name
             code
@@ -117,13 +162,13 @@ export const fetchStop = async (destination) => {
         return undefined;
     }
     const json = await resp.json();
-    /* if (json.data.stops.length < 1) {
-        console.log(destination);
-    } */
-    for (let i = 0; i < json.data.stops.length; i++) {
-        if (json.data.stops[i].name === destination) {
-            to = { lat: json.data.stops[i].lat, long: json.data.stops[i].lon }
-        }
+
+    //console.log(json.data);
+    if (json.data.stops === null) {
+        return undefined
     }
+    to = { lat: json.data.stops[0].lat, long: json.data.stops[0].lon }
+
+
     return to;
 }

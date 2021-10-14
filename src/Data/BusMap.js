@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { fetchDuration, fuzzyTripQuery } from "./ItineraryData";
+import { fetchDuration, fetchEndStopId, fuzzyTripQuery } from "./ItineraryData";
 import { MqttHandler } from "./Mqtt";
 
 const L = require('leaflet');
@@ -112,7 +112,7 @@ const BusMap = () => {
         // BASIC LEAFLET WITH HSL TILELAYER
 
         // The <div id="map"> must be added to the dom before calling L.map('map')
-        map = L.map('map', {dragging: false, zoomControl: false, scrollWheelZoom: false}).setView([current_lat, current_long], 14);
+        map = L.map('map', { dragging: false, zoomControl: false, scrollWheelZoom: false, doubleClickZoom: false }).setView([current_lat, current_long], 14);
 
         L.tileLayer("https://cdn.digitransit.fi/map/v1/{id}/{z}/{x}/{y}.png", {
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
@@ -126,22 +126,21 @@ const BusMap = () => {
 
     const updatePopups = async () => {
         // Parallel
-        const time = new Date().getTime();
+        const currentTime = new Date().getTime();
         await Promise.all(Object.keys(buses).map(async (key) => {
             const bus = buses[key];
             const from = { lat: bus.lat, long: bus.long };
-            const timeToDestination = await fetchDuration(from, bus.destination);
 
-            const route = bus.route;
-
+            const route = await fetchEndStopId(bus.route);
+            //console.log(route);
             const direction = bus.direction - 1;
             const date = bus.date;
             const [hours, minutes] = bus.start.split(':');
             const time = hours * 60 * 60 + minutes * 60;
-            await fuzzyTripQuery({ route: route, direction: direction, date: date, time: time });
-
+            const hslId = await fuzzyTripQuery({ route: route, direction: direction, date: date, time: time });
+            const timeToDestination = await fetchDuration(from, hslId);
             if (timeToDestination !== undefined && timeToDestination > 0) {
-                const timeRemaining = (timeToDestination - time) / 60000;
+                const timeRemaining = (timeToDestination - currentTime) / 60000;
                 bus.duration = timeRemaining;
             } else {
                 bus.duration = -1;
@@ -228,7 +227,7 @@ const BusMap = () => {
     // If props, then buses needs to be a useState and only be updated
     // every once in a while maybe??
     return (
-        <div style={{ width:'100vw', height:'100vh' }} >
+        <div style={{ width: '100vw', height: '100vh' }} >
             <div id='map' style={{ height: '100%', width: '100%' }}>
             </div>
         </div >
