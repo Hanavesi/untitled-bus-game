@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { fetchDuration, fetchEndStopId, fuzzyTripQuery } from "./ItineraryData";
 import { MqttHandler } from "./Mqtt";
 
@@ -31,8 +31,8 @@ const BusMap = () => {
         iconUrl: 'https://cdn-icons-png.flaticon.com/512/4550/4550988.png',
 
         iconSize: [40, 40],
-        iconAnchor: [10, 30],
-        popupAnchor: [10, -25]
+        iconAnchor: [15, 35],
+        popupAnchor: [5, -25]
 
     })
 
@@ -86,6 +86,7 @@ const BusMap = () => {
             marker.setLatLng([subData.lat, subData.long]);
         } else {
             marker = new L.Marker([subData.lat, subData.long], { icon: busIcon }).addTo(map).bindPopup('no data');
+            // tänne fetchstop ja endstop ja fuzzytrip
             newBus = {
                 position: Object.keys(data)[0],
                 start: subData.start,
@@ -131,19 +132,29 @@ const BusMap = () => {
             const bus = buses[key];
             const from = { lat: bus.lat, long: bus.long };
 
+            // Tää uuden bussin luontiin
             const route = await fetchEndStopId(bus.route);
             //console.log(route);
             const direction = bus.direction - 1;
             const date = bus.date;
             const [hours, minutes] = bus.start.split(':');
             const time = hours * 60 * 60 + minutes * 60;
+            // Tää uuden bussin luontiin
             const hslId = await fuzzyTripQuery({ route: route, direction: direction, date: date, time: time });
+            // tää jää tänne
             const timeToDestination = await fetchDuration(from, hslId);
             if (timeToDestination !== undefined && timeToDestination > 0) {
                 const timeRemaining = (timeToDestination - currentTime) / 60000;
-                bus.duration = timeRemaining;
+                bus.duration = Math.round(timeRemaining);
+                var icon = bus.marker.options.icon
+                icon.options.iconSize = [40, 40]
+                bus.marker.setIcon(icon)
             } else {
                 bus.duration = -1;
+                //console.log(bus.marker.options.icon.options.iconSize);
+                var icon = bus.marker.options.icon
+                icon.options.iconSize = [0, 0]
+                bus.marker.setIcon(icon)
             }
             const container = createPopupContent(bus);
             bus.marker.setPopupContent(container);
@@ -171,7 +182,7 @@ const BusMap = () => {
     const createPopupContent = (bus) => {
         const container = document.createElement('div');
         const info = document.createElement('div');
-        info.innerText = `dest: ${bus.destination}; duration: ${bus.duration}; route: ${bus.route}; door: ${bus.drst}`;
+        info.innerText = `dest: ${bus.destination}; duration: ${bus.duration}min; route: ${bus.route}; door: ${bus.drst}`;
         const button = document.createElement('button');
         button.innerText = 'Press Me!';
         button.onclick = () => clickEvent(bus);
@@ -204,7 +215,7 @@ const BusMap = () => {
     }
 
     useEffect(() => {
-        const interval = setInterval(update, 5000);
+        const interval = setInterval(update, 30000);
         mqttHandler.current = new MqttHandler();
         connect();
         initMap();

@@ -2,7 +2,9 @@ const url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
 
 export const fetchDuration = async (from, id) => {
     let duration = -1;
+    // tää uuden bussin luontiin
     const to = await fetchStop(id);
+
     if (to === undefined) {
         console.log('undefined destination');
         return undefined;
@@ -44,12 +46,12 @@ export const fetchItinerary = async (from, to) => {
     try {
         resp = await fetch(url, req);
     } catch (err) {
-        console.error('Failed to fetch itinerary', err);
+        //console.error('Failed to fetch itinerary', err);
         return undefined;
     }
     const json = await resp.json();
     //console.log(json.data);
-    if (json.data.plan === null) {
+    if (json.data.plan.itineraries[0] === undefined) {
         return undefined
     }
     let duration;
@@ -136,7 +138,7 @@ export const fetchEndStopId = async (name) => {
     return undefined
 }
 
-// hakee päätepysäkin noin suurinpiirtein graphqlstä topicista tuodulla päätepysäkillä
+// hakee tarkan päätepysäkin graphqlstä topicista tuodulla päätepysäkillä
 export const fetchStop = async (id) => {
     if (id === undefined) console.log('id undefined at fetchStop');
     let to;
@@ -158,7 +160,7 @@ export const fetchStop = async (id) => {
     try {
         resp = await fetch(url, req);
     } catch (err) {
-        console.error('Failed to fetch stop data', err);
+        //console.error('Failed to fetch stop data', err);
         return undefined;
     }
     const json = await resp.json();
