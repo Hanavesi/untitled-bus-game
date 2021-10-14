@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { fetchDuration } from "./ItineraryData";
+import { fetchDuration, fuzzyTripQuery } from "./ItineraryData";
 import { MqttHandler } from "./Mqtt";
 
 const L = require('leaflet');
@@ -97,6 +97,8 @@ const BusMap = () => {
                 route: route,
                 marker: marker,
                 drst: subData.drst,
+                direction: subData.dir,
+                date: subData.oday,
                 lastUpdate: timeStamp
             }
         }
@@ -124,13 +126,22 @@ const BusMap = () => {
 
     const updatePopups = async () => {
         // Parallel
-        const curr = new Date();
+        const time = new Date().getTime();
         await Promise.all(Object.keys(buses).map(async (key) => {
             const bus = buses[key];
             const from = { lat: bus.lat, long: bus.long };
             const timeToDestination = await fetchDuration(from, bus.destination);
+
+            const route = bus.route;
+
+            const direction = bus.direction - 1;
+            const date = bus.date;
+            const [hours, minutes] = bus.start.split(':');
+            const time = hours * 60 * 60 + minutes * 60;
+            await fuzzyTripQuery({ route: route, direction: direction, date: date, time: time });
+
             if (timeToDestination !== undefined && timeToDestination > 0) {
-                const timeRemaining = (timeToDestination - curr.getTime()) / 60000;
+                const timeRemaining = (timeToDestination - time) / 60000;
                 bus.duration = timeRemaining;
             } else {
                 bus.duration = -1;
