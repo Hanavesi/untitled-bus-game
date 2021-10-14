@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { fetchDuration, fetchEndStopId, fuzzyTripQuery } from "./ItineraryData";
+import { fetchDuration, fetchEndStopId, fuzzyTripQuery, fetchStop } from "./ItineraryData";
 import { MqttHandler } from "./Mqtt";
 
 const L = require('leaflet');
@@ -87,6 +87,7 @@ const BusMap = () => {
         } else {
             marker = new L.Marker([subData.lat, subData.long], { icon: busIcon }).addTo(map).bindPopup('no data');
             // tänne fetchstop ja endstop ja fuzzytrip
+
             newBus = {
                 position: Object.keys(data)[0],
                 start: subData.start,
@@ -100,11 +101,22 @@ const BusMap = () => {
                 drst: subData.drst,
                 direction: subData.dir,
                 date: subData.oday,
+                endLoc: null,
                 lastUpdate: timeStamp
             }
         }
 
         buses = { ...buses, [busId]: newBus };
+    }
+
+    const getEndStopLoc = async (bus) => {
+        const { route, direction, date, start } = bus;
+        const [hours, minutes] = start.split(':');
+        const time = hours * 60 * 60 + minutes * 60;
+        const endId = await fetchEndStopId(route);
+        const endGtfsId = endId && await fuzzyTripQuery({ route: endId, direction: direction, date: date, time: time });
+        const endLoc = endGtfsId && await fetchStop(endGtfsId);
+        bus.endLoc = endLoc;
     }
 
     const initMap = () => {
@@ -113,7 +125,7 @@ const BusMap = () => {
         // BASIC LEAFLET WITH HSL TILELAYER
 
         // The <div id="map"> must be added to the dom before calling L.map('map')
-        map = L.map('map', { dragging: false, zoomControl: false, scrollWheelZoom: false, doubleClickZoom: false }).setView([current_lat, current_long], 14);
+        map = L.map('map', { /* dragging: false, zoomControl: false, scrollWheelZoom: false, doubleClickZoom: false */ }).setView([current_lat, current_long], 14);
 
         L.tileLayer("https://cdn.digitransit.fi/map/v1/{id}/{z}/{x}/{y}.png", {
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
@@ -131,30 +143,21 @@ const BusMap = () => {
         await Promise.all(Object.keys(buses).map(async (key) => {
             const bus = buses[key];
             const from = { lat: bus.lat, long: bus.long };
+            if (!bus.endLoc || bus.endLoc === undefined) await getEndStopLoc(bus);
+            const to = bus.endLoc;
 
-            // Tää uuden bussin luontiin
-            const route = await fetchEndStopId(bus.route);
-            //console.log(route);
-            const direction = bus.direction - 1;
-            const date = bus.date;
-            const [hours, minutes] = bus.start.split(':');
-            const time = hours * 60 * 60 + minutes * 60;
-            // Tää uuden bussin luontiin
-            const hslId = await fuzzyTripQuery({ route: route, direction: direction, date: date, time: time });
-            // tää jää tänne
-            const timeToDestination = await fetchDuration(from, hslId);
+            const icon = bus.marker.options.icon;
+            const timeToDestination = await fetchDuration(from, to);
             if (timeToDestination !== undefined && timeToDestination > 0) {
                 const timeRemaining = (timeToDestination - currentTime) / 60000;
                 bus.duration = Math.round(timeRemaining);
-                var icon = bus.marker.options.icon
-                icon.options.iconSize = [40, 40]
-                bus.marker.setIcon(icon)
+                icon.options.iconSize = [40, 40];
+                bus.marker.setIcon(icon);
             } else {
                 bus.duration = -1;
-                //console.log(bus.marker.options.icon.options.iconSize);
-                var icon = bus.marker.options.icon
-                icon.options.iconSize = [0, 0]
-                bus.marker.setIcon(icon)
+                //hide icon if duration is unavailable
+                icon.options.iconSize = [0, 0];
+                bus.marker.setIcon(icon);
             }
             const container = createPopupContent(bus);
             bus.marker.setPopupContent(container);
