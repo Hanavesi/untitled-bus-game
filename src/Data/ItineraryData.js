@@ -1,21 +1,8 @@
 const url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
 
-export const fetchDuration = async (from, id) => {
-    let duration = -1;
-    // tää uuden bussin luontiin
-    const to = await fetchStop(id);
-
-    if (to === undefined) {
-        console.log('undefined destination');
-        return undefined;
-    }
-    duration = await fetchItinerary(from, to)
-    //console.log('duration', duration);
-    return duration;
-}
-
 // hakee kauanko kestää kohteesta A kohteeseen B, koordinaatteja käyttäen
-export const fetchItinerary = async (from, to) => {
+export const fetchDuration = async (from, to) => {
+    if (to === undefined) return undefined;
     const requestBody = `{
         plan(
             from: { lat: ${from.lat}, lon: ${from.long} }
@@ -73,7 +60,7 @@ export const fuzzyTripQuery = async (data) => {
     if (data === undefined) console.log('data undefined at fuzzyTripQuery');
     const { route, direction, date, time } = data;
     const requestBody = `{
-    fuzzyTrip(route: "${route}", direction:${direction}, date: "${date}", time: ${time}) {
+    fuzzyTrip(route: "${route}", direction:${direction-1}, date: "${date}", time: ${time}) {
         route {
         shortName
         }
