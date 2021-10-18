@@ -59,15 +59,12 @@ export const fetchDuration = async (from, to) => {
 export const fuzzyTripQuery = async (data) => {
     if (data === undefined) console.log('data undefined at fuzzyTripQuery');
     const { route, direction, date, time } = data;
-    const requestBody = `{
-    fuzzyTrip(route: "${route}", direction:${direction-1}, date: "${date}", time: ${time}) {
-        route {
-        shortName
+    const requestBody = `
+    {
+        fuzzyTrip(route: "${route}", direction:${direction-1}, date: "${date}", time: ${time}) {
+            route { shortName }
+            pattern { name }
         }
-        pattern {
-        name
-        }
-    }
     }`;
     const req = {
         method: 'POST',
@@ -84,22 +81,23 @@ export const fuzzyTripQuery = async (data) => {
     const json = await resp.json();
     if (!json.data.fuzzyTrip) {
         console.log(requestBody);
-        return undefined
+        return undefined;
     };
-    const idIndex = json.data.fuzzyTrip.pattern.name.indexOf('HSL')
-    const hslId = json.data.fuzzyTrip.pattern.name.substring(idIndex, idIndex + 11)
-    return hslId
+    const idIndex = json.data.fuzzyTrip.pattern.name.indexOf('HSL');
+    const hslId = json.data.fuzzyTrip.pattern.name.substring(idIndex, idIndex + 11);
+    return hslId;
     //console.log(hslId);
 
 }
 
 export const fetchEndStopId = async (name) => {
-    const requestBody = `{
-  routes(name: "${name}", transportModes: BUS) {
-    gtfsId
-    shortName
-  }
-}`;
+    const requestBody = `
+    {
+        routes(name: "${name}", transportModes: BUS) {
+            gtfsId
+            shortName
+        }
+    }`;
     const req = {
         method: 'POST',
         headers: { 'Content-Type': 'application/graphql' },
@@ -122,14 +120,15 @@ export const fetchEndStopId = async (name) => {
         }
     }
     console.log(name);
-    return undefined
+    return undefined;
 }
 
 // hakee tarkan päätepysäkin graphqlstä topicista tuodulla päätepysäkillä
 export const fetchStop = async (id) => {
     if (id === undefined) console.log('id undefined at fetchStop');
     let to;
-    const requestBody = `{
+    const requestBody = `
+    {
         stops(ids: "${id}") {
             gtfsId
             name
@@ -156,8 +155,6 @@ export const fetchStop = async (id) => {
     if (json.data.stops === null) {
         return undefined
     }
-    to = { lat: json.data.stops[0].lat, long: json.data.stops[0].lon }
-
-
+    to = { lat: json.data.stops[0].lat, long: json.data.stops[0].lon };
     return to;
 }

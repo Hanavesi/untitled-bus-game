@@ -1,7 +1,8 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchDuration, fetchEndStopId, fuzzyTripQuery, fetchStop } from "./ItineraryData";
 import { MqttHandler } from "./Mqtt";
 
+const MQTTURL = 'wss://mqtt.hsl.fi:443/';
 const L = require('leaflet');
 const topicAreas = [
     '60;24/19/50', '60;24/19/51',
@@ -20,6 +21,15 @@ const topicAreas = [
     '60;24/19/85', '60;24/19/86'
 ];
 
+const busIcon = new L.Icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/4550/4550988.png',
+
+    iconSize: [40, 40],
+    iconAnchor: [15, 35],
+    popupAnchor: [5, -25]
+
+});
+
 const BusMap = () => {
     let buses = {};
     const topicStub = "/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/+/+/+/";
@@ -27,14 +37,14 @@ const BusMap = () => {
     const mqttHandler = useRef(null);
     let map;
 
-    var busIcon = new L.Icon({
-        iconUrl: 'https://cdn-icons-png.flaticon.com/512/4550/4550988.png',
 
-        iconSize: [40, 40],
-        iconAnchor: [15, 35],
-        popupAnchor: [5, -25]
-
-    })
+    useEffect(() => {
+        const interval = setInterval(update, 30000);
+        mqttHandler.current = new MqttHandler();
+        connect();
+        initMap();
+        return (() => clearInterval(interval));
+    }, []);
 
     const onConnect = () => {
         console.log('Connected');
@@ -45,7 +55,7 @@ const BusMap = () => {
     }
 
     const connect = () => {
-        mqttHandler.current.connect('wss://mqtt.hsl.fi:443/', onConnect, onMessage);
+        mqttHandler.current.connect(MQTTURL, onConnect, onMessage);
     }
 
     const onDisconnect = () => {
@@ -65,6 +75,7 @@ const BusMap = () => {
         const eventType = Object.keys(data)[0];
         if (eventType !== 'VP') return;
         const subData = data[eventType];
+        const {start, long, lat, desi, drst, dir, oday} = subData;
         const vehicleNumber = subData.veh.toString().padStart(5, '0');
         /**
          * https://digitransit.fi/en/developers/apis/4-realtime-api/vehicle-positions/
@@ -74,49 +85,37 @@ const BusMap = () => {
         const operatorId = subData.oper.toString().padStart(4, '0');
         const busId = vehicleNumber + operatorId;
         const busTopic = `/hfp/v2/journey/ongoing/+/bus/+/${vehicleNumber}/#`;
-        const route = subData.desi;
 
         let newBus;
-        let marker;
         if (busId in buses) {
             newBus = buses[busId];
             newBus.lastUpdate = timeStamp;
-            newBus.drst = subData.drst;
-            marker = newBus.marker;
-            marker.setLatLng([subData.lat, subData.long]);
+            newBus.drst = drst;
+            const marker = newBus.marker;
+            marker.setLatLng([lat, long]);
         } else {
-            marker = new L.Marker([subData.lat, subData.long], { icon: busIcon }).addTo(map).bindPopup('no data');
+            const marker = new L.Marker([lat, long], { icon: busIcon }).addTo(map).bindPopup('no data');
             // tänne fetchstop ja endstop ja fuzzytrip
 
             newBus = {
                 position: Object.keys(data)[0],
-                start: subData.start,
-                long: subData.long,
-                lat: subData.lat,
+                start: start,
+                long: long,
+                lat: lat,
                 topic: busTopic,
                 destination: destination,
                 duration: -1,
-                route: route,
+                route: desi,
                 marker: marker,
-                drst: subData.drst,
-                direction: subData.dir,
-                date: subData.oday,
+                drst: drst,
+                direction: dir,
+                date: oday,
                 endLoc: null,
                 lastUpdate: timeStamp
             }
         }
 
         buses = { ...buses, [busId]: newBus };
-    }
-
-    const getEndStopLoc = async (bus) => {
-        const { route, direction, date, start } = bus;
-        const [hours, minutes] = start.split(':');
-        const time = hours * 60 * 60 + minutes * 60;
-        const endId = await fetchEndStopId(route);
-        const endGtfsId = endId && await fuzzyTripQuery({ route: endId, direction: direction, date: date, time: time });
-        const endLoc = endGtfsId && await fetchStop(endGtfsId);
-        bus.endLoc = endLoc;
     }
 
     const initMap = () => {
@@ -137,9 +136,24 @@ const BusMap = () => {
         }).addTo(map);
     }
 
+    const getEndStopLoc = async (bus) => {
+        const { route, direction, date, start } = bus;
+        const [hours, minutes] = start.split(':');
+        const time = hours * 60 * 60 + minutes * 60;
+        const endId = await fetchEndStopId(route);
+        const endGtfsId = endId && await fuzzyTripQuery({ route: endId, direction: direction, date: date, time: time });
+        const endLoc = endGtfsId && await fetchStop(endGtfsId);
+        bus.endLoc = endLoc;
+    }
+
+    const update = () => {
+        removeOld();
+        updatePopups();
+    }
+
     const updatePopups = async () => {
-        // Parallel
         const currentTime = new Date().getTime();
+        // Parallel processing
         await Promise.all(Object.keys(buses).map(async (key) => {
             const bus = buses[key];
             const from = { lat: bus.lat, long: bus.long };
@@ -162,7 +176,7 @@ const BusMap = () => {
             const container = createPopupContent(bus);
             bus.marker.setPopupContent(container);
         }));
-        // In sequence
+        // In sequence processing
         /* for (const key of Object.keys(buses)) {
             const bus = buses[key];
             const from = { lat: bus.lat, long: bus.long };
@@ -196,7 +210,7 @@ const BusMap = () => {
     }
 
     /**
-     * Removes buses that have not received any new updates for 10 seconds
+     * Removes buses that have not received any new updates for 30 seconds
      */
     const removeOld = () => {
         const timeStamp = Date.now();
@@ -204,26 +218,12 @@ const BusMap = () => {
             const bus = buses[key];
             const lastUpdate = bus.lastUpdate;
             const delta = (timeStamp - lastUpdate) / 1000;
-            if (delta > 10) {
+            if (delta > 30) {
                 bus.marker.remove();
                 delete buses[key];
             };
         });
-        console.log('Amount of buses: ' + Object.keys(buses).length);
     }
-
-    const update = () => {
-        removeOld();
-        updatePopups();
-    }
-
-    useEffect(() => {
-        const interval = setInterval(update, 30000);
-        mqttHandler.current = new MqttHandler();
-        connect();
-        initMap();
-        return (() => clearInterval(interval));
-    }, []);
 
     // TODO: If no messages are received after selecting, Show all buses again.
     /**
