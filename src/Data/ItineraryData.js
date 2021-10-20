@@ -1,6 +1,13 @@
 const url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
 
 // hakee kauanko kestää kohteesta A kohteeseen B, koordinaatteja käyttäen
+/**
+ * Tries to fetch the expected time to destination
+ * from current location. Returns undefined when fetch fails.
+ * @param {{lat: number, long: number}} from 
+ * @param {{lat: number, long: number}} to 
+ * @returns {number} expected time of arrival to end stop.
+ */
 export const fetchDuration = async (from, to) => {
     if (to === undefined) return undefined;
     const requestBody = `{
@@ -41,18 +48,18 @@ export const fetchDuration = async (from, to) => {
     if (json.data.plan.itineraries[0] === undefined) {
         return undefined
     }
-    let duration;
+    let end;
     for (let i = 0; i < json.data.plan.itineraries[0].legs.length; i++) {
         if (json.data.plan.itineraries[0].legs[i].mode === 'BUS') {
-            duration = json.data.plan.itineraries[0].legs[i].endTime;
+            end = json.data.plan.itineraries[0].legs[i].endTime;
             //console.log(json.data.plan.itineraries[0].legs[i]);
         }
     }
-    return duration;
+    return end;
 }
 
 /**
- * Query end stop id from bus data
+ * Query end stop gtfs id from bus data.
  * @param {{route: string, direction: number, date: string, time: number}} data
  * @returns {Promise<string>}
  */
@@ -86,11 +93,14 @@ export const fuzzyTripQuery = async (data) => {
     const idIndex = json.data.fuzzyTrip.pattern.name.indexOf('HSL');
     const hslId = json.data.fuzzyTrip.pattern.name.substring(idIndex, idIndex + 11);
     return hslId;
-    //console.log(hslId);
-
 }
 
-export const fetchEndStopId = async (name) => {
+/**
+ * 
+ * @param {string} name 
+ * @returns {string} the gtfs id of the route the bus is currently on.
+ */
+export const fetchRouteId = async (name) => {
     const requestBody = `
     {
         routes(name: "${name}", transportModes: BUS) {
@@ -116,7 +126,7 @@ export const fetchEndStopId = async (name) => {
     for (const route of json.data.routes) {
         if (route.shortName === name) {
             //console.log(route.shortName, route.gtfsId);
-            return route.gtfsId
+            return route.gtfsId;
         }
     }
     console.log(name);
@@ -124,7 +134,12 @@ export const fetchEndStopId = async (name) => {
 }
 
 // hakee tarkan päätepysäkin graphqlstä topicista tuodulla päätepysäkillä
-export const fetchStop = async (id) => {
+/**
+ * 
+ * @param {string} id 
+ * @returns {{lat: number, long: number}} the location of the bus stop with the specified id.
+ */
+export const fetchStopLocation = async (id) => {
     if (id === undefined) console.log('id undefined at fetchStop');
     let to;
     const requestBody = `

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { fetchDuration, fetchEndStopId, fuzzyTripQuery, fetchStop } from "./ItineraryData";
+import { fetchDuration, fetchRouteId, fuzzyTripQuery, fetchStopLocation } from "./ItineraryData";
 import { MqttHandler } from "./Mqtt";
 
 const MQTTURL = 'wss://mqtt.hsl.fi:443/';
@@ -140,9 +140,9 @@ const BusMap = () => {
         const { route, direction, date, start } = bus;
         const [hours, minutes] = start.split(':');
         const time = hours * 60 * 60 + minutes * 60;
-        const endId = await fetchEndStopId(route);
-        const endGtfsId = endId && await fuzzyTripQuery({ route: endId, direction: direction, date: date, time: time });
-        const endLoc = endGtfsId && await fetchStop(endGtfsId);
+        const routeId = await fetchRouteId(route);
+        const endGtfsId = routeId && await fuzzyTripQuery({ route: routeId, direction: direction, date: date, time: time });
+        const endLoc = endGtfsId && await fetchStopLocation(endGtfsId);
         bus.endLoc = endLoc;
     }
 
