@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { fetchDuration, fetchRouteId, fuzzyTripQuery, fetchStopLocation } from "./ItineraryData";
 import { MqttHandler } from "./Mqtt";
 
@@ -34,13 +34,12 @@ const BusMap = () => {
     let buses = {};
     const topicStub = "/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/+/+/+/";
     const topic = "/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/+/+/+/60;24/19/73/#";
-    const mqttHandler = useRef(null);
+    const mqttHandler = new MqttHandler();
     let map;
 
 
     useEffect(() => {
         const interval = setInterval(update, 30000);
-        mqttHandler.current = new MqttHandler();
         connect();
         initMap();
         return (() => clearInterval(interval));
@@ -48,14 +47,14 @@ const BusMap = () => {
 
     const onConnect = () => {
         console.log('Connected');
-        //mqttHandler.current.subscribe(topic);
+        //mqttHandler.subscribe(topic);
         for (const area of topicAreas) {
-            mqttHandler.current.subscribe(`${topicStub}${area}/#`)
+            mqttHandler.subscribe(`${topicStub}${area}/#`)
         }
     }
 
     const connect = () => {
-        mqttHandler.current.connect(MQTTURL, onConnect, onMessage);
+        mqttHandler.connect(MQTTURL, onConnect, onMessage);
     }
 
     const onDisconnect = () => {
@@ -63,7 +62,7 @@ const BusMap = () => {
     }
 
     const disconnect = () => {
-        mqttHandler.current.disconnect(onDisconnect);
+        mqttHandler.disconnect(onDisconnect);
     }
 
     const onMessage = (message, topic) => {
@@ -98,7 +97,6 @@ const BusMap = () => {
             // tänne fetchstop ja endstop ja fuzzytrip
 
             newBus = {
-                position: Object.keys(data)[0],
                 start: start,
                 long: long,
                 lat: lat,
@@ -136,6 +134,11 @@ const BusMap = () => {
         }).addTo(map);
     }
 
+    /**
+     * Tries to fetch the position of the last stop for the bus and
+     * updates the bus object.
+     * @param {*} bus 
+     */
     const getEndStopLoc = async (bus) => {
         const { route, direction, date, start } = bus;
         const [hours, minutes] = start.split(':');
@@ -146,11 +149,20 @@ const BusMap = () => {
         bus.endLoc = endLoc;
     }
 
+    /**
+     * Calls the update-functions that update the bus marker
+     * info and remove inactive buses.
+     */
     const update = () => {
         removeOld();
         updatePopups();
     }
 
+    /**
+     * Asynchronously updates all the popups for the buses on the map.
+     * The markers are hidden, if the estimated time to finish for the bus
+     * cannot be fetched.
+     */
     const updatePopups = async () => {
         const currentTime = new Date().getTime();
         // Parallel processing
@@ -159,11 +171,11 @@ const BusMap = () => {
             const from = { lat: bus.lat, long: bus.long };
             if (!bus.endLoc || bus.endLoc === undefined) await getEndStopLoc(bus);
             const to = bus.endLoc;
+            const timeToDestination = await fetchDuration(from, to);
 
             const icon = bus.marker.options.icon;
-            const timeToDestination = await fetchDuration(from, to);
             if (timeToDestination !== undefined && timeToDestination > 0) {
-                const timeRemaining = (timeToDestination - currentTime) / 60000;
+                const timeRemaining = (timeToDestination - currentTime) / 60000; // ms to minutes
                 bus.duration = Math.round(timeRemaining);
                 icon.options.iconSize = [40, 40];
                 bus.marker.setIcon(icon);
@@ -194,7 +206,7 @@ const BusMap = () => {
     /**
      * Creates a div-element that contains bus info for leaflet popup
      * @param {*} bus 
-     * @returns {HTMLDivElement}
+     * @returns {HTMLDivElement} a div-element containing some info and a button.
      */
     const createPopupContent = (bus) => {
         const container = document.createElement('div');
@@ -231,10 +243,10 @@ const BusMap = () => {
      * @param {*} bus 
      */
     const clickEvent = (bus) => {
-        mqttHandler.current.unsubscribeAll();
+        mqttHandler.unsubscribeAll();
         console.log(bus.topic);
         // Sometimes subsctiption fails somehow and further messages from hte chosen bus are not received
-        mqttHandler.current.subscribe(bus.topic);
+        mqttHandler.subscribe(bus.topic);
     }
 
     // TODO: change outer div size according to props etc.
