@@ -6,7 +6,7 @@ const url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
  * from current location. Returns undefined when fetch fails.
  * @param {{lat: number, long: number}} from 
  * @param {{lat: number, long: number}} to 
- * @returns {number} expected time of arrival to end stop.
+ * @returns {Promise<number>} expected time of arrival to end stop.
  */
 export const fetchDuration = async (from, to) => {
     if (to === undefined) return undefined;
@@ -98,7 +98,7 @@ export const fuzzyTripQuery = async (data) => {
 /**
  * 
  * @param {string} name 
- * @returns {string} the gtfs id of the route the bus is currently on.
+ * @returns {Promise<string>} the gtfs id of the route the bus is currently on.
  */
 export const fetchRouteId = async (name) => {
     const requestBody = `
@@ -137,7 +137,7 @@ export const fetchRouteId = async (name) => {
 /**
  * 
  * @param {string} id 
- * @returns {{lat: number, long: number}} the location of the bus stop with the specified id.
+ * @returns {Promise<{lat: number, long: number}>} the location of the bus stop with the specified id.
  */
 export const fetchStopLocation = async (id) => {
     if (id === undefined) console.log('id undefined at fetchStop');
