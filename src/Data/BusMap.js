@@ -94,7 +94,6 @@ const BusMap = () => {
             marker.setLatLng([lat, long]);
         } else {
             const marker = new L.Marker([lat, long], { icon: busIcon }).addTo(map).bindPopup('no data');
-            // tänne fetchstop ja endstop ja fuzzytrip
 
             newBus = {
                 start: start,
@@ -125,7 +124,8 @@ const BusMap = () => {
         map = L.map('map', { /* dragging: false, zoomControl: false, scrollWheelZoom: false, doubleClickZoom: false */ }).setView([current_lat, current_long], 14);
 
         L.tileLayer("https://cdn.digitransit.fi/map/v1/{id}/{z}/{x}/{y}.png", {
-            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+            attribution:
+                'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
                 '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
             maxZoom: 19,
             tileSize: 512,
