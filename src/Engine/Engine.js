@@ -28,6 +28,7 @@ export class Engine {
         this.renderer = new THREE.WebGLRenderer({ canvas });
         this.renderer.setSize(width, height, false);
         this.renderer.render(this.scene, this.camera);
+        this.scene.background = new THREE.Color(0x000000);
         
         this.modelManager = new ModelManager();
         this.modelManager.setModels(['knight.gltf', 'checkers.gltf']);
