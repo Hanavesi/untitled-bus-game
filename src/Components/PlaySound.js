@@ -3,11 +3,7 @@ import Sound from 'react-sound';
 import Running from '../music/run.mp3';
 
 
-const PlaySound = ( 
-    handleSongLoading, 
-    handleSongPlaying, 
-    handleSongFinishedPlaying
- ) => {
+const PlaySound = () => {
      const [isPlaying, setIsPlaying] = useState(false);
 
     return (
@@ -19,9 +15,6 @@ const PlaySound = (
             isPlaying ? Sound.status.PLAYING : Sound.status.STOPPED
         }
         playFromPosition={300}
-        onLoading={handleSongLoading}
-        onPlaying={handleSongPlaying}
-        onFinished={handleSongFinishedPlaying}
         loop={true}
         volume = {20}
         />

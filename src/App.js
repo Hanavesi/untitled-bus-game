@@ -13,7 +13,7 @@ function App() {
   return (
     <div>
       <Menu />
-      <PlaySound />
+      <PlaySound  />
     </div>
   );
 }
