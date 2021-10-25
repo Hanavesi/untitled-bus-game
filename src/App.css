@@ -6,8 +6,7 @@ body {
   background-color: #000000;
 }
 
-button {
-  
+.menuButton {
   width: 380px;
   height: 86px;
   font-size: 50px;
@@ -20,7 +19,6 @@ button {
   line-height: 88px;
   outline: transparent;
   position: relative;
-
 }
 
 .nimet, h2 {
