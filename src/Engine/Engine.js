@@ -31,7 +31,7 @@ export class Engine {
         this.scene.background = new THREE.Color(0x000000);
         
         this.modelManager = new ModelManager();
-        this.modelManager.setModels(['knight.gltf', 'checkers.gltf']);
+        this.modelManager.setModels(['knight.gltf', 'checkers.gltf', 'soldier1.gltf']);
         this.modelManager.load(() => {
             this.init();
             onReady(true);
@@ -83,6 +83,13 @@ export class Engine {
             .addComponent(Playable)
             .addComponent(HitBox, { size: new THREE.Vector2(1.5, 1.5) })
             .addComponent(StateMachine, { fsm: knightFSM });
+
+        const soldier = new SkinInstance(this.modelManager.models['soldier1', this.scene]);
+        entity = this.world.createEntity();
+        entity
+            .addComponent(Vectors, { direction: new THREE.Vector3(1, 0, 0), speed: 20 })
+            .addComponent(Object3D, { skin: soldier })
+            .addComponent(HitBox, { size: new THREE.Vector2(1.5, 1.5) })
 
         const tilemap = mapToMeshes(MAP_TEST);
         for (const tile of tilemap) {
