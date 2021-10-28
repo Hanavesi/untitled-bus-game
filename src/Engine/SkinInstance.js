@@ -10,7 +10,6 @@ export class SkinInstance {
     constructor(model, scene) {
         this.model = model;
         this.moveRoot = new Group();
-        console.log(model);
         this.animRoot = clone(this.model.gltf.scene);
         this.mixer = new AnimationMixer(this.animRoot);
         this.moveRoot.add(this.animRoot);

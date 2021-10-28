@@ -84,12 +84,25 @@ export class Engine {
             .addComponent(HitBox, { size: new THREE.Vector2(1.5, 1.5) })
             .addComponent(StateMachine, { fsm: knightFSM });
 
-        const soldier = new SkinInstance(this.modelManager.models['soldier1', this.scene]);
+        const soldier = new SkinInstance(this.modelManager.models['soldier1'], this.scene);
+        const soldierFSM = new FiniteStateMachine({
+            idle: {
+                enter: () => {
+                    soldier.setAnimation('ArmatureAction');
+                }
+            },
+            run: {
+                enter: () => {
+                    knight.setAnimation('ArmatureAction');
+                }
+            }
+        }, 'idle');
         entity = this.world.createEntity();
         entity
-            .addComponent(Vectors, { direction: new THREE.Vector3(1, 0, 0), speed: 20 })
+            .addComponent(Vectors, { direction: new THREE.Vector3(0, 0, 0), speed: 20 })
             .addComponent(Object3D, { skin: soldier })
             .addComponent(HitBox, { size: new THREE.Vector2(1.5, 1.5) })
+            .addComponent(StateMachine, { fsm: soldierFSM });
 
         const tilemap = mapToMeshes(MAP_TEST);
         for (const tile of tilemap) {
