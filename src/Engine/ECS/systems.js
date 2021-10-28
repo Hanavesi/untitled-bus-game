@@ -93,8 +93,7 @@ export class UpdateVectorsSystem extends System {
                     fsm.transition('idle');
                 }
                 continue;
-                animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), Math.PI * 2);
-                
+                //animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), Math.PI * 2);
             } else {
                 const angle = Math.atan2(x, -y);
                 animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), angle);
