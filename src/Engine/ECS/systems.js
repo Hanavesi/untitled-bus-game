@@ -89,10 +89,12 @@ export class UpdateVectorsSystem extends System {
             const animRoot = skin.animRoot;
             const fsm = entity.getComponent(StateMachine).fsm;
             if (x === 0 && y === 0) { // If standing still, look "down"
-                animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), Math.PI * 2);
                 if (fsm && fsm.state !== 'idle') {
                     fsm.transition('idle');
                 }
+                continue;
+                animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), Math.PI * 2);
+                
             } else {
                 const angle = Math.atan2(x, -y);
                 animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), angle);
