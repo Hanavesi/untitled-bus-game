@@ -1,5 +1,5 @@
 import { clone } from "three/examples/jsm/utils/SkeletonUtils";
-import { AnimationMixer, Group, Mesh, MeshBasicMaterial, PlaneGeometry } from "three";
+import { AnimationMixer, Group, Mesh, MeshBasicMaterial, PlaneGeometry, Vector3 } from "three";
 
 
 export class SkinInstance {
@@ -11,6 +11,7 @@ export class SkinInstance {
         this.model = model;
         this.moveRoot = new Group();
         this.animRoot = clone(this.model.gltf.scene);
+        this.animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
         this.mixer = new AnimationMixer(this.animRoot);
         this.moveRoot.add(this.animRoot);
         scene.add(this.moveRoot);
