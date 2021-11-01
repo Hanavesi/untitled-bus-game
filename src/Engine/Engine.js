@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Input, Object3D, Playable, Vectors, HitBox, Tile, StateMachine, CameraComponent } from "./ECS/components";
+import { Input, Object3D, Playable, Vectors, HitBox, Tile, StateMachine, CameraComponent, Enemy } from "./ECS/components";
 import { initWorld } from "./ECS/initializer";
 import { FiniteStateMachine } from "./FSM";
 import { InputManager } from "./InputManager";
@@ -93,16 +93,17 @@ export class Engine {
             },
             run: {
                 enter: () => {
-                    knight.setAnimation('ArmatureAction');
+                    soldier.setAnimation('ArmatureAction');
                 }
             }
         }, 'idle');
         entity = this.world.createEntity();
         entity
-            .addComponent(Vectors, { direction: new THREE.Vector3(0, 0, 0), speed: 20 })
+            .addComponent(Vectors, { direction: new THREE.Vector3(0, 0, 0), speed: 5 })
             .addComponent(Object3D, { skin: soldier })
             .addComponent(HitBox, { size: new THREE.Vector2(1.5, 1.5) })
-            .addComponent(StateMachine, { fsm: soldierFSM });
+            .addComponent(StateMachine, { fsm: soldierFSM })
+            .addComponent(Enemy);
 
         const tilemap = mapToMeshes(MAP_TEST);
         for (const tile of tilemap) {

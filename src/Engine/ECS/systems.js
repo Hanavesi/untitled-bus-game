@@ -1,15 +1,15 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent } from "./components";
+import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy } from "./components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect } from "../util/collisions";
 
-export class MoveSystem extends System {
+export class ControlPlayerSystem extends System {
     execute() {
         const entities = this.queries.entities.results;
         const inputState = this.queries.inputState.results[0].getComponent(Input).state;
         for (const entity of entities) {
             const vectors = entity.getMutableComponent(Vectors);
-            let newDir = new Vector3(0, 0, 0);
+            let newDir = new Vector2(0, 0);
             if (inputState.left.down) newDir.x -= 1;
             if (inputState.right.down) newDir.x += 1;
             if (inputState.up.down) newDir.y += 1;
@@ -19,16 +19,57 @@ export class MoveSystem extends System {
     }
 }
 
-MoveSystem.queries = {
+ControlPlayerSystem.queries = {
     entities: { components: [Object3D, Vectors, Playable] },
     inputState: { components: [Input] }
 }
+
+export class ControlEnemySystem extends System {
+    execute() {
+        const player = this.queries.player.results[0].getComponent(Object3D);
+        const playerMoveRoot = player.skin.moveRoot;
+        const playerPos = new Vector2(playerMoveRoot.position.x, playerMoveRoot.position.y);
+
+        const enemies = this.queries.enemies.results;
+        for (const enemy of enemies) {
+            const enemyRoot = enemy.getComponent(Object3D).skin.moveRoot;
+            const enemyPos = new Vector2(enemyRoot.position.x, enemyRoot.position.y);
+            const dir = new Vector2().addVectors(enemyPos.negate(), playerPos);
+            const dist = Math.sqrt(dir.x * dir.x + dir.y * dir.y);
+            const vector = enemy.getMutableComponent(Vectors);
+            if (dist <= 5) {
+                vector.direction = new Vector2();
+            } else {
+                vector.direction = dir.normalize();
+            }
+        }
+    }
+}
+
+ControlEnemySystem.queries = {
+    player: { components: [Playable] },
+    enemies: { components: [Enemy, Object3D, Vectors] }
+}
+
+export class CameraPositionSystem extends System {
+    execute() {
+        const player = this.queries.entities.results[0].getComponent(Object3D);
+        const camera = this.queries.camera.results[0].getMutableComponent(CameraComponent).camera;
+        const moveRoot = player.skin.moveRoot;
+        camera.position.set(moveRoot.position.x, moveRoot.position.y, 20);
+    }
+}
+
+CameraPositionSystem.queries = {
+    entities: { components: [Playable] },
+    camera: { components: [CameraComponent] }
+}
+
 // TODO: move animation handling to a different system and maybe component
 export class UpdateVectorsSystem extends System {
     execute(delta) {
         const entities = this.queries.entities.results;
         const tiles = this.queries.tiles.results;
-        const camera = this.queries.camera.results[0].getMutableComponent(CameraComponent).camera;
         for (const entity of entities) {
             const skin = entity.getComponent(Object3D).skin;
             const moveRoot = skin.moveRoot;
@@ -80,8 +121,6 @@ export class UpdateVectorsSystem extends System {
             moveRoot.translateX(vel.x * delta);
             moveRoot.translateY(vel.y * delta);
 
-            camera.position.set(moveRoot.position.x, moveRoot.position.y, 20);
-
             // wacky solution to rotate moving objects according to direction
             // while keeping them titled on the screen
             const x = vectors.direction.x;
@@ -108,6 +147,5 @@ export class UpdateVectorsSystem extends System {
 
 UpdateVectorsSystem.queries = {
     entities: { components: [Object3D, Vectors, HitBox] },
-    tiles: { components: [Tile] },
-    camera: { components: [CameraComponent] }
+    tiles: { components: [Tile] }
 }

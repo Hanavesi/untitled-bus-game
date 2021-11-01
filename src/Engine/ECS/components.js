@@ -2,6 +2,7 @@ import { TagComponent, Component, Types } from "ecsy";
 
 export class Playable extends TagComponent { }
 export class Animated extends TagComponent { }
+export class Enemy extends TagComponent {}
 
 export class Object3D extends Component { }
 
