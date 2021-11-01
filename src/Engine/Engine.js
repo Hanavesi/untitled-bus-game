@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Input, Object3D, Playable, Vectors, HitBox, Tile, StateMachine, CameraComponent, Enemy } from "./ECS/components";
 import { initWorld } from "./ECS/initializer";
 import { FiniteStateMachine } from "./FSM";
@@ -8,6 +7,7 @@ import { ModelManager } from "./ModelManager";
 import { SkinInstance } from "./SkinInstance";
 import { mapToMeshes } from "./TileGen";
 import { MAP_TEST } from "./TileMap";
+import { EntityGenerator } from "./util/EntityGenerator";
 
 export class Engine {
 
@@ -31,7 +31,7 @@ export class Engine {
         this.scene.background = new THREE.Color(0x000000);
         
         this.modelManager = new ModelManager();
-        this.modelManager.setModels(['knight.gltf', 'checkers.gltf', 'soldier1.gltf']);
+        this.modelManager.setModels(['knight.gltf', 'soldier1.gltf']);
         this.modelManager.load(() => {
             this.init();
             onReady(true);
@@ -63,48 +63,14 @@ export class Engine {
     }
 
     init() {
-        const knight = new SkinInstance(this.modelManager.models['knight'], this.scene);
-        const knightFSM = new FiniteStateMachine({
-            idle: {
-                enter: () => {
-                    knight.setAnimation('Idle');
-                }
-            },
-            run: {
-                enter: () => {
-                    knight.setAnimation('Run');
-                }
-            }
-        }, 'idle');
-        let entity = this.world.createEntity();
-        entity
-            .addComponent(Vectors, { direction: new THREE.Vector3(1, 0, 0), speed: 20 })
-            .addComponent(Object3D, { skin: knight })
-            .addComponent(Playable)
-            .addComponent(HitBox, { size: new THREE.Vector2(1.5, 1.5) })
-            .addComponent(StateMachine, { fsm: knightFSM });
+        this.entityGenerator = new EntityGenerator(this.modelManager.models, this.world, this.scene);
+        this.entityGenerator.createPlayer({x: 0, y: 0});
+        this.entityGenerator.createSoldier({x: -30, y: 0});
+        this.entityGenerator.createSoldier({x: 30, y: -10});
+        this.entityGenerator.createSoldier({x: -30, y: 10});
+        this.entityGenerator.createSoldier({x: 30, y: 10});
 
-        const soldier = new SkinInstance(this.modelManager.models['soldier1'], this.scene);
-        const soldierFSM = new FiniteStateMachine({
-            idle: {
-                enter: () => {
-                    soldier.setAnimation('ArmatureAction');
-                }
-            },
-            run: {
-                enter: () => {
-                    soldier.setAnimation('ArmatureAction');
-                }
-            }
-        }, 'idle');
-        entity = this.world.createEntity();
-        entity
-            .addComponent(Vectors, { direction: new THREE.Vector3(0, 0, 0), speed: 5 })
-            .addComponent(Object3D, { skin: soldier })
-            .addComponent(HitBox, { size: new THREE.Vector2(1.5, 1.5) })
-            .addComponent(StateMachine, { fsm: soldierFSM })
-            .addComponent(Enemy);
-
+        let entity;
         const tilemap = mapToMeshes(MAP_TEST);
         for (const tile of tilemap) {
             this.scene.add(tile);
