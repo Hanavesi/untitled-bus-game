@@ -37,7 +37,7 @@ export class ControlEnemySystem extends System {
             const dir = new Vector2().addVectors(enemyPos.negate(), playerPos);
             const dist = Math.sqrt(dir.x * dir.x + dir.y * dir.y);
             const vector = enemy.getMutableComponent(Vectors);
-            if (dist <= 5) {
+            if (dist <= 15) {
                 vector.direction = new Vector2();
             } else {
                 vector.direction = dir.normalize();
@@ -70,6 +70,8 @@ export class UpdateVectorsSystem extends System {
     execute(delta) {
         const entities = this.queries.entities.results;
         const tiles = this.queries.tiles.results;
+        const enemies = this.queries.enemies.results;
+
         for (const entity of entities) {
             const skin = entity.getComponent(Object3D).skin;
             const moveRoot = skin.moveRoot;
@@ -79,7 +81,11 @@ export class UpdateVectorsSystem extends System {
             // initializing some arrays that hold collision data
             const collisions = [];
             const tileBoxes = [];
+            // ENEMIES
+            const enemyCollisions = [];
+            const enemyBoxes = [];
 
+            // Player HITBOX
             const hitBox = entity.getComponent(HitBox);
             const vel = new Vector2(vectors.direction.x, vectors.direction.y).multiplyScalar(vectors.speed);
             // gathering required data from moving entity for AABB collision calculations
@@ -87,8 +93,33 @@ export class UpdateVectorsSystem extends System {
             let entityY = moveRoot.position.y - hitBox.size.y / 2;
             const r1 = { pos: new Vector2(entityX, entityY), size: hitBox.size };
 
-            // First check for collision on the current frame
-            for (let i = 0, obj; obj=tiles[i]; i++) {
+            // First check for collisions to ENEMIES on the current frame
+            for (let i = 0, enemy; enemy = enemies[i]; i++) {
+                // Enemy HITBOX
+                const enemyHitBox = enemy.getComponent(HitBox);
+                const enemySkin = enemy.getComponent(Object3D).skin;
+                const enemyRoot = enemySkin.moveRoot;
+                //console.log(enemyRoot.position);
+                let enemyX = enemyRoot.position.x - enemyHitBox.size.x / 2;
+                let enemyY = enemyRoot.position.y - enemyHitBox.size.y / 2;
+                //console.log(enemyX, enemyY);
+                const r2 = { pos: new Vector2(enemyX, enemyY), size: enemyHitBox.size };
+                //console.log(r2);
+
+                // saving the enemy bounding box for possible collision resolution
+                enemyBoxes.push(r2);
+
+                // initializing contactInfo object that holds the data through collision caltulations
+                const contactInfo = { contactNormal: null, contactPoint: null, tHitNear: 0 };
+
+                if (DynamicRectToRect(r1, vel, delta, r2, contactInfo)) {
+                    enemyCollisions.push({ index: i, time: contactInfo.tHitNear });
+                    console.log('asd');
+                }
+            }
+
+            // First check for collisions to TILES on the current frame
+            for (let i = 0, obj; obj = tiles[i]; i++) {
                 // gathering the same data for static collidable tiles
                 // TODO: optimize this by only checking tiles close to the entity
                 const tile = obj.getComponent(Tile);
@@ -100,24 +131,29 @@ export class UpdateVectorsSystem extends System {
                 tileBoxes.push(r2);
 
                 // initializing contactInfo object that holds the data through collision caltulations
-                const contactInfo = {contactNormal: null, contactPoint: null, tHitNear: 0};
+                const contactInfo = { contactNormal: null, contactPoint: null, tHitNear: 0 };
 
                 // If collision is detected, get tile index and collision "time" for collision resolution.
                 // The time is basically just a scalar value that tells when the first collision happens
                 // on one of the axes
-                if(DynamicRectToRect(r1, vel, delta, r2, contactInfo)) {
+                if (DynamicRectToRect(r1, vel, delta, r2, contactInfo)) {
                     collisions.push({ index: i, time: contactInfo.tHitNear });
                 }
             }
 
             // sort the collisions based on collision time
             collisions.sort((a, b) => a.time - b.time);
-            
+            enemyCollisions.sort((a, b) => a.time - b.time)
+
             // resolve the collisions in order
             for (const collision of collisions) {
                 ResolveDynamicRectToRect(r1, vel, delta, tileBoxes[collision.index])
             }
-            
+            // resolve the collisions in order
+            for (const enemyCollision of enemyCollisions) {
+                ResolveDynamicRectToRect(r1, vel, delta, enemyBoxes[enemyCollision.index])
+            }
+
             moveRoot.translateX(vel.x * delta);
             moveRoot.translateY(vel.y * delta);
 
@@ -147,5 +183,6 @@ export class UpdateVectorsSystem extends System {
 
 UpdateVectorsSystem.queries = {
     entities: { components: [Object3D, Vectors, HitBox] },
-    tiles: { components: [Tile] }
+    tiles: { components: [Tile] },
+    enemies: { components: [Enemy, Object3D, Vectors, HitBox] }
 }
