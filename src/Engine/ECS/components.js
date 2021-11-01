@@ -58,3 +58,11 @@ export class StateMachine extends Component { }
 StateMachine.schema = {
     fsm: { type: Types.Ref }
 };
+
+export class HealthBar extends Component {}
+
+HealthBar.schema = {
+    bar: { type: Types.Ref },
+    max: { type: Types.Number },
+    current: { type: Types.Number }
+}

@@ -1,5 +1,5 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy } from "./components";
+import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar } from "./components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect } from "../util/collisions";
 
@@ -24,6 +24,23 @@ ControlPlayerSystem.queries = {
     inputState: { components: [Input] }
 }
 
+export class TempHealthSystem extends System {
+    execute() {
+        const healthBar = this.queries.entities.results[0].getMutableComponent(HealthBar);
+        const current = healthBar.current;
+        const max = healthBar.max;
+        const scale = (current / max);
+        healthBar.bar.scale.set(scale * 5, 0.2, 1);
+        healthBar.bar.position.x = (scale * 5 - 5) / 2;
+        healthBar.current -= 0.1;
+        if (healthBar.current < 0) healthBar.current = 0;
+    }
+}
+
+TempHealthSystem.queries = {
+    entities: { components: [HealthBar] }
+}
+
 export class ControlEnemySystem extends System {
     execute() {
         const player = this.queries.player.results[0].getComponent(Object3D);
@@ -36,12 +53,13 @@ export class ControlEnemySystem extends System {
             const enemyPos = new Vector2(enemyRoot.position.x, enemyRoot.position.y);
             const dir = new Vector2().addVectors(enemyPos.negate(), playerPos);
             const dist = Math.sqrt(dir.x * dir.x + dir.y * dir.y);
-            const vector = enemy.getMutableComponent(Vectors);
-            if (dist <= 5) {
-                vector.direction = new Vector2();
+            const vectors = enemy.getMutableComponent(Vectors);
+            if (dist <= 10) {
+                vectors.speed = 0;
             } else {
-                vector.direction = dir.normalize();
+                vectors.speed = 3;
             }
+            vectors.direction = dir.normalize();
         }
     }
 }
@@ -115,7 +133,7 @@ export class UpdateVectorsSystem extends System {
             
             // resolve the collisions in order
             for (const collision of collisions) {
-                ResolveDynamicRectToRect(r1, vel, delta, tileBoxes[collision.index])
+                ResolveDynamicRectToRect(r1, vel, delta, tileBoxes[collision.index]);
             }
             
             moveRoot.translateX(vel.x * delta);

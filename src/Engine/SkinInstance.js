@@ -16,7 +16,7 @@ export class SkinInstance {
         this.moveRoot.add(this.animRoot);
         scene.add(this.moveRoot);
         this.actions = {};
-        this.setHitBoxVisible();
+        //this.setHitBoxVisible();
     }
 
     setAnimation(animName) {
