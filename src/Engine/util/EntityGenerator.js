@@ -28,6 +28,7 @@ export class EntityGenerator {
     const uzi = this.modelManager.getModel('uzi');
     uzi.setRotationFromAxisAngle(new Vector3(0, 1, 0), Math.PI/-2);
     uzi.rotateOnAxis(new Vector3(1, 0, 0), Math.PI / 2);
+    console.log(uzi.getObjectByName('barrel'))
     palm.add(uzi);
 
     const healthBaseMaterial = new THREE.SpriteMaterial({ color: 0xff0000 });

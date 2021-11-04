@@ -1,10 +1,8 @@
 import * as THREE from "three";
-import { Input, Object3D, Playable, Vectors, HitBox, Tile, StateMachine, CameraComponent, Enemy, Cells } from "./ECS/components";
+import { Input, Tile, CameraComponent } from "./ECS/components";
 import { initWorld } from "./ECS/initializer";
-import { FiniteStateMachine } from "./FSM";
 import { InputManager } from "./InputManager";
 import { ModelManager } from "./ModelManager";
-import { SkinInstance } from "./SkinInstance";
 import { mapToMeshes } from "./TileGen";
 import { MAP_TEST } from "./TileMap";
 import { EntityGenerator } from "./util/EntityGenerator";
@@ -67,10 +65,12 @@ export class Engine {
   init() {
     this.entityGenerator = new EntityGenerator(this.modelManager, this.world, this.scene);
     this.entityGenerator.createPlayer({ x: 0, y: 0 });
-    for (let i = 0; i < 100; i++) {
+    /* for (let i = 0; i < 100; i++) {
       this.entityGenerator.createSoldier({ x: 0, y: 10 });
-    }
-    //this.entityGenerator.createSoldier({ x: 0, y: 10 });
+    } */
+    this.entityGenerator.createSoldier({ x: 0, y: 10 });
+    this.entityGenerator.createSoldier({ x: -20, y: 0});
+    this.entityGenerator.createSoldier({ x: 20, y: 0});
 
     let entity;
     const { meshes } = mapToMeshes(MAP_TEST);

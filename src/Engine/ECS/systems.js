@@ -26,14 +26,18 @@ ControlPlayerSystem.queries = {
 
 export class TempHealthSystem extends System {
     execute() {
-        const healthBar = this.queries.entities.results[0].getMutableComponent(HealthBar);
+        const player = this.queries.entities.results[0];
+        const healthBar = player.getMutableComponent(HealthBar);
         const current = healthBar.current;
         const max = healthBar.max;
         const scale = (current / max);
         healthBar.bar.scale.set(scale * 5, 0.2, 1);
         healthBar.bar.position.x = (scale * 5 - 5) / 2;
         healthBar.current -= 0.1;
-        if (healthBar.current < 0) healthBar.current = 0;
+        if (healthBar.current < 0) {
+            healthBar.current = 0;
+            //player.remove();
+        };
     }
 }
 

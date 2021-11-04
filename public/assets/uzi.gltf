@@ -8,14 +8,27 @@
         {
             "name" : "Scene",
             "nodes" : [
-                2
+                3
             ]
         }
     ],
     "nodes" : [
         {
+            "name" : "barrel",
+            "scale" : [
+                3.6895792484283447,
+                3.6895792484283447,
+                3.6895792484283447
+            ],
+            "translation" : [
+                -0.0009799798717722297,
+                2.8733718395233154,
+                -8.300431251525879
+            ]
+        },
+        {
             "mesh" : 0,
-            "name" : "Cube",
+            "name" : "clip",
             "scale" : [
                 0.7814152836799622,
                 0.7814152836799622,
@@ -29,7 +42,7 @@
         },
         {
             "mesh" : 1,
-            "name" : "Cube.002",
+            "name" : "trigger",
             "scale" : [
                 0.06840773671865463,
                 0.06840773671865463,
@@ -44,7 +57,8 @@
         {
             "children" : [
                 0,
-                1
+                1,
+                2
             ],
             "mesh" : 2,
             "name" : "Cube.001",
@@ -100,7 +114,7 @@
             ]
         },
         {
-            "name" : "Cube.002",
+            "name" : "body",
             "primitives" : [
                 {
                     "attributes" : {
@@ -145,7 +159,7 @@
         {
             "bufferView" : 3,
             "componentType" : 5126,
-            "count" : 88,
+            "count" : 102,
             "max" : [
                 1.0943715572357178,
                 3.7051050662994385,
@@ -161,7 +175,7 @@
         {
             "bufferView" : 4,
             "componentType" : 5126,
-            "count" : 88,
+            "count" : 102,
             "type" : "VEC3"
         },
         {
@@ -173,7 +187,7 @@
         {
             "bufferView" : 6,
             "componentType" : 5126,
-            "count" : 2219,
+            "count" : 3059,
             "max" : [
                 0.731764018535614,
                 3.8482797145843506,
@@ -189,7 +203,7 @@
         {
             "bufferView" : 7,
             "componentType" : 5126,
-            "count" : 2219,
+            "count" : 3059,
             "type" : "VEC3"
         },
         {
@@ -217,38 +231,38 @@
         },
         {
             "buffer" : 0,
-            "byteLength" : 1056,
+            "byteLength" : 1224,
             "byteOffset" : 648
         },
         {
             "buffer" : 0,
-            "byteLength" : 1056,
-            "byteOffset" : 1704
+            "byteLength" : 1224,
+            "byteOffset" : 1872
         },
         {
             "buffer" : 0,
             "byteLength" : 264,
-            "byteOffset" : 2760
+            "byteOffset" : 3096
         },
         {
             "buffer" : 0,
-            "byteLength" : 26628,
-            "byteOffset" : 3024
+            "byteLength" : 36708,
+            "byteOffset" : 3360
         },
         {
             "buffer" : 0,
-            "byteLength" : 26628,
-            "byteOffset" : 29652
+            "byteLength" : 36708,
+            "byteOffset" : 40068
         },
         {
             "buffer" : 0,
             "byteLength" : 7926,
-            "byteOffset" : 56280
+            "byteOffset" : 76776
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 64208,
+            "byteLength" : 84704,
             "uri" : "uzi.bin"
         }
     ]
