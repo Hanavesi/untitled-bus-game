@@ -1,4 +1,3 @@
-import * as CANNON from 'cannon';
 import * as THREE from "three";
 import { System } from "ecsy";
 import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Bullet } from "./components";

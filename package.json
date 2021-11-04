@@ -6,7 +6,6 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
-    "cannon": "^0.6.2",
     "ecsy": "^0.4.2",
     "leaflet": "^1.7.1",
     "mqtt": "^4.2.8",
