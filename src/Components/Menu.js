@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import Game from './Game';
+import { MemoizedGame } from './Game';
 import Credits from './Credits';
 import BusMap from '../Data/BusMap';
 import MenuList from './MenuList';
@@ -12,7 +12,7 @@ export default function Menu() {
     <Router>
       <Switch>
         <Route exact path="/" render={MenuList} />
-        <Route path="/Game" component={Game} />
+        <Route path="/Game" component={MemoizedGame} />
         <Route path="/Map" component={BusMap} />
         <Route path="/Credits" component={Credits} />
         <Route path="*" render={() => <h2>Error! Page not  found!</h2>} />

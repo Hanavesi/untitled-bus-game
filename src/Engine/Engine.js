@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { Input, Tile, CameraComponent } from "./ECS/components";
+import { Vector2, Vector3 } from "three";
+import { Input, Tile, CameraComponent, Mouse } from "./ECS/components";
 import { initWorld } from "./ECS/initializer";
 import { InputManager } from "./InputManager";
 import { ModelManager } from "./ModelManager";
@@ -14,6 +15,7 @@ export class Engine {
   constructor(canvas, width, height, onReady) {
     this.inputManager = new InputManager();
     this.lastFrame = 0;
+    this.mousePos = new Vector2();
     this.world = initWorld();
     //this.camera = new THREE.PerspectiveCamera(45, width / height, 0.005, 10000);
     const aspectratio = width / height;
@@ -62,15 +64,23 @@ export class Engine {
     this.camera.updateProjectionMatrix();
   }
 
+  setMousePos(pos) {
+    this.mousePos = this.mousePos.set(pos.x, pos.y).normalize();
+  }
+
+  mouseClick() {
+    //
+  }
+
   init() {
     this.entityGenerator = new EntityGenerator(this.modelManager, this.world, this.scene);
     this.entityGenerator.createPlayer({ x: 0, y: 0 });
     /* for (let i = 0; i < 100; i++) {
       this.entityGenerator.createSoldier({ x: 0, y: 10 });
     } */
-    this.entityGenerator.createSoldier({ x: 0, y: 10 });
+    /* this.entityGenerator.createSoldier({ x: 0, y: 10 });
     this.entityGenerator.createSoldier({ x: -20, y: 0});
-    this.entityGenerator.createSoldier({ x: 20, y: 0});
+    this.entityGenerator.createSoldier({ x: 20, y: 0}); */
 
     let entity;
     const { meshes } = mapToMeshes(MAP_TEST);
@@ -89,6 +99,9 @@ export class Engine {
       plane.position.y = tile.position.y;
       this.scene.add(plane); */
     }
+
+    const mouseEntity = this.world.createEntity();
+    mouseEntity.addComponent(Mouse, { pos: this.mousePos });
 
     const cameraEntity = this.world.createEntity();
     cameraEntity.addComponent(CameraComponent, { camera: this.camera });

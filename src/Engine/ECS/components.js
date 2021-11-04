@@ -72,3 +72,9 @@ HealthBar.schema = {
     max: { type: Types.Number },
     current: { type: Types.Number }
 }
+
+export class Mouse extends Component { }
+
+Mouse.schema = {
+    pos: { type: Types.Ref }
+}

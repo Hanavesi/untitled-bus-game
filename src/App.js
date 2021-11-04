@@ -5,7 +5,6 @@ import {useMousePosition} from './Components/useMousePosition';
 
 
 function App() {
-  // const position = useMousePosition();
 
   return (
     <div>

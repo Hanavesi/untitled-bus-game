@@ -1,5 +1,5 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Cells } from "./components";
+import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Cells, Mouse } from "./components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect } from "../util/collisions";
 
@@ -33,16 +33,8 @@ export class TempHealthSystem extends System {
         const scale = (current / max);
         healthBar.bar.scale.set(scale * 5, 0.2, 1);
         healthBar.bar.position.x = (scale * 5 - 5) / 2;
-<<<<<<< HEAD
         healthBar.current -= 0.05;
         if (healthBar.current < 0) healthBar.current = 0;
-=======
-        healthBar.current -= 0.1;
-        if (healthBar.current < 0) {
-            healthBar.current = 0;
-            //player.remove();
-        };
->>>>>>> c5958f7e6867324c0304b79e913ee3fe7862133f
     }
 }
 
@@ -65,15 +57,8 @@ export class ControlEnemySystem extends System {
             const dist = Math.sqrt(enemyToPlayer.x * enemyToPlayer.x + enemyToPlayer.y * enemyToPlayer.y);
             const dir = enemyToPlayer.clone().normalize();
             const vectors = enemy.getMutableComponent(Vectors);
-<<<<<<< HEAD
-            if (dist <= 3) {
-                vectors.speed = 0;
-            } else {
-                vectors.speed = 8;
-=======
             if (dist <= 2) {
                 playerVectors.velocity.add(dir.multiplyScalar(20))
->>>>>>> c5958f7e6867324c0304b79e913ee3fe7862133f
             }
             vectors.direction = dir.normalize();
         }
@@ -83,6 +68,22 @@ export class ControlEnemySystem extends System {
 ControlEnemySystem.queries = {
     player: { components: [Playable] },
     enemies: { components: [Enemy, Object3D, Vectors] }
+}
+
+export class FollowMouseSystem extends System {
+    execute() {
+        const player = this.queries.player.results[0].getComponent(Object3D);
+        const animRoot = player.skin.animRoot;
+        const mousePos = this.queries.mouse.results[0].getComponent(Mouse).pos;
+        const angle = Math.atan2(mousePos.y, mousePos.x);
+        animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), angle + Math.PI / 2);
+        animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
+    }
+}
+
+FollowMouseSystem.queries = {
+    player: { components: [Playable] },
+    mouse: { components: [Mouse] }
 }
 
 export class CameraPositionSystem extends System {

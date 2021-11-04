@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Engine } from '../Engine/Engine';
 
-function Game(props) {
+export function Game() {
     const [ready, setReady] = useState(false);
     const engine = useRef(null);
     const visible = { visibility: 'visible' };
@@ -19,7 +19,12 @@ function Game(props) {
             const height = canvas.clientHeight;
             engine.current.onWindowResize(width, height);
         });
-    }, [props]);
+        window.addEventListener('mousemove', (e) => {
+            const pos = {x:(e.clientX / window.innerWidth) * 2 - 1, y:-(e.clientY / window.innerHeight) * 2 + 1};
+            engine.current.setMousePos(pos);
+        });
+        
+    }, []);
 
 
     return (
@@ -30,4 +35,4 @@ function Game(props) {
 
 }
 
-export default Game;
+export const MemoizedGame = React.memo(Game);
