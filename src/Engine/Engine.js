@@ -67,10 +67,13 @@ export class Engine {
   init() {
     this.entityGenerator = new EntityGenerator(this.modelManager, this.world, this.scene);
     this.entityGenerator.createPlayer({ x: 0, y: 0 });
+    for (let i = 0; i < 100; i++) {
+      this.entityGenerator.createSoldier({ x: 0, y: 10 });
+    }
     //this.entityGenerator.createSoldier({ x: 0, y: 10 });
 
     let entity;
-    const { meshes, bounds } = mapToMeshes(MAP_TEST);
+    const { meshes } = mapToMeshes(MAP_TEST);
     for (const tile of meshes) {
       this.scene.add(tile);
       if (tile.name === 'floor') continue;
@@ -86,17 +89,6 @@ export class Engine {
       plane.position.y = tile.position.y;
       this.scene.add(plane); */
     }
-    const cells = {};
-    for (let i = 0; i < bounds.width; i += CELLSIZE) {
-      let row = {};
-      for (let j = 0; j < bounds.height; j += CELLSIZE) {
-        row[-bounds.height / 2 + j] = {};
-      }
-      cells[-bounds.width / 2 + i] = row;
-    }
-    console.log(cells);
-    this.world.createEntity()
-      .addComponent(Cells, { cells: cells });
 
     const cameraEntity = this.world.createEntity();
     cameraEntity.addComponent(CameraComponent, { camera: this.camera });

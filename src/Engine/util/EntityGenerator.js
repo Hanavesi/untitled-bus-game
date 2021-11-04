@@ -13,7 +13,6 @@ export class EntityGenerator {
 
   createPlayer(position) {
     const skin = new SkinInstance(this.modelManager.models['knight2'], this.scene);
-    console.log(skin)
     skin.moveRoot.position.x = position.x;
     skin.moveRoot.position.y = position.y;
     const healthBar = new THREE.Group();

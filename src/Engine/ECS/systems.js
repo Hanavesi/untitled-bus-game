@@ -1,5 +1,5 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar } from "./components";
+import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Cells } from "./components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect } from "../util/collisions";
 
@@ -52,8 +52,9 @@ export class ControlEnemySystem extends System {
         for (const enemy of enemies) {
             const enemyRoot = enemy.getComponent(Object3D).skin.moveRoot;
             const enemyPos = new Vector2(enemyRoot.position.x, enemyRoot.position.y);
-            const dir = new Vector2().addVectors(enemyPos.negate(), playerPos);
-            const dist = Math.sqrt(dir.x * dir.x + dir.y * dir.y);
+            const enemyToPlayer = new Vector2().addVectors(enemyPos.negate(), playerPos);
+            const dist = Math.sqrt(enemyToPlayer.x * enemyToPlayer.x + enemyToPlayer.y * enemyToPlayer.y);
+            const dir = enemyToPlayer.clone().normalize();
             const vectors = enemy.getMutableComponent(Vectors);
             if (dist <= 2) {
                 playerVectors.velocity.add(dir.multiplyScalar(20))
@@ -106,6 +107,7 @@ export class UpdateVectorsSystem extends System {
             const acc = new Vector2().add(vectors.direction).multiplyScalar(vectors.speed).multiplyScalar(delta);
             const vel = acc.multiplyScalar(delta).add(vectors.velocity);
             if (vel.length() > 5 && entity.hasComponent(Enemy)) vel.setLength(5);
+            if (vel.length() > 30 && entity.hasComponent(Playable)) vel.setLength(30);
             //if (entity.hasComponent(Enemy)) console.log(vectors)
             // gathering required data from moving entity for AABB collision calculations
             let entityX = moveRoot.position.x - hitBox.size.x / 2;
@@ -146,9 +148,11 @@ export class UpdateVectorsSystem extends System {
                 let tileY = tile.position.y - tile.size.y / 2;
                 const r2 = { pos: new Vector2(tileX, tileY), size: tile.size };
 
+                const entityToTile = r1.pos.clone().negate().add(r2.pos);
+                const dist = entityToTile.length();
                 // saving the tile bounding box for possible collision resolution
                 tileBoxes.push(r2);
-
+                if (dist > 5) continue;
                 // initializing contactInfo object that holds the data through collision caltulations
                 const contactInfo = { contactNormal: null, contactPoint: null, tHitNear: 0 };
 
