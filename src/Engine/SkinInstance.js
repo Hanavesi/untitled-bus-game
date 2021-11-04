@@ -8,6 +8,7 @@ export class SkinInstance {
      * @param {*} model 
      */
     constructor(model, scene) {
+        console.log(model)
         this.model = model;
         this.moveRoot = new Group();
         this.animRoot = clone(this.model.gltf.scene);

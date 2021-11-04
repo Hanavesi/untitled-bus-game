@@ -1,5 +1,5 @@
 import { World } from "ecsy";
-import { Vectors, Object3D, Playable, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar } from "./components";
+import { Vectors, Object3D, Playable, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Cells } from "./components";
 import { CameraPositionSystem, ControlEnemySystem, ControlPlayerSystem, TempHealthSystem, UpdateVectorsSystem } from "./systems";
 
 export const initWorld = () => {
@@ -16,6 +16,7 @@ export const initWorld = () => {
         .registerComponent(CameraComponent)
         .registerComponent(Enemy)
         .registerComponent(HealthBar)
+        .registerComponent(Cells)
 
     world
         .registerSystem(ControlPlayerSystem)

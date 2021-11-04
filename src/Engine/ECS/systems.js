@@ -43,9 +43,10 @@ TempHealthSystem.queries = {
 
 export class ControlEnemySystem extends System {
     execute() {
-        const player = this.queries.player.results[0].getComponent(Object3D);
-        const playerMoveRoot = player.skin.moveRoot;
+        const player = this.queries.player.results[0];
+        const playerMoveRoot = player.getComponent(Object3D).skin.moveRoot;
         const playerPos = new Vector2(playerMoveRoot.position.x, playerMoveRoot.position.y);
+        const playerVectors = player.getComponent(Vectors);
 
         const enemies = this.queries.enemies.results;
         for (const enemy of enemies) {
@@ -54,10 +55,8 @@ export class ControlEnemySystem extends System {
             const dir = new Vector2().addVectors(enemyPos.negate(), playerPos);
             const dist = Math.sqrt(dir.x * dir.x + dir.y * dir.y);
             const vectors = enemy.getMutableComponent(Vectors);
-            if (dist <= 10) {
-                vectors.speed = 0;
-            } else {
-                vectors.speed = 3;
+            if (dist <= 2) {
+                playerVectors.velocity.add(dir.multiplyScalar(20))
             }
             vectors.direction = dir.normalize();
         }
@@ -88,31 +87,33 @@ export class UpdateVectorsSystem extends System {
     execute(delta) {
         const entities = this.queries.entities.results;
         const tiles = this.queries.tiles.results;
-        const enemies = this.queries.enemies.results;
-
+        //const enemies = this.queries.enemies.results;
         for (const entity of entities) {
             const skin = entity.getComponent(Object3D).skin;
             const moveRoot = skin.moveRoot;
-            const vectors = entity.getComponent(Vectors);
+            const vectors = entity.getMutableComponent(Vectors);
             skin.update(delta);
 
             // initializing some arrays that hold collision data
             const collisions = [];
             const tileBoxes = [];
             // ENEMIES
-            const enemyCollisions = [];
-            const enemyBoxes = [];
+            /* const enemyCollisions = [];
+            const enemyBoxes = []; */
 
             // Player HITBOX
             const hitBox = entity.getComponent(HitBox);
-            const vel = new Vector2(vectors.direction.x, vectors.direction.y).multiplyScalar(vectors.speed);
+            const acc = new Vector2().add(vectors.direction).multiplyScalar(vectors.speed).multiplyScalar(delta);
+            const vel = acc.multiplyScalar(delta).add(vectors.velocity);
+            if (vel.length() > 5 && entity.hasComponent(Enemy)) vel.setLength(5);
+            //if (entity.hasComponent(Enemy)) console.log(vectors)
             // gathering required data from moving entity for AABB collision calculations
             let entityX = moveRoot.position.x - hitBox.size.x / 2;
             let entityY = moveRoot.position.y - hitBox.size.y / 2;
             const r1 = { pos: new Vector2(entityX, entityY), size: hitBox.size };
 
             // First check for collisions to ENEMIES on the current frame
-            for (let i = 0, enemy; enemy = enemies[i]; i++) {
+            /* for (let i = 0, enemy; enemy = enemies[i]; i++) {
                 // Enemy HITBOX
                 const enemyHitBox = enemy.getComponent(HitBox);
                 const enemySkin = enemy.getComponent(Object3D).skin;
@@ -134,7 +135,7 @@ export class UpdateVectorsSystem extends System {
                     enemyCollisions.push({ index: i, time: contactInfo.tHitNear });
                     console.log('asd');
                 }
-            }
+            } */
 
             // First check for collisions to TILES on the current frame
             for (let i = 0, obj; obj = tiles[i]; i++) {
@@ -161,16 +162,17 @@ export class UpdateVectorsSystem extends System {
 
             // sort the collisions based on collision time
             collisions.sort((a, b) => a.time - b.time);
-            enemyCollisions.sort((a, b) => a.time - b.time)
+            /* enemyCollisions.sort((a, b) => a.time - b.time) */
+            vectors.velocity = vel.clone().multiplyScalar(0.8);
 
             // resolve the collisions in order
             for (const collision of collisions) {
                 ResolveDynamicRectToRect(r1, vel, delta, tileBoxes[collision.index]);
             }
             // resolve the collisions in order
-            for (const enemyCollision of enemyCollisions) {
+            /* for (const enemyCollision of enemyCollisions) {
                 ResolveDynamicRectToRect(r1, vel, delta, enemyBoxes[enemyCollision.index])
-            }
+            } */
 
             moveRoot.translateX(vel.x * delta);
             moveRoot.translateY(vel.y * delta);
