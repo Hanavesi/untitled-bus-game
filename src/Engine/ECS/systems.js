@@ -32,7 +32,7 @@ export class TempHealthSystem extends System {
         const scale = (current / max);
         healthBar.bar.scale.set(scale * 5, 0.2, 1);
         healthBar.bar.position.x = (scale * 5 - 5) / 2;
-        healthBar.current -= 0.1;
+        healthBar.current -= 0.05;
         if (healthBar.current < 0) healthBar.current = 0;
     }
 }
@@ -54,10 +54,10 @@ export class ControlEnemySystem extends System {
             const dir = new Vector2().addVectors(enemyPos.negate(), playerPos);
             const dist = Math.sqrt(dir.x * dir.x + dir.y * dir.y);
             const vectors = enemy.getMutableComponent(Vectors);
-            if (dist <= 10) {
+            if (dist <= 3) {
                 vectors.speed = 0;
             } else {
-                vectors.speed = 3;
+                vectors.speed = 8;
             }
             vectors.direction = dir.normalize();
         }
