@@ -1,5 +1,7 @@
 import { TextureLoader, MeshLambertMaterial, Mesh, PlaneGeometry } from "three"
 
+const TILESIZE = 4;
+
 export const mapToMeshes = (map) => {
     const loader = new TextureLoader();
     const height = map.length;
@@ -12,9 +14,9 @@ export const mapToMeshes = (map) => {
             const material = new MeshLambertMaterial({
                 map: loader.load(tileSrc)
             });
-            const geometry = new PlaneGeometry(4, 4);
+            const geometry = new PlaneGeometry(TILESIZE, TILESIZE);
             const mesh = new Mesh(geometry, material);
-            mesh.position.set(-width * 2 + x * 4, height * 2 - y * 4, -1);
+            mesh.position.set(-width * 2 + x * TILESIZE, height * 2 - y * TILESIZE, -1);
             if (tileSrc.includes('floor')) {
                 mesh.name = 'floor';
             } else if (tileSrc.includes('door')) {
@@ -29,7 +31,7 @@ export const mapToMeshes = (map) => {
             meshes.push(mesh);
         }
     }
-    return meshes;
+    return { meshes: meshes, bounds: { width: width * TILESIZE, height: height * TILESIZE } };
 }
 
 const idToSrc = (id) => {

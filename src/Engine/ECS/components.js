@@ -36,10 +36,16 @@ export class Vectors extends Component { }
 
 Vectors.schema = {
     direction: { type: Types.Ref },
+    velocity: { type: Types.Ref },
     speed: { type: Types.Number },
     object: { type: Types.Ref }
 };
 
+export class Cells extends Component { }
+
+Cells.schema = {
+    cells: { type: Types.Ref }
+}
 
 export class Input extends Component { }
 
