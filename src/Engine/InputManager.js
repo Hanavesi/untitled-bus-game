@@ -26,7 +26,7 @@ export class InputManager {
     addKey(68, 'right');
     addKey(87, 'up');
     addKey(83, 'down');
-    addKey(66, 'b');
+    addKey(32, 'space');
 
     window.addEventListener('keydown', (e) => {
       setKeyFromKeyCode(e.keyCode, true);

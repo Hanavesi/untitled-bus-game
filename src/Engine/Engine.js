@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Input, Object3D, Playable, Vectors, HitBox, Tile, StateMachine, CameraComponent, Enemy } from "./ECS/components";
+import { Input, Object3D, Playable, Vectors, HitBox, Tile, StateMachine, CameraComponent, Enemy, Bullet } from "./ECS/components";
 import { initWorld } from "./ECS/initializer";
 import { FiniteStateMachine } from "./FSM";
 import { InputManager } from "./InputManager";
@@ -16,9 +16,9 @@ export class Engine {
         this.lastFrame = 0;
         this.world = initWorld();
         //this.camera = new THREE.PerspectiveCamera(45, width / height, 0.005, 10000);
-        const aspectratio = width/height;
+        const aspectratio = width / height;
         //this.camera = new THREE.OrthographicCamera(width / -30, width / 30, height / 30, height / -30, 1, 1000);
-        this.camera = new THREE.OrthographicCamera(-15 * aspectratio, 15 * aspectratio, 15, -15 , 1, 1000);
+        this.camera = new THREE.OrthographicCamera(-15 * aspectratio, 15 * aspectratio, 15, -15, 1, 1000);
         this.camera.position.set(0, 0, 20);
         /* const controls = new OrbitControls(this.camera, canvas);
         controls.target.set(0, 0, 0);
@@ -29,7 +29,7 @@ export class Engine {
         this.renderer.setSize(width, height, false);
         this.renderer.render(this.scene, this.camera);
         this.scene.background = new THREE.Color(0x000000);
-        
+
         this.modelManager = new ModelManager();
         this.modelManager.setModels(['knight.gltf', 'soldier1.gltf']);
         this.modelManager.load(() => {
@@ -37,12 +37,14 @@ export class Engine {
             onReady(true);
         });
         this.onWindowResize(width, height);
+
+
     }
 
     onWindowResize(width, height) {
         let bottom, top, left, right;
-        const ratio = width/height;
-        if (ratio > 1)  {
+        const ratio = width / height;
+        if (ratio > 1) {
             top = 30 / ratio;
             bottom = -30 / ratio;
             left = -30;
@@ -64,11 +66,11 @@ export class Engine {
 
     init() {
         this.entityGenerator = new EntityGenerator(this.modelManager.models, this.world, this.scene);
-        this.entityGenerator.createPlayer({x: 0, y: 0});
-        this.entityGenerator.createSoldier({x: -30, y: 0});
-        this.entityGenerator.createSoldier({x: 30, y: -10});
-        this.entityGenerator.createSoldier({x: -30, y: 10});
-        this.entityGenerator.createSoldier({x: 30, y: 10});
+        this.entityGenerator.createPlayer({ x: 0, y: 0 });
+        this.entityGenerator.createSoldier({ x: -30, y: 0 });
+        this.entityGenerator.createSoldier({ x: 30, y: -10 });
+        this.entityGenerator.createSoldier({ x: -30, y: 10 });
+        this.entityGenerator.createSoldier({ x: 30, y: 10 });
 
         let entity;
         const tilemap = mapToMeshes(MAP_TEST);
@@ -88,8 +90,9 @@ export class Engine {
             this.scene.add(plane); */
         }
 
+
         const cameraEntity = this.world.createEntity();
-        cameraEntity.addComponent(CameraComponent, { camera: this.camera  });
+        cameraEntity.addComponent(CameraComponent, { camera: this.camera });
 
         const inputEntity = this.world.createEntity();
         inputEntity
@@ -102,6 +105,7 @@ export class Engine {
         this.scene.add(light);
 
         this.loop(0);
+
     }
 
     loop(now) {
@@ -110,22 +114,7 @@ export class Engine {
         const deltaTime = now - this.lastFrame;
         this.lastFrame = now;
 
-        /* if (this.inputManager.keys.left.justPressed) {
-            console.log("left")
-        };
-        if (this.inputManager.keys.right.justPressed) {
-            console.log("right")
-        };
-        if (this.inputManager.keys.up.justPressed) {
-            console.log("up")
-        };
-        if (this.inputManager.keys.down.justPressed) {
-            console.log("down")
-        };
 
-        if (this.inputManager.keys.b.justPressed) {
-            console.log("b")
-        }; */
 
         this.world.execute(deltaTime, now);
         this.inputManager.update();
@@ -143,5 +132,7 @@ export class Engine {
         this.scene.add(light.target);
     }
 }
+
+
 
 

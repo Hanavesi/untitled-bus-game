@@ -2,7 +2,7 @@ import { TagComponent, Component, Types } from "ecsy";
 
 export class Playable extends TagComponent { }
 export class Animated extends TagComponent { }
-export class Enemy extends TagComponent {}
+export class Enemy extends TagComponent { }
 
 export class Object3D extends Component { }
 
@@ -59,10 +59,18 @@ StateMachine.schema = {
     fsm: { type: Types.Ref }
 };
 
-export class HealthBar extends Component {}
+export class HealthBar extends Component { }
 
 HealthBar.schema = {
     bar: { type: Types.Ref },
     max: { type: Types.Number },
     current: { type: Types.Number }
+}
+
+export class Bullet extends Component { }
+
+Bullet.schema = {
+    x: { type: Types.Number },
+    y: { type: Types.Number },
+    size: { type: Types.Ref }
 }

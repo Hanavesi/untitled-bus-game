@@ -1,7 +1,10 @@
+import * as CANNON from 'cannon';
+import * as THREE from "three";
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar } from "./components";
-import { Vector3, Vector2 } from "three";
+import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Bullet } from "./components";
+import { Vector3, Vector2, Ray } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect } from "../util/collisions";
+const bulletImg = require('../util/bullet.png')
 
 export class ControlPlayerSystem extends System {
     execute() {
@@ -14,6 +17,7 @@ export class ControlPlayerSystem extends System {
             if (inputState.right.down) newDir.x += 1;
             if (inputState.up.down) newDir.y += 1;
             if (inputState.down.down) newDir.y -= 1;
+
             vectors.direction = newDir.normalize();
         }
     }
@@ -23,6 +27,41 @@ ControlPlayerSystem.queries = {
     entities: { components: [Object3D, Vectors, Playable] },
     inputState: { components: [Input] }
 }
+
+export class ControlBulletSystem extends System {
+    execute() {
+        const player = this.queries.player.results[0].getComponent(Object3D);
+        const playerMoveRoot = player.skin.moveRoot;
+        const entities = this.queries.entities.results;
+        const bullets = this.queries.bullets.results;
+
+        for (const entity of entities) {
+            window.addEventListener("click", function (e) {
+                entity.addComponent(Bullet, {
+                    x: playerMoveRoot.position.x,
+                    y: playerMoveRoot.position.y,
+                    size: new THREE.Vector2(1.5, 1.5),
+                    skin: bulletImg
+                })
+            });
+        }
+
+        for (const bullet of bullets) {
+            const dir = new Ray(playerPos, { x: 30, y: 30 });
+            const vectors = bullet.getMutableComponent(Vectors);
+            vectors.speed = 5;
+            vectors.direction = dir.normalize();
+        }
+
+    }
+}
+
+ControlBulletSystem.queries = {
+    player: { components: [Playable] },
+    entities: { components: [Object3D, Vectors, HitBox, Bullet] },
+    bullets: { components: [Bullet] }
+}
+
 
 export class TempHealthSystem extends System {
     execute() {
@@ -132,7 +171,6 @@ export class UpdateVectorsSystem extends System {
 
                 if (DynamicRectToRect(r1, vel, delta, r2, contactInfo)) {
                     enemyCollisions.push({ index: i, time: contactInfo.tHitNear });
-                    console.log('asd');
                 }
             }
 
@@ -200,7 +238,8 @@ export class UpdateVectorsSystem extends System {
 }
 
 UpdateVectorsSystem.queries = {
-    entities: { components: [Object3D, Vectors, HitBox] },
+    entities: { components: [Object3D, Vectors, HitBox, Bullet] },
     tiles: { components: [Tile] },
-    enemies: { components: [Enemy, Object3D, Vectors, HitBox] }
+    enemies: { components: [Enemy, Object3D, Vectors, HitBox] },
+    bullets: { components: [Object3D, Bullet] }
 }
