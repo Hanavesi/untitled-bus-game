@@ -25,11 +25,11 @@ export const initWorld = () => {
 
     world
         .registerSystem(ControlPlayerSystem)
-        .registerSystem(UpdateVectorsSystem)
-        .registerSystem(CameraPositionSystem)
         .registerSystem(ControlEnemySystem)
         .registerSystem(TempHealthSystem)
         .registerSystem(UpdateBulletsSystem)
+        .registerSystem(UpdateVectorsSystem)
+        .registerSystem(CameraPositionSystem)
 
     return world;
 }
