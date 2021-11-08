@@ -1,6 +1,6 @@
 import { FiniteStateMachine } from "../FSM";
 import { SkinInstance } from "../SkinInstance";
-import { Object3D, Playable, Vectors, HitBox, StateMachine, Enemy, HealthBar, Bullet, Gun } from "../ECS/components";
+import { Object3D, Playable, Vectors, HitBox, StateMachine, Enemy, HealthBar, Bullet, Gun, TimeToLive } from "../ECS/components";
 import * as THREE from 'three';
 
 export class EntityGenerator {
@@ -51,7 +51,7 @@ export class EntityGenerator {
     }, 'idle');
     const entity = this.world.createEntity();
     entity
-      .addComponent(Vectors, { direction: new THREE.Vector2(1, 0), speed: 80000, velocity: new THREE.Vector2() })
+      .addComponent(Vectors, { direction: new THREE.Vector2(1, 0), speed: 200, velocity: new THREE.Vector2() })
       .addComponent(Object3D, { object: object })
       .addComponent(Playable)
       .addComponent(HitBox, { size: new THREE.Vector2(1.5, 1.5) })
@@ -79,7 +79,7 @@ export class EntityGenerator {
     }, 'idle');
     const entity = this.world.createEntity();
     entity
-      .addComponent(Vectors, { direction: new THREE.Vector2(0, 0), speed: 3000, velocity: new THREE.Vector2() })
+      .addComponent(Vectors, { direction: new THREE.Vector2(0, 0), speed: 50, velocity: new THREE.Vector2() })
       .addComponent(Object3D, { object: object })
       .addComponent(HitBox, { size: new THREE.Vector2(1.5, 1.5) })
       .addComponent(StateMachine, { fsm: fsm })
@@ -96,6 +96,7 @@ export class EntityGenerator {
     entity
       .addComponent(Object3D, { object: bullet })
       .addComponent(Vectors, { direction: direction, speed: speed, velocity: new THREE.Vector2() })
-      .addComponent(Bullet);
+      .addComponent(Bullet)
+      .addComponent(TimeToLive, { age: 0, max: 5.5 });
   }
 }

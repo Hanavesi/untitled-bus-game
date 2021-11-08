@@ -1,5 +1,5 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Mouse, Bullet, EntityGeneratorComp, Gun } from "./components";
+import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Mouse, Bullet, EntityGeneratorComp, Gun, TimeToLive } from "./components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect } from "../util/collisions";
 
@@ -38,7 +38,7 @@ export class ControlPlayerSystem extends System {
             animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), newAngle);
             animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
 
-            if (inputState.leftMouse.justPressed) {
+            if (inputState.leftMouse.down) {
                 const barrel = entity.getComponent(Gun).barrel;
                 const pos = new Vector3();
                 const speed = 30;
@@ -123,8 +123,8 @@ export class ControlEnemySystem extends System {
                 enemy.timeToShoot = 0;
             } else {
                 enemy.timeToShoot += delta;
-                waitTime = Math.random() * 2 + 5;
             }
+            waitTime = Math.random() * 2 + 5;
             //console.log(enemy.timeToShoot);
             if (enemy.timeToShoot > waitTime) {
 
@@ -169,6 +169,15 @@ export class UpdateBulletsSystem extends System {
         const bullets = this.queries.bullets.results;
         for (const bullet of bullets) {
             const object = bullet.getMutableComponent(Object3D).object;
+            const ttl = bullet.getMutableComponent(TimeToLive);
+            ttl.age += delta;
+            if (ttl.age >= ttl.max) {
+                object.geometry.dispose();
+                object.material.dispose();
+                object.removeFromParent();
+                bullet.remove();
+                continue;
+            }
             const vectors = bullet.getMutableComponent(Vectors);
             object.translateOnAxis(new Vector3(vectors.direction.x, vectors.direction.y, 0), vectors.speed * delta);
         }
@@ -200,10 +209,11 @@ export class UpdateVectorsSystem extends System {
 
             // Player HITBOX
             const hitBox = entity.getComponent(HitBox);
-            const acc = new Vector2().add(vectors.direction).multiplyScalar(vectors.speed).multiplyScalar(delta);
-            const vel = acc.multiplyScalar(delta).add(vectors.velocity);
+            const acc = new Vector2().add(vectors.direction).multiplyScalar(vectors.speed);
+            const vel = acc.clone().multiplyScalar(delta).add(vectors.velocity);
             if (vel.length() > 5 && entity.hasComponent(Enemy)) vel.setLength(5);
             if (vel.length() > 30 && entity.hasComponent(Playable)) vel.setLength(30);
+            const posUpdate = vel.clone().add(acc.multiplyScalar(-0.5 * delta));
             //if (entity.hasComponent(Enemy)) console.log(vectors)
             // gathering required data from moving entity for AABB collision calculations
             let entityX = moveRoot.position.x - hitBox.size.x / 2;
@@ -255,7 +265,7 @@ export class UpdateVectorsSystem extends System {
                 // If collision is detected, get tile index and collision "time" for collision resolution.
                 // The time is basically just a scalar value that tells when the first collision happens
                 // on one of the axes
-                if (DynamicRectToRect(r1, vel, delta, r2, contactInfo)) {
+                if (DynamicRectToRect(r1, posUpdate, delta, r2, contactInfo)) {
                     collisions.push({ index: i, time: contactInfo.tHitNear });
                 }
             }
@@ -263,19 +273,18 @@ export class UpdateVectorsSystem extends System {
             // sort the collisions based on collision time
             collisions.sort((a, b) => a.time - b.time);
             /* enemyCollisions.sort((a, b) => a.time - b.time) */
-            vectors.velocity = vel.clone().multiplyScalar(0.8);
-
             // resolve the collisions in order
             for (const collision of collisions) {
-                ResolveDynamicRectToRect(r1, vel, delta, tileBoxes[collision.index]);
+                ResolveDynamicRectToRect(r1, posUpdate, delta, tileBoxes[collision.index]);
             }
+            vectors.velocity = vel.clone().multiplyScalar(0.8);
             // resolve the collisions in order
             /* for (const enemyCollision of enemyCollisions) {
                 ResolveDynamicRectToRect(r1, vel, delta, enemyBoxes[enemyCollision.index])
             } */
 
-            moveRoot.translateX(vel.x * delta);
-            moveRoot.translateY(vel.y * delta);
+            moveRoot.translateX(delta * posUpdate.x);
+            moveRoot.translateY(delta * posUpdate.y);
         }
     }
 }

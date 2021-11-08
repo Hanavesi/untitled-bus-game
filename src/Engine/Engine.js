@@ -68,10 +68,6 @@ export class Engine {
     this.mousePos = this.mousePos.set(pos.x, pos.y).normalize();
   }
 
-  mouseClick() {
-    //
-  }
-
   init() {
     this.entityGenerator = new EntityGenerator(this.modelManager, this.world, this.scene);
     this.world.createEntity().addComponent(EntityGeneratorComp, { generator: this.entityGenerator });
@@ -80,8 +76,8 @@ export class Engine {
       this.entityGenerator.createSoldier({ x: 0, y: 10 });
     } */
     this.entityGenerator.createSoldier({ x: 0, y: 10 });
-    this.entityGenerator.createSoldier({ x: -20, y: 0});
-    this.entityGenerator.createSoldier({ x: 20, y: 0});
+    this.entityGenerator.createSoldier({ x: -20, y: 0 });
+    this.entityGenerator.createSoldier({ x: 20, y: 0 });
 
     let entity;
     const { meshes } = mapToMeshes(MAP_TEST);
@@ -139,8 +135,10 @@ export class Engine {
         console.log("down")
     }; */
 
-    this.world.execute(deltaTime, now);
-    this.inputManager.update();
+    if (now > 2) {
+      this.world.execute(deltaTime, now);
+      this.inputManager.update();
+    }
 
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.loop.bind(this));

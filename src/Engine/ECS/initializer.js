@@ -1,5 +1,5 @@
 import { World } from "ecsy";
-import { Vectors, Object3D, Playable, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Cells, Mouse, Bullet, EntityGeneratorComp, Gun } from "./components";
+import { Vectors, Object3D, Playable, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Cells, Mouse, Bullet, EntityGeneratorComp, Gun, TimeToLive } from "./components";
 import { CameraPositionSystem, ControlEnemySystem, ControlPlayerSystem, FollowMouseSystem, TempHealthSystem, UpdateBulletsSystem, UpdateVectorsSystem } from "./systems";
 
 export const initWorld = () => {
@@ -21,14 +21,15 @@ export const initWorld = () => {
         .registerComponent(Bullet)
         .registerComponent(EntityGeneratorComp)
         .registerComponent(Gun)
+        .registerComponent(TimeToLive)
 
     world
         .registerSystem(ControlPlayerSystem)
-        .registerSystem(UpdateVectorsSystem)
-        .registerSystem(CameraPositionSystem)
         .registerSystem(ControlEnemySystem)
         .registerSystem(TempHealthSystem)
         .registerSystem(UpdateBulletsSystem)
+        .registerSystem(UpdateVectorsSystem)
+        .registerSystem(CameraPositionSystem)
 
     return world;
 }
