@@ -38,7 +38,7 @@ export class ControlPlayerSystem extends System {
             animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), newAngle);
             animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
 
-            if (inputState.b.justPressed) {
+            if (inputState.leftMouse.justPressed) {
                 const barrel = entity.getComponent(Gun).barrel;
                 const pos = new Vector3();
                 barrel.getWorldPosition(pos);
@@ -141,7 +141,7 @@ export class UpdateBulletsSystem extends System {
         for (const bullet of bullets) {
             const object = bullet.getMutableComponent(Object3D).object;
             const vectors = bullet.getMutableComponent(Vectors);
-            object.translateOnAxis(new Vector3(vectors.direction.x, vectors.direction.y, 0), vectors.speed);
+            object.translateOnAxis(new Vector3(vectors.direction.x, vectors.direction.y, 0), vectors.speed * delta);
         }
     }
 }

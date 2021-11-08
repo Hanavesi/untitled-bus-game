@@ -27,7 +27,14 @@ export class InputManager {
     addKey(87, 'up');
     addKey(83, 'down');
     addKey(66, 'b');
+    addKey(1, 'leftMouse');
 
+    window.addEventListener('mousedown', () => {
+      setKeyFromKeyCode(1, true);
+    });
+    window.addEventListener('mouseup', () => {
+      setKeyFromKeyCode(1, false);
+    });
     window.addEventListener('keydown', (e) => {
       setKeyFromKeyCode(e.keyCode, true);
     });

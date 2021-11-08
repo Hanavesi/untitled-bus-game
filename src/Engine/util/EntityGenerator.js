@@ -95,7 +95,7 @@ export class EntityGenerator {
     const entity = this.world.createEntity();
     entity
       .addComponent(Object3D, { object: bullet })
-      .addComponent(Vectors, { direction: direction, speed: 0.6, velocity: new THREE.Vector2() })
+      .addComponent(Vectors, { direction: direction, speed: 30, velocity: new THREE.Vector2() })
       .addComponent(Bullet);
   }
 }
