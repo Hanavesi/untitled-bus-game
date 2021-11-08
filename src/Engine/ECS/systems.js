@@ -128,13 +128,13 @@ export class ControlEnemySystem extends System {
             //console.log(enemy.timeToShoot);
             if (enemy.timeToShoot > waitTime) {
 
-                console.log('2s menny');
+                //console.log('2s menny');
                 enemy.timeToShoot = 0;
                 const speed = 15;
                 const pos = new Vector2(enemyMoveRoot.position.x, enemyMoveRoot.position.y);
                 //barrel.getWorldPosition(pos);
-                const dir = new Vector2(playerMoveRoot.position.x, playerMoveRoot.position.y);
-                dir.normalize()
+                /* const dir = new Vector2(playerMoveRoot.position.x, playerMoveRoot.position.y);
+                dir.normalize() */
                 generator.createBullet(pos, dir, speed);
             }
 
