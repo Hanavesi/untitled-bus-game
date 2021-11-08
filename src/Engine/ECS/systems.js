@@ -41,9 +41,10 @@ export class ControlPlayerSystem extends System {
             if (inputState.leftMouse.justPressed) {
                 const barrel = entity.getComponent(Gun).barrel;
                 const pos = new Vector3();
+                const speed = 30;
                 barrel.getWorldPosition(pos);
                 const dir = new Vector2(mousePos.x, mousePos.y);
-                generator.createBullet(pos, dir);
+                generator.createBullet(pos, dir, speed);
             }
         }
     }
@@ -75,13 +76,18 @@ TempHealthSystem.queries = {
 }
 
 export class ControlEnemySystem extends System {
-    execute() {
+    execute(delta) {
         const player = this.queries.player.results[0];
         const playerMoveRoot = player.getComponent(Object3D).object.moveRoot;
         const playerPos = new Vector2(playerMoveRoot.position.x, playerMoveRoot.position.y);
         const playerVectors = player.getComponent(Vectors);
+        const generator = this.queries.generator.results[0].getComponent(EntityGeneratorComp).generator;
 
         const enemies = this.queries.enemies.results;
+
+
+
+
         for (const enemy of enemies) {
             const enemyObject = enemy.getComponent(Object3D).object;
             const enemyMoveRoot = enemyObject.moveRoot;
@@ -111,6 +117,27 @@ export class ControlEnemySystem extends System {
                     fsm.transition('run');
                 }
             }
+            //console.log(timeToShoot);
+            let waitTime;
+            if (enemy.timeToShoot === undefined) {
+                enemy.timeToShoot = 0;
+            } else {
+                enemy.timeToShoot += delta;
+                waitTime = Math.random() * 2 + 5;
+            }
+            //console.log(enemy.timeToShoot);
+            if (enemy.timeToShoot > waitTime) {
+
+                console.log('2s menny');
+                enemy.timeToShoot = 0;
+                const speed = 15;
+                const pos = new Vector2(enemyMoveRoot.position.x, enemyMoveRoot.position.y);
+                //barrel.getWorldPosition(pos);
+                const dir = new Vector2(playerMoveRoot.position.x, playerMoveRoot.position.y);
+                dir.normalize()
+                generator.createBullet(pos, dir, speed);
+            }
+
             animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
         }
     }
@@ -118,7 +145,9 @@ export class ControlEnemySystem extends System {
 
 ControlEnemySystem.queries = {
     player: { components: [Playable] },
-    enemies: { components: [Enemy, Object3D, Vectors] }
+    enemies: { components: [Enemy, Object3D, Vectors] },
+    generator: { components: [EntityGeneratorComp] },
+
 }
 
 export class CameraPositionSystem extends System {

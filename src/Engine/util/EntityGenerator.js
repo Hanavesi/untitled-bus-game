@@ -51,7 +51,7 @@ export class EntityGenerator {
     }, 'idle');
     const entity = this.world.createEntity();
     entity
-      .addComponent(Vectors, { direction: new THREE.Vector2(1, 0), speed: 8000, velocity: new THREE.Vector2() })
+      .addComponent(Vectors, { direction: new THREE.Vector2(1, 0), speed: 80000, velocity: new THREE.Vector2() })
       .addComponent(Object3D, { object: object })
       .addComponent(Playable)
       .addComponent(HitBox, { size: new THREE.Vector2(1.5, 1.5) })
@@ -86,7 +86,7 @@ export class EntityGenerator {
       .addComponent(Enemy);
   }
 
-  createBullet(position, direction) {
+  createBullet(position, direction, speed) {
     const bulletMaterial = new THREE.SpriteMaterial({ color: 0x000000 });
     const bullet = new THREE.Sprite(bulletMaterial);
     bullet.scale.set(0.8, 0.8, 0.8);
@@ -95,7 +95,7 @@ export class EntityGenerator {
     const entity = this.world.createEntity();
     entity
       .addComponent(Object3D, { object: bullet })
-      .addComponent(Vectors, { direction: direction, speed: 30, velocity: new THREE.Vector2() })
+      .addComponent(Vectors, { direction: direction, speed: speed, velocity: new THREE.Vector2() })
       .addComponent(Bullet);
   }
 }
