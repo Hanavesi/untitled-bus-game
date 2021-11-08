@@ -180,8 +180,8 @@ export class UpdateVectorsSystem extends System {
 
             // Player HITBOX
             const hitBox = entity.getComponent(HitBox);
-            const acc = new Vector2().add(vectors.direction).multiplyScalar(vectors.speed).multiplyScalar(delta);
-            const vel = acc.multiplyScalar(delta).add(vectors.velocity);
+            const acc = new Vector2().add(vectors.direction).multiplyScalar(vectors.speed);
+            const vel = acc.clone().multiplyScalar(delta).add(vectors.velocity);
             if (vel.length() > 5 && entity.hasComponent(Enemy)) vel.setLength(5);
             if (vel.length() > 30 && entity.hasComponent(Playable)) vel.setLength(30);
             //if (entity.hasComponent(Enemy)) console.log(vectors)
