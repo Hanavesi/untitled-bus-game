@@ -135,6 +135,7 @@ export class Engine {
         console.log("down")
     }; */
 
+    // Wait before starting loop
     if (now > 2) {
       this.world.execute(deltaTime, now);
       this.inputManager.update();
