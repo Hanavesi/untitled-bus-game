@@ -243,19 +243,19 @@ export class UpdateVectorsSystem extends System {
             // sort the collisions based on collision time
             collisions.sort((a, b) => a.time - b.time);
             /* enemyCollisions.sort((a, b) => a.time - b.time) */
-            vectors.velocity = vel.clone().multiplyScalar(0.8);
 
             // resolve the collisions in order
             for (const collision of collisions) {
                 ResolveDynamicRectToRect(r1, vel, delta, tileBoxes[collision.index]);
             }
+            vectors.velocity = vel.clone().multiplyScalar(0.8);
             // resolve the collisions in order
             /* for (const enemyCollision of enemyCollisions) {
                 ResolveDynamicRectToRect(r1, vel, delta, enemyBoxes[enemyCollision.index])
             } */
 
-            moveRoot.translateX(vel.x * delta);
-            moveRoot.translateY(vel.y * delta);
+            moveRoot.translateX(delta * (vel.x - 0.5 * delta * acc.x));
+            moveRoot.translateY(delta * (vel.y - 0.5 * delta * acc.y));
         }
     }
 }
