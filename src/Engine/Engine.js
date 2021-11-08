@@ -116,9 +116,8 @@ export class Engine {
     this.loop(0);
   }
 
-  loop(now) {
-
-    now *= 0.001;
+  loop() {
+    const now = performance.now() * 0.001;
     const deltaTime = now - this.lastFrame;
     this.lastFrame = now;
 
