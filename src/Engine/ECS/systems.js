@@ -1,5 +1,5 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Mouse, Bullet, EntityGeneratorComp, Gun } from "./components";
+import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Mouse, Bullet, EntityGeneratorComp, Gun, TimeToLive } from "./components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect } from "../util/collisions";
 
@@ -38,7 +38,7 @@ export class ControlPlayerSystem extends System {
             animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), newAngle);
             animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
 
-            if (inputState.leftMouse.justPressed) {
+            if (inputState.leftMouse.down) {
                 const barrel = entity.getComponent(Gun).barrel;
                 const pos = new Vector3();
                 barrel.getWorldPosition(pos);
@@ -140,6 +140,15 @@ export class UpdateBulletsSystem extends System {
         const bullets = this.queries.bullets.results;
         for (const bullet of bullets) {
             const object = bullet.getMutableComponent(Object3D).object;
+            const ttl = bullet.getMutableComponent(TimeToLive);
+            ttl.age += delta;
+            if (ttl.age >= ttl.max) {
+                object.geometry.dispose();
+                object.material.dispose();
+                object.removeFromParent();
+                bullet.remove();
+                continue;
+            }
             const vectors = bullet.getMutableComponent(Vectors);
             object.translateOnAxis(new Vector3(vectors.direction.x, vectors.direction.y, 0), vectors.speed * delta);
         }

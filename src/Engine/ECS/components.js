@@ -83,3 +83,10 @@ export class Gun extends Component { }
 Gun.schema = {
     barrel: { type: Types.Ref }
 }
+
+export class TimeToLive extends Component { }
+
+TimeToLive.schema = {
+    age: { type: Types.Number },
+    max: { type: Types.Number }
+}

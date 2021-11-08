@@ -1,6 +1,6 @@
 import { FiniteStateMachine } from "../FSM";
 import { SkinInstance } from "../SkinInstance";
-import { Object3D, Playable, Vectors, HitBox, StateMachine, Enemy, HealthBar, Bullet, Gun } from "../ECS/components";
+import { Object3D, Playable, Vectors, HitBox, StateMachine, Enemy, HealthBar, Bullet, Gun, TimeToLive } from "../ECS/components";
 import * as THREE from 'three';
 
 export class EntityGenerator {
@@ -96,6 +96,7 @@ export class EntityGenerator {
     entity
       .addComponent(Object3D, { object: bullet })
       .addComponent(Vectors, { direction: direction, speed: 30, velocity: new THREE.Vector2() })
-      .addComponent(Bullet);
+      .addComponent(Bullet)
+      .addComponent(TimeToLive, { age: 0, max: 0.5 });
   }
 }
