@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { Vector2, Vector3 } from "three";
-import { Input, Tile, CameraComponent, Mouse } from "./ECS/components";
+import { Vector2 } from "three";
+import { Input, Tile, CameraComponent, Mouse, EntityGeneratorComp } from "./ECS/components";
 import { initWorld } from "./ECS/initializer";
 import { InputManager } from "./InputManager";
 import { ModelManager } from "./ModelManager";
@@ -74,13 +74,14 @@ export class Engine {
 
   init() {
     this.entityGenerator = new EntityGenerator(this.modelManager, this.world, this.scene);
+    this.world.createEntity().addComponent(EntityGeneratorComp, { generator: this.entityGenerator });
     this.entityGenerator.createPlayer({ x: 0, y: 0 });
     /* for (let i = 0; i < 100; i++) {
       this.entityGenerator.createSoldier({ x: 0, y: 10 });
     } */
-    /* this.entityGenerator.createSoldier({ x: 0, y: 10 });
+    this.entityGenerator.createSoldier({ x: 0, y: 10 });
     this.entityGenerator.createSoldier({ x: -20, y: 0});
-    this.entityGenerator.createSoldier({ x: 20, y: 0}); */
+    this.entityGenerator.createSoldier({ x: 20, y: 0});
 
     let entity;
     const { meshes } = mapToMeshes(MAP_TEST);
@@ -136,10 +137,6 @@ export class Engine {
     };
     if (this.inputManager.keys.down.justPressed) {
         console.log("down")
-    };
-
-    if (this.inputManager.keys.b.justPressed) {
-        console.log("b")
     }; */
 
     this.world.execute(deltaTime, now);

@@ -1,6 +1,6 @@
 import { World } from "ecsy";
-import { Vectors, Object3D, Playable, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Cells, Mouse } from "./components";
-import { CameraPositionSystem, ControlEnemySystem, ControlPlayerSystem, FollowMouseSystem, TempHealthSystem, UpdateVectorsSystem } from "./systems";
+import { Vectors, Object3D, Playable, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Cells, Mouse, Bullet, EntityGeneratorComp, Gun } from "./components";
+import { CameraPositionSystem, ControlEnemySystem, ControlPlayerSystem, FollowMouseSystem, TempHealthSystem, UpdateBulletsSystem, UpdateVectorsSystem } from "./systems";
 
 export const initWorld = () => {
     const world = new World();
@@ -18,6 +18,9 @@ export const initWorld = () => {
         .registerComponent(HealthBar)
         .registerComponent(Cells)
         .registerComponent(Mouse)
+        .registerComponent(Bullet)
+        .registerComponent(EntityGeneratorComp)
+        .registerComponent(Gun)
 
     world
         .registerSystem(ControlPlayerSystem)
@@ -25,7 +28,7 @@ export const initWorld = () => {
         .registerSystem(CameraPositionSystem)
         .registerSystem(ControlEnemySystem)
         .registerSystem(TempHealthSystem)
-        .registerSystem(FollowMouseSystem)
+        .registerSystem(UpdateBulletsSystem)
 
     return world;
 }

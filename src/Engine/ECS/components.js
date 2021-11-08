@@ -2,12 +2,13 @@ import { TagComponent, Component, Types } from "ecsy";
 
 export class Playable extends TagComponent { }
 export class Animated extends TagComponent { }
-export class Enemy extends TagComponent {}
+export class Enemy extends TagComponent { }
+export class Bullet extends TagComponent { }
 
 export class Object3D extends Component { }
 
 Object3D.schema = {
-    skin: { type: Types.Ref }
+    object: { type: Types.Ref }
 };
 
 // TILE
@@ -17,14 +18,6 @@ Tile.schema = {
     position: { type: Types.Ref },
     size: { type: Types.Ref }
 };
-
-// Position component
-export class Position extends Component { }
-
-Position.schema = {
-    x: { type: Types.Number },
-    y: { type: Types.Number }
-}
 
 export class CameraComponent extends Component { }
 
@@ -77,4 +70,16 @@ export class Mouse extends Component { }
 
 Mouse.schema = {
     pos: { type: Types.Ref }
+}
+
+export class EntityGeneratorComp extends Component { }
+
+EntityGeneratorComp.schema = {
+    generator: { type: Types.Ref }
+}
+
+export class Gun extends Component { }
+
+Gun.schema = {
+    barrel: { type: Types.Ref }
 }

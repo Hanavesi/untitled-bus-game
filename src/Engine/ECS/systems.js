@@ -1,5 +1,5 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Cells, Mouse } from "./components";
+import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Mouse, Bullet, EntityGeneratorComp, Gun } from "./components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect } from "../util/collisions";
 
@@ -7,6 +7,8 @@ export class ControlPlayerSystem extends System {
     execute() {
         const entities = this.queries.entities.results;
         const inputState = this.queries.inputState.results[0].getComponent(Input).state;
+        const generator = this.queries.generator.results[0].getComponent(EntityGeneratorComp).generator;
+        const mousePos = this.queries.mouse.results[0].getComponent(Mouse).pos;
         for (const entity of entities) {
             const vectors = entity.getMutableComponent(Vectors);
             let newDir = new Vector2(0, 0);
@@ -15,13 +17,43 @@ export class ControlPlayerSystem extends System {
             if (inputState.up.down) newDir.y += 1;
             if (inputState.down.down) newDir.y -= 1;
             vectors.direction = newDir.normalize();
+
+            const object = entity.getComponent(Object3D).object;
+
+            const { x, y } = vectors.direction;
+            const animRoot = object.animRoot;
+            const fsm = entity.getComponent(StateMachine).fsm;
+            if (x === 0 && y === 0) { // If standing still, look "down"
+                if (fsm && fsm.state !== 'idle') {
+                    fsm.transition('idle');
+                }
+            } else {
+                if (fsm && fsm.state !== 'run') {
+                    fsm.transition('run');
+                }
+            }
+
+            const angle = Math.atan2(mousePos.y, mousePos.x);
+            const newAngle = angle + Math.PI / 2;
+            animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), newAngle);
+            animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
+
+            if (inputState.b.justPressed) {
+                const barrel = entity.getComponent(Gun).barrel;
+                const pos = new Vector3();
+                barrel.getWorldPosition(pos);
+                const dir = new Vector2(mousePos.x, mousePos.y);
+                generator.createBullet(pos, dir);
+            }
         }
     }
 }
 
 ControlPlayerSystem.queries = {
     entities: { components: [Object3D, Vectors, Playable] },
-    inputState: { components: [Input] }
+    inputState: { components: [Input] },
+    generator: { components: [EntityGeneratorComp] },
+    mouse: { components: [Mouse] }
 }
 
 export class TempHealthSystem extends System {
@@ -45,22 +77,41 @@ TempHealthSystem.queries = {
 export class ControlEnemySystem extends System {
     execute() {
         const player = this.queries.player.results[0];
-        const playerMoveRoot = player.getComponent(Object3D).skin.moveRoot;
+        const playerMoveRoot = player.getComponent(Object3D).object.moveRoot;
         const playerPos = new Vector2(playerMoveRoot.position.x, playerMoveRoot.position.y);
         const playerVectors = player.getComponent(Vectors);
 
         const enemies = this.queries.enemies.results;
         for (const enemy of enemies) {
-            const enemyRoot = enemy.getComponent(Object3D).skin.moveRoot;
-            const enemyPos = new Vector2(enemyRoot.position.x, enemyRoot.position.y);
+            const enemyObject = enemy.getComponent(Object3D).object;
+            const enemyMoveRoot = enemyObject.moveRoot;
+            const enemyPos = new Vector2(enemyMoveRoot.position.x, enemyMoveRoot.position.y);
             const enemyToPlayer = new Vector2().addVectors(enemyPos.negate(), playerPos);
             const dist = Math.sqrt(enemyToPlayer.x * enemyToPlayer.x + enemyToPlayer.y * enemyToPlayer.y);
             const dir = enemyToPlayer.clone().normalize();
             const vectors = enemy.getMutableComponent(Vectors);
             if (dist <= 2) {
-                playerVectors.velocity.add(dir.multiplyScalar(20))
+                playerVectors.velocity.add(dir.multiplyScalar(20));
             }
             vectors.direction = dir.normalize();
+
+            const { x, y } = vectors.direction;
+            const animRoot = enemyObject.animRoot;
+            const fsm = enemy.getComponent(StateMachine).fsm;
+            if (x === 0 && y === 0) { // If standing still, look "down"
+                if (fsm && fsm.state !== 'idle') {
+                    fsm.transition('idle');
+                }
+                continue;
+                //animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), Math.PI * 2);
+            } else {
+                const angle = Math.atan2(x, -y);
+                animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), angle);
+                if (fsm && fsm.state !== 'run') {
+                    fsm.transition('run');
+                }
+            }
+            animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
         }
     }
 }
@@ -70,27 +121,11 @@ ControlEnemySystem.queries = {
     enemies: { components: [Enemy, Object3D, Vectors] }
 }
 
-export class FollowMouseSystem extends System {
-    execute() {
-        const player = this.queries.player.results[0].getComponent(Object3D);
-        const animRoot = player.skin.animRoot;
-        const mousePos = this.queries.mouse.results[0].getComponent(Mouse).pos;
-        const angle = Math.atan2(mousePos.y, mousePos.x);
-        animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), angle + Math.PI / 2);
-        animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
-    }
-}
-
-FollowMouseSystem.queries = {
-    player: { components: [Playable] },
-    mouse: { components: [Mouse] }
-}
-
 export class CameraPositionSystem extends System {
     execute() {
         const player = this.queries.entities.results[0].getComponent(Object3D);
         const camera = this.queries.camera.results[0].getMutableComponent(CameraComponent).camera;
-        const moveRoot = player.skin.moveRoot;
+        const moveRoot = player.object.moveRoot;
         camera.position.set(moveRoot.position.x, moveRoot.position.y, 20);
     }
 }
@@ -100,6 +135,21 @@ CameraPositionSystem.queries = {
     camera: { components: [CameraComponent] }
 }
 
+export class UpdateBulletsSystem extends System {
+    execute(delta) {
+        const bullets = this.queries.bullets.results;
+        for (const bullet of bullets) {
+            const object = bullet.getMutableComponent(Object3D).object;
+            const vectors = bullet.getMutableComponent(Vectors);
+            object.translateOnAxis(new Vector3(vectors.direction.x, vectors.direction.y, 0), vectors.speed);
+        }
+    }
+}
+
+UpdateBulletsSystem.queries = {
+    bullets: { components: [Bullet] }
+}
+
 // TODO: move animation handling to a different system and maybe component
 export class UpdateVectorsSystem extends System {
     execute(delta) {
@@ -107,10 +157,10 @@ export class UpdateVectorsSystem extends System {
         const tiles = this.queries.tiles.results;
         //const enemies = this.queries.enemies.results;
         for (const entity of entities) {
-            const skin = entity.getComponent(Object3D).skin;
-            const moveRoot = skin.moveRoot;
+            const object = entity.getComponent(Object3D).object;
+            const moveRoot = object.moveRoot;
             const vectors = entity.getMutableComponent(Vectors);
-            skin.update(delta);
+            object.update(delta);
 
             // initializing some arrays that hold collision data
             const collisions = [];
@@ -197,33 +247,11 @@ export class UpdateVectorsSystem extends System {
 
             moveRoot.translateX(vel.x * delta);
             moveRoot.translateY(vel.y * delta);
-
-            // wacky solution to rotate moving objects according to direction
-            // while keeping them titled on the screen
-            const x = vectors.direction.x;
-            const y = vectors.direction.y;
-            const animRoot = skin.animRoot;
-            const fsm = entity.getComponent(StateMachine).fsm;
-            if (x === 0 && y === 0) { // If standing still, look "down"
-                if (fsm && fsm.state !== 'idle') {
-                    fsm.transition('idle');
-                }
-                continue;
-                //animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), Math.PI * 2);
-            } else {
-                const angle = Math.atan2(x, -y);
-                animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), angle);
-                if (fsm && fsm.state !== 'run') {
-                    fsm.transition('run');
-                }
-            }
-            animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
         }
     }
 }
 
 UpdateVectorsSystem.queries = {
     entities: { components: [Object3D, Vectors, HitBox] },
-    tiles: { components: [Tile] },
-    enemies: { components: [Enemy, Object3D, Vectors, HitBox] }
+    tiles: { components: [Tile] }
 }
