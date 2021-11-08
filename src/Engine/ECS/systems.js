@@ -127,11 +127,13 @@ export class ControlEnemySystem extends System {
             waitTime = Math.random() * 2 + 5;
             //console.log(enemy.timeToShoot);
             if (enemy.timeToShoot > waitTime) {
-
+                const barrel = enemy.getComponent(Gun).barrel;
+                const pos = new Vector3();
+                barrel.getWorldPosition(pos);
                 //console.log('2s menny');
                 enemy.timeToShoot = 0;
                 const speed = 15;
-                const pos = new Vector2(enemyMoveRoot.position.x, enemyMoveRoot.position.y);
+                //const pos = new Vector2(enemyMoveRoot.position.x, enemyMoveRoot.position.y);
                 //barrel.getWorldPosition(pos);
                 /* const dir = new Vector2(playerMoveRoot.position.x, playerMoveRoot.position.y);
                 dir.normalize() */

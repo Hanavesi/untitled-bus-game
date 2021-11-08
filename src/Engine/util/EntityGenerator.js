@@ -62,6 +62,7 @@ export class EntityGenerator {
 
   createSoldier(position) {
     const object = new SkinInstance(this.modelManager.models['soldier1'], this.scene);
+    const barrel = object.moveRoot.getObjectByName('barrel');
     object.moveRoot.position.x = position.x;
     object.moveRoot.position.y = position.y;
 
@@ -83,7 +84,8 @@ export class EntityGenerator {
       .addComponent(Object3D, { object: object })
       .addComponent(HitBox, { size: new THREE.Vector2(1.5, 1.5) })
       .addComponent(StateMachine, { fsm: fsm })
-      .addComponent(Enemy);
+      .addComponent(Enemy)
+      .addComponent(Gun, { barrel: barrel });
   }
 
   createBullet(position, direction, speed) {
