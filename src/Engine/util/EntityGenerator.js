@@ -54,7 +54,7 @@ export class EntityGenerator {
       .addComponent(Vectors, { direction: new THREE.Vector2(1, 0), speed: 5, velocity: new THREE.Vector2() })
       .addComponent(Object3D, { object: object })
       .addComponent(Playable)
-      .addComponent(HitBox, { size: new THREE.Vector2(1.5, 1.5) })
+      .addComponent(HitBox, { size: new THREE.Vector2(1.5, 3), offset: new THREE.Vector2(0, 1.5) })
       .addComponent(StateMachine, { fsm: fsm })
       .addComponent(HealthBar, { max: 100, current: 100, bar: health })
       .addComponent(Gun, { barrel: barrel });
@@ -82,7 +82,7 @@ export class EntityGenerator {
     entity
       .addComponent(Vectors, { direction: new THREE.Vector2(0, 0), speed: 2, velocity: new THREE.Vector2() })
       .addComponent(Object3D, { object: object })
-      .addComponent(HitBox, { size: new THREE.Vector2(1.5, 1.5) })
+      .addComponent(HitBox, { size: new THREE.Vector2(1.5, 3), offset: new THREE.Vector2(0, 1.5) })
       .addComponent(StateMachine, { fsm: fsm })
       .addComponent(Enemy)
       .addComponent(Gun, { barrel: barrel });

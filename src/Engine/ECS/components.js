@@ -49,7 +49,8 @@ Input.schema = {
 export class HitBox extends Component { }
 
 HitBox.schema = {
-    size: { type: Types.Ref }
+    size: { type: Types.Ref },
+    offset: { type: Types.Ref }
 };
 
 export class StateMachine extends Component { }
