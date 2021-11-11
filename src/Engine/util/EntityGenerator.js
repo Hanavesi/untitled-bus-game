@@ -1,6 +1,6 @@
 import { FiniteStateMachine } from "../FSM";
 import { SkinInstance } from "../SkinInstance";
-import { Object3D, Playable, Vectors, HitBox, StateMachine, Enemy, HealthBar, Bullet, Gun, TimeToLive } from "../ECS/components";
+import { Object3D, Playable, Vectors, HitBox, StateMachine, Enemy, HealthBar, Bullet, Gun, TimeToLive, Tile } from "../ECS/components";
 import * as THREE from 'three';
 
 export class EntityGenerator {
@@ -14,6 +14,7 @@ export class EntityGenerator {
     const object = new SkinInstance(this.modelManager.models['knight2'], this.scene);
     object.moveRoot.position.x = position.x;
     object.moveRoot.position.y = position.y;
+
     const healthBar = new THREE.Group();
     healthBar.position.y = 5;
     healthBar.position.z = 10;
@@ -96,9 +97,19 @@ export class EntityGenerator {
     this.scene.add(bullet);
     const entity = this.world.createEntity();
     entity
-      .addComponent(Object3D, { object: bullet })
-      .addComponent(Vectors, { direction: direction, speed: speed, velocity: new THREE.Vector2() })
+      .addComponent(Object3D, { object: { moveRoot: bullet } })
+      .addComponent(Vectors, { direction: direction, speed: speed, velocity: direction.clone().multiplyScalar(speed) })
+      .addComponent(HitBox, { size: new THREE.Vector2(0.3, 0.3), offset: new THREE.Vector2() })
       .addComponent(Bullet)
       .addComponent(TimeToLive, { age: 0, max: 1 });
+  }
+
+  createTile(tile, size) {
+    this.scene.add(tile);
+    const entity = this.world.createEntity();
+    entity
+      .addComponent(Object3D, { object: { moveRoot: tile } })
+      .addComponent(HitBox, { size: new THREE.Vector2(size, size), offset: new THREE.Vector2() })
+      .addComponent(Tile);
   }
 }

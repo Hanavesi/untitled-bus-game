@@ -1,6 +1,6 @@
 import { World } from "ecsy";
-import { Vectors, Object3D, Playable, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Cells, Mouse, Bullet, EntityGeneratorComp, Gun, TimeToLive } from "./components";
-import { CameraPositionSystem, ControlEnemySystem, ControlPlayerSystem, FollowMouseSystem, TempHealthSystem, UpdateBulletsSystem, UpdateVectorsSystem } from "./systems";
+import { Vectors, Object3D, Playable, Input, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Cells, Mouse, Bullet, EntityGeneratorComp, Gun, TimeToLive, Grid, Tile } from "./components";
+import { CameraPositionSystem, CollisionSystem, ControlEnemySystem, ControlPlayerSystem, TempHealthSystem, UpdateBulletsSystem, UpdateGridSystem, UpdateVectorsSystem } from "./systems";
 
 export const initWorld = () => {
     const world = new World();
@@ -11,7 +11,6 @@ export const initWorld = () => {
         .registerComponent(Playable)
         .registerComponent(Input)
         .registerComponent(HitBox)
-        .registerComponent(Tile)
         .registerComponent(StateMachine)
         .registerComponent(CameraComponent)
         .registerComponent(Enemy)
@@ -22,12 +21,16 @@ export const initWorld = () => {
         .registerComponent(EntityGeneratorComp)
         .registerComponent(Gun)
         .registerComponent(TimeToLive)
+        .registerComponent(Grid)
+        .registerComponent(Tile)
 
     world
         .registerSystem(ControlPlayerSystem)
         .registerSystem(ControlEnemySystem)
         .registerSystem(TempHealthSystem)
-        .registerSystem(UpdateBulletsSystem)
+        /* .registerSystem(UpdateBulletsSystem) */
+        .registerSystem(UpdateGridSystem)
+        .registerSystem(CollisionSystem)
         .registerSystem(UpdateVectorsSystem)
         .registerSystem(CameraPositionSystem)
 

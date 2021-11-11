@@ -31,7 +31,7 @@ export const mapToMeshes = (map) => {
             meshes.push(mesh);
         }
     }
-    return { meshes: meshes, bounds: { width: width * TILESIZE, height: height * TILESIZE } };
+    return { meshes: meshes, bounds: { width: width * TILESIZE, height: height * TILESIZE, botLeft: {x: -width * 2, y: -height * 2} } };
 }
 
 const idToSrc = (id) => {

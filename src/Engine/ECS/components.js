@@ -4,19 +4,12 @@ export class Playable extends TagComponent { }
 export class Animated extends TagComponent { }
 export class Enemy extends TagComponent { }
 export class Bullet extends TagComponent { }
+export class Tile extends TagComponent { }
 
 export class Object3D extends Component { }
 
 Object3D.schema = {
     object: { type: Types.Ref }
-};
-
-// TILE
-export class Tile extends Component { }
-
-Tile.schema = {
-    position: { type: Types.Ref },
-    size: { type: Types.Ref }
 };
 
 export class CameraComponent extends Component { }
@@ -90,4 +83,11 @@ export class TimeToLive extends Component { }
 TimeToLive.schema = {
     age: { type: Types.Number },
     max: { type: Types.Number }
+}
+
+export class Grid extends Component { }
+
+Grid.schema = {
+    cells: { type: Types.Ref },
+    bounds: { type: Types.Ref }
 }
