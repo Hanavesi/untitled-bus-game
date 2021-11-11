@@ -1,7 +1,7 @@
 import { System } from "ecsy";
 import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Mouse, Bullet, EntityGeneratorComp, Gun, TimeToLive } from "./components";
 import { Vector3, Vector2 } from "three";
-import { DynamicRectToRect, ResolveDynamicRectToRect } from "../util/collisions";
+import { DynamicRectToRect, RayToRect, ResolveDynamicRectToRect } from "../util/collisions";
 
 export class ControlPlayerSystem extends System {
     execute() {
@@ -85,9 +85,6 @@ export class ControlEnemySystem extends System {
 
         const enemies = this.queries.enemies.results;
 
-
-
-
         for (const enemy of enemies) {
             const enemyObject = enemy.getComponent(Object3D).object;
             const enemyMoveRoot = enemyObject.moveRoot;
@@ -137,7 +134,7 @@ export class ControlEnemySystem extends System {
                 //barrel.getWorldPosition(pos);
                 /* const dir = new Vector2(playerMoveRoot.position.x, playerMoveRoot.position.y);
                 dir.normalize() */
-                generator.createBullet(pos, dir, speed);
+                generator.createBullet(pos.add(new Vector3(0,-0.5,0)), dir, speed);
             }
 
             animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
@@ -149,7 +146,6 @@ ControlEnemySystem.queries = {
     player: { components: [Playable] },
     enemies: { components: [Enemy, Object3D, Vectors] },
     generator: { components: [EntityGeneratorComp] },
-
 }
 
 export class CameraPositionSystem extends System {
@@ -169,7 +165,8 @@ CameraPositionSystem.queries = {
 export class UpdateBulletsSystem extends System {
     execute(delta) {
         const bullets = this.queries.bullets.results;
-        for (const bullet of bullets) {
+        const entities = this.queries.entities.results;
+        bullets: for (const bullet of bullets) {
             const object = bullet.getMutableComponent(Object3D).object;
             const ttl = bullet.getMutableComponent(TimeToLive);
             ttl.age += delta;
@@ -178,16 +175,36 @@ export class UpdateBulletsSystem extends System {
                 object.material.dispose();
                 object.removeFromParent();
                 bullet.remove();
-                continue;
+                continue bullets;
             }
             const vectors = bullet.getMutableComponent(Vectors);
+            const pos = new Vector2(object.position.x, object.position.y);
+            const ray = vectors.direction.clone().multiplyScalar(vectors.speed * delta);
+            entities: for (const entity of entities) {
+                const entityPos = entity.getComponent(Object3D).object.moveRoot.position;
+                const hitbox = entity.getComponent(HitBox);
+                const entityX = (entityPos.x - hitbox.size.x / 2) + hitbox.offset.x;
+                const entityY = (entityPos.y - hitbox.size.y / 2) + hitbox.offset.y;
+                const rect = { pos: new Vector2(entityX, entityY), size: hitbox.size };
+                const contactInfo = { contactNormal: null, contactPoint: null, tHitNear: 0 };
+                if (RayToRect(pos, ray, rect, contactInfo)) {
+                    if (contactInfo.tHitNear >= 0 && contactInfo.tHitNear <= 1) {
+                        object.geometry.dispose();
+                        object.material.dispose();
+                        object.removeFromParent();
+                        bullet.remove();
+                        continue bullets;
+                    }
+                }
+            }
             object.translateOnAxis(new Vector3(vectors.direction.x, vectors.direction.y, 0), vectors.speed * delta);
         }
     }
 }
 
 UpdateBulletsSystem.queries = {
-    bullets: { components: [Bullet] }
+    bullets: { components: [Bullet] },
+    entities: { components: [Object3D, Vectors, HitBox] }
 }
 
 // TODO: move animation handling to a different system and maybe component
@@ -206,13 +223,13 @@ export class UpdateVectorsSystem extends System {
             const tileBoxes = [];
 
             // Entity HITBOX
-            const hitBox = entity.getComponent(HitBox);
+            const hitbox = entity.getComponent(HitBox);
             const vel = new Vector2().add(vectors.direction).multiplyScalar(vectors.speed).add(vectors.velocity);
             //if (entity.hasComponent(Enemy)) console.log(vectors)
             // gathering required data from moving entity for AABB collision calculations
-            let entityX = moveRoot.position.x - hitBox.size.x / 2;
-            let entityY = moveRoot.position.y - hitBox.size.y / 2;
-            const r1 = { pos: new Vector2(entityX, entityY), size: hitBox.size };
+            const entityX = moveRoot.position.x - hitbox.size.x / 2;
+            const entityY = moveRoot.position.y - hitbox.size.y / 2;
+            const r1 = { pos: new Vector2(entityX, entityY), size: hitbox.size };
 
             // check for collisions to TILES on the current frame
             for (let i = 0, obj; obj = tiles[i]; i++) {
