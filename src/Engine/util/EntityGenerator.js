@@ -66,6 +66,22 @@ export class EntityGenerator {
     object.moveRoot.position.x = position.x;
     object.moveRoot.position.y = position.y;
 
+    const healthBar = new THREE.Group();
+    healthBar.position.y = 5;
+    healthBar.position.z = 10;
+    const healthMaterial = new THREE.SpriteMaterial({ color: 0x00ff00 });
+    const health = new THREE.Sprite(healthMaterial);
+    health.scale.set(5, 0.2, 1);
+    health.position.z = 1;
+    healthBar.add(health);
+
+    const healthBaseMaterial = new THREE.SpriteMaterial({ color: 0xff0000 });
+    const healthBase = new THREE.Sprite(healthBaseMaterial);
+    healthBase.scale.set(5, 0.2, 1);
+    healthBar.add(healthBase);
+
+    object.moveRoot.add(healthBar);
+
     const fsm = new FiniteStateMachine({
       idle: {
         enter: () => {
@@ -85,6 +101,7 @@ export class EntityGenerator {
       .addComponent(HitBox, { size: new THREE.Vector2(1.5, 3), offset: new THREE.Vector2(0, 1.5) })
       .addComponent(StateMachine, { fsm: fsm })
       .addComponent(Enemy)
+      .addComponent(HealthBar, { max: 1000, current: 1000, bar: health })
       .addComponent(Gun, { barrel: barrel });
   }
 

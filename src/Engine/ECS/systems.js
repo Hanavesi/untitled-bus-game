@@ -59,15 +59,17 @@ ControlPlayerSystem.queries = {
 
 export class TempHealthSystem extends System {
     execute() {
-        const player = this.queries.entities.results[0];
-        const healthBar = player.getMutableComponent(HealthBar);
-        const current = healthBar.current;
-        const max = healthBar.max;
-        const scale = (current / max);
-        healthBar.bar.scale.set(scale * 5, 0.2, 1);
-        healthBar.bar.position.x = (scale * 5 - 5) / 2;
-        healthBar.current -= 0.05;
-        if (healthBar.current < 0) healthBar.current = 0;
+        const entities = this.queries.entities.results;
+        for (const entity of entities) {
+            const healthBar = entity.getMutableComponent(HealthBar);
+            const current = healthBar.current;
+            const max = healthBar.max;
+            const scale = (current / max);
+            healthBar.bar.scale.set(scale * 5, 0.2, 1);
+            healthBar.bar.position.x = (scale * 5 - 5) / 2;
+            //healthBar.current -= 0.05;
+            if (healthBar.current < 0) healthBar.current = 0;
+        }
     }
 }
 
@@ -134,7 +136,7 @@ export class ControlEnemySystem extends System {
                 //barrel.getWorldPosition(pos);
                 /* const dir = new Vector2(playerMoveRoot.position.x, playerMoveRoot.position.y);
                 dir.normalize() */
-                generator.createBullet(pos.add(new Vector3(0,-0.5,0)), dir, speed);
+                generator.createBullet(pos.add(new Vector3(0, -0.5, 0)), dir, speed);
             }
 
             animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
@@ -168,7 +170,7 @@ export class UpdateBulletsSystem extends System {
         const entities = this.queries.entities.results;
         bullets: for (const bullet of bullets) {
             const object = bullet.getMutableComponent(Object3D).object;
-            const ttl = bullet.getMutableComponent(TimeToLive);
+            /* const ttl = bullet.getMutableComponent(TimeToLive);
             ttl.age += delta;
             if (ttl.age >= ttl.max) {
                 object.geometry.dispose();
@@ -176,13 +178,15 @@ export class UpdateBulletsSystem extends System {
                 object.removeFromParent();
                 bullet.remove();
                 continue bullets;
-            }
+            } */
             const vectors = bullet.getMutableComponent(Vectors);
             const pos = new Vector2(object.position.x, object.position.y);
             const ray = vectors.direction.clone().multiplyScalar(vectors.speed * delta);
             entities: for (const entity of entities) {
+                const enemy = entity.getMutableComponent(Object3D).object
                 const entityPos = entity.getComponent(Object3D).object.moveRoot.position;
                 const hitbox = entity.getComponent(HitBox);
+                const healthBar = entity.getMutableComponent(HealthBar);
                 const entityX = (entityPos.x - hitbox.size.x / 2) + hitbox.offset.x;
                 const entityY = (entityPos.y - hitbox.size.y / 2) + hitbox.offset.y;
                 const rect = { pos: new Vector2(entityX, entityY), size: hitbox.size };
@@ -193,8 +197,12 @@ export class UpdateBulletsSystem extends System {
                         object.material.dispose();
                         object.removeFromParent();
                         bullet.remove();
+                        healthBar.current -= 10
                         continue bullets;
                     }
+                }
+                if (healthBar.current < 0) {
+                    entity.remove()
                 }
             }
             object.translateOnAxis(new Vector3(vectors.direction.x, vectors.direction.y, 0), vectors.speed * delta);
@@ -204,7 +212,7 @@ export class UpdateBulletsSystem extends System {
 
 UpdateBulletsSystem.queries = {
     bullets: { components: [Bullet] },
-    entities: { components: [Object3D, Vectors, HitBox] }
+    entities: { components: [Object3D, Vectors, HitBox, HealthBar] },
 }
 
 // TODO: move animation handling to a different system and maybe component

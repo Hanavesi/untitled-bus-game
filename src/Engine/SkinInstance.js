@@ -21,7 +21,7 @@ export class SkinInstance {
 
     setAnimation(animName) {
         const clip = this.model.animations[animName];
-        
+
         // turn off all current actions
         for (const action of Object.values(this.actions)) {
             action.enabled = false;
@@ -40,8 +40,9 @@ export class SkinInstance {
 
     setHitBoxVisible() {
         const material = new MeshBasicMaterial({ color: 0xff0000 });
-        const geometry = new PlaneGeometry(1.5,1.5);
-        const plane = new Mesh( geometry, material );
+        const geometry = new PlaneGeometry(1.5, 1.5);
+        const plane = new Mesh(geometry, material);
         this.moveRoot.add(plane);
     }
+
 }
