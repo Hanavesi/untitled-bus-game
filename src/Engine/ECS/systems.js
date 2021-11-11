@@ -1,5 +1,5 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Mouse, Bullet, EntityGeneratorComp, Gun, TimeToLive, Grid, Tile } from "./components";
+import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Mouse, Bullet, EntityGeneratorComp, Gun, TimeToLive, Grid, Tile, Dead } from "./components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, getGridPosition, RayToRect, ResolveDynamicRectToRect } from "../util/collisions";
 
@@ -42,10 +42,10 @@ export class ControlPlayerSystem extends System {
       animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), newAngle);
       animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
 
-      if (inputState.leftMouse.justPressed) {
+      if (inputState.leftMouse.down) {
         const barrel = entity.getComponent(Gun).barrel;
         const pos = new Vector3();
-        const speed = 5;
+        const speed = 30;
         barrel.getWorldPosition(pos);
         const dir = new Vector2(mousePos.x, mousePos.y);
         generator.createBullet(pos, dir, speed);
@@ -67,14 +67,18 @@ ControlPlayerSystem.queries = {
 export class TempHealthSystem extends System {
   execute() {
     const player = this.queries.entities.results[0];
+    if (!player) return;
     const healthBar = player.getMutableComponent(HealthBar);
     const current = healthBar.current;
     const max = healthBar.max;
     const scale = (current / max);
     healthBar.bar.scale.set(scale * 5, 0.2, 1);
     healthBar.bar.position.x = (scale * 5 - 5) / 2;
-    healthBar.current -= 0.05;
-    if (healthBar.current < 0) healthBar.current = 0;
+    healthBar.current -= 0.5;
+    if (healthBar.current < 0) {
+      healthBar.current = 0;
+      player.addComponent(Dead)
+    };
   }
 }
 
@@ -85,6 +89,7 @@ TempHealthSystem.queries = {
 export class ControlEnemySystem extends System {
   execute(delta) {
     const player = this.queries.player.results[0];
+    if (!player) return;
     const playerMoveRoot = player.getComponent(Object3D).object.moveRoot;
     const playerPos = new Vector2(playerMoveRoot.position.x, playerMoveRoot.position.y);
     const playerVectors = player.getComponent(Vectors);
@@ -162,9 +167,10 @@ ControlEnemySystem.queries = {
 
 export class CameraPositionSystem extends System {
   execute() {
-    const player = this.queries.entities.results[0].getComponent(Object3D);
+    const player = this.queries.entities.results[0];
+    if (!player) return;
     const camera = this.queries.camera.results[0].getMutableComponent(CameraComponent).camera;
-    const moveRoot = player.object.moveRoot;
+    const moveRoot = player.getComponent(Object3D).object.moveRoot;
     camera.position.set(moveRoot.position.x, moveRoot.position.y, 20);
   }
 }
@@ -294,27 +300,30 @@ export class CollisionSystem extends System {
       cell: for (const cellKey of Object.keys(cells[colKey])) {
         const cell = cells[colKey][cellKey];
         if (cell.length < 2) continue cell;
-        entity: for (let i = 0; i < cell.length - 1; i++) {
+        entity: for (let i = 0; i < cell.length; i++) {
           const entity1 = cell[i];
           const id1 = entity1.id;
+
           // skip when entity1 is a tile
           // so that only moving entities are checked
-          if (entity1.hasComponent(Tile)) continue entity;
+          if (entity1.hasComponent(Tile) || entity1.hasComponent(Dead)) continue entity;
 
-          collision: for (let j = i + 1; j < cell.length; j++) {
+          collision: for (let j = 0; j < cell.length; j++) {
+            if (i === j) continue collision;
+
             const entity2 = cell[j];
             const id2 = entity2.id;
 
             // if both are bullets, skip
             if (entity1.hasComponent(Bullet) && entity2.hasComponent(Bullet)) continue collision;
-            if (entity1.hasComponent(Bullet)) console.log(entity1.id);
+            if (entity2.hasComponent(Dead)) continue entity;
 
             // temp skip when target is not tile
             //if (!entity2.hasComponent(Tile)) continue collision;
 
             // check if this collision is already checked
             if (collisionCache.includes(`${id1}-${id2}`)) {
-              /* console.log('skipped'); */
+              //console.log('skipped');
             } else {
 
               collisionCache.push(`${id1}-${id2}`);
@@ -347,7 +356,10 @@ export class CollisionSystem extends System {
 
               const contactInfo = { contactNormal: null, contactPoint: null, tHitNear: 0 };
               if (DynamicRectToRect(r1, vel1, delta, r2, contactInfo)) {
-                if (entity1.hasComponent(Bullet)) console.log('hit');
+                if (entity1.hasComponent(Bullet)) {
+                  entity1.addComponent(Dead);
+                  continue collision;
+                }
                 collisions.push({ time: contactInfo.tHitNear, r1: r1, r2: r2, vel: vel1, vectors: vectors1 });
               }
             }
@@ -363,7 +375,6 @@ export class CollisionSystem extends System {
       const { r1, r2, vel, vectors } = collision;
       ResolveDynamicRectToRect(r1, vel, delta, r2);
       vectors.velocity = vel.clone();
-
     }
 
   }
@@ -384,48 +395,33 @@ export class UpdateVectorsSystem extends System {
       moveRoot.translateX(vel.x * delta);
       moveRoot.translateY(vel.y * delta);
     }
-
-
-
-    /* // check for collisions to TILES on the current frame
-    for (let i = 0, obj; obj = tiles[i]; i++) {
-        // gathering the same data for static collidable tiles
-        // TODO: optimize this by only checking tiles close to the entity
-        const tile = obj.getComponent(Tile);
-        let tileX = tile.position.x - tile.size.x / 2;
-        let tileY = tile.position.y - tile.size.y / 2;
-        const r2 = { pos: new Vector2(tileX, tileY), size: tile.size };
-
-        const entityToTile = r1.pos.clone().negate().add(r2.pos);
-        const dist = entityToTile.length();
-        // saving the tile bounding box for possible collision resolution
-        tileBoxes.push(r2);
-        if (dist > 5) continue;
-        // initializing contactInfo object that holds the data through collision caltulations
-        const contactInfo = { contactNormal: null, contactPoint: null, tHitNear: 0 };
-
-        // If collision is detected, get tile index and collision "time" for collision resolution.
-        // The time is basically just a scalar value that tells when the first collision happens
-        // on one of the axes
-        if (DynamicRectToRect(r1, vel, delta, r2, contactInfo)) {
-            collisions.push({ index: i, time: contactInfo.tHitNear });
-        }
-    }
-
-    // sort the collisions based on collision time
-    collisions.sort((a, b) => a.time - b.time);
-    // resolve the collisions in order
-    for (const collision of collisions) {
-        ResolveDynamicRectToRect(r1, vel, delta, tileBoxes[collision.index]);
-    } */
-    /* vectors.velocity = vel.clone().multiplyScalar(0.8);
-
-    moveRoot.translateX(delta * vel.x);
-    moveRoot.translateY(delta * vel.y); */
   }
 }
 
 
 UpdateVectorsSystem.queries = {
   entities: { components: [Object3D, Vectors] }
+}
+
+export class CleanUpSystem extends System {
+  execute() {
+    const entities = this.queries.entities.results;
+    for (const entity of entities) {
+      if (entity.hasComponent(Object3D)) {
+        const objectComponent = entity.getComponent(Object3D);
+        const moveRoot = objectComponent.object.moveRoot
+        if (entity.hasComponent(Bullet)) {
+          moveRoot.geometry.dispose();
+          moveRoot.material.dispose();
+        }
+        moveRoot.removeFromParent();
+      }
+      entity.removeAllComponents();
+      entity.remove();
+    }
+  }
+}
+
+CleanUpSystem.queries = {
+  entities: { components: [Dead] }
 }

@@ -5,6 +5,7 @@ export class Animated extends TagComponent { }
 export class Enemy extends TagComponent { }
 export class Bullet extends TagComponent { }
 export class Tile extends TagComponent { }
+export class Dead extends TagComponent { }
 
 export class Object3D extends Component { }
 
