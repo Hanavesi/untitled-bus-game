@@ -1,26 +1,42 @@
 import React from 'react'
 import wasdnew from './images/wasdnew.png'
+import { useHistory } from "react-router-dom";
+import MenuList from './MenuList'
+
 
 
 function HowToPlay() {
 
-    
+    const history = useHistory();
+
+    const handleRoute = () => {
+        history.push("/");
+    }
 
     return (
-        <div className="nimet">
+        <div className="HowTo">
             <h1>How to Play?</h1>
-           
-            <p>Use 
-                <img src={wasdnew} 
-                style={{width: '100px',
+            <br />
+            <h3>Pick a bus you want to get in, to start the game</h3>
+            <br />
+            <h3>// lisätään tekstejä mitä halutaan </h3>
+            <br />
+            <h3>Use
+                <img src={wasdnew}
+                    style={{
+                        width: '100px',
                         height: '50px',
-                        borderRadius: '5px',
+                        borderRadius: '10px',
                         marginBottom: '-18px',
-                        marginLeft: '5px',
-                        marginRight: '5px'}} /> 
-            to move</p>
-            <p>Use mouse to shoot</p>
-            <p>Enemies have diffirent capabilities</p>
+                        marginLeft: '10px',
+                        marginRight: '10px'
+                    }} />
+                to move</h3>
+            <br />
+            <h3>Use mouse to aim and shoot</h3>
+            <br />
+            <h3>Enemies have diffirent capabilities</h3>
+            <button onClick={handleRoute} className="backButton">Back</button>
         </div>
     )
 }

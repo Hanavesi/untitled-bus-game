@@ -9,7 +9,7 @@ body {
 .menuButton {
   width: 380px;
   height: 86px;
-  font-size: 50px;
+  font-size: 45px;
   font-family: 'Games', sans-serif;           
   background: linear-gradient(transparent 50%, #FF013C 5%);
   border: 1;
@@ -19,6 +19,30 @@ body {
   line-height: 88px;
   outline: transparent;
   position: relative;
+}
+.backButton {
+  font-size: 40px;
+  font-family: 'Games', sans-serif;           
+  background: linear-gradient(transparent 70%, #FF013C 5%);
+  border: 1;
+  border-color: #FF013C;
+  border-radius: 15px;
+  color: rgb(255, 255, 255);
+  letter-spacing: 8px;
+  line-height: 45px;
+  outline: transparent;
+  position: relative;
+  margin-top: 30px;
+}
+
+.HowTo {
+  font-size: 20px;
+  font-family: 'Games', sans-serif;           
+  border: 1;
+  border-color: #000000;
+  color: rgb(255, 255, 255);
+  letter-spacing: 5px;
+  text-align: center;
 }
 
 .nimet, h2 {
