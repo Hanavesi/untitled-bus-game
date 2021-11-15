@@ -75,7 +75,7 @@ export class Engine {
     /* for (let i = 0; i < 100; i++) {
       this.entityGenerator.createSoldier({ x: 0, y: 10 });
     } */
-    //this.entityGenerator.createSoldier({ x: 0, y: 10 });
+    this.entityGenerator.createSoldier({ x: 0, y: 10 });
     //this.entityGenerator.createSoldier({ x: -20, y: 0 });
     //this.entityGenerator.createSoldier({ x: 20, y: 0 });
 

@@ -148,7 +148,7 @@ export class ControlEnemySystem extends System {
         //barrel.getWorldPosition(pos);
         /* const dir = new Vector2(playerMoveRoot.position.x, playerMoveRoot.position.y);
         dir.normalize() */
-        generator.createBullet(pos.add(new Vector3(0, -0.5, 0)), dir, speed);
+        generator.createBullet(pos.add(new Vector3(0, -0.5, 0)), dir, speed, vectors.velocity);
       }
 
       animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
