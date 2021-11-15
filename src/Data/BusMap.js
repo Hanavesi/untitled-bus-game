@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { fetchDuration, fetchRouteId, fuzzyTripQuery, fetchStopLocation } from "./ItineraryData";
-import { MqttHandler } from "./Mqtt";
+import { Redirect } from "react-router-dom";
 
 const MQTTURL = 'wss://mqtt.hsl.fi:443/';
 const L = require('leaflet');
@@ -30,16 +30,15 @@ const busIcon = new L.Icon({
 
 });
 
-const BusMap = () => {
+const BusMap = ({ mqttHandler }) => {
     let buses = {};
+    let map;
     const topicStub = "/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/+/+/+/";
     const topic = "/hfp/v2/journey/ongoing/+/bus/+/+/+/+/+/+/+/+/60;24/19/73/#";
-    const mqttHandler = new MqttHandler();
-    let map;
-
+    const [busChosen, setBusChosen] = useState(false);
 
     useEffect(() => {
-        const interval = setInterval(update, 30000);
+        const interval = setInterval(update, 5000);
         connect();
         initMap();
         return (() => clearInterval(interval));
@@ -247,12 +246,17 @@ const BusMap = () => {
         console.log(bus.topic);
         // Sometimes subsctiption fails somehow and further messages from hte chosen bus are not received
         mqttHandler.subscribe(bus.topic);
+        setBusChosen(true);
     }
 
     // TODO: change outer div size according to props etc.
     // If props, then buses needs to be a useState and only be updated
     // every once in a while maybe??
     return (
+        busChosen
+        ?
+        <Redirect to='/Game' />
+        :
         <div style={{ width: '100vw', height: '100vh' }} >
             <div id='map' style={{ height: '100%', width: '100%' }}>
             </div>

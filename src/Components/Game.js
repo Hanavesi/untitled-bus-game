@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Engine } from '../Engine/Engine';
 
-export function Game() {
+export function Game({ mqttHandler }) {
     const [ready, setReady] = useState(false);
     const engine = useRef(null);
     const visible = { visibility: 'visible' };
@@ -12,6 +12,8 @@ export function Game() {
         const width = canvas.clientWidth;
         const height = canvas.clientHeight;
         engine.current = new Engine(canvas, width, height, setReady);
+
+        mqttHandler.setMessageCallback(onMessage)
 
         window.addEventListener('resize', () => {
             const canvas = document.getElementById("gameCanvas");
@@ -24,8 +26,15 @@ export function Game() {
             engine.current.setMousePos(pos);
         });
         
+        return(() => {
+            mqttHandler.disconnect();
+        });
     }, []);
 
+    const onMessage = (message, topic) => {
+        // do stufs
+        console.log(message);
+    }
 
     return (
         <div>

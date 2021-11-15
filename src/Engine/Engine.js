@@ -17,14 +17,9 @@ export class Engine {
     this.lastFrame = 0;
     this.mousePos = new Vector2();
     this.world = initWorld();
-    //this.camera = new THREE.PerspectiveCamera(45, width / height, 0.005, 10000);
     const aspectratio = width / height;
-    //this.camera = new THREE.OrthographicCamera(width / -30, width / 30, height / 30, height / -30, 1, 1000);
     this.camera = new THREE.OrthographicCamera(-15 * aspectratio, 15 * aspectratio, 15, -15, 1, 1000);
     this.camera.position.set(0, 0, 20);
-    /* const controls = new OrbitControls(this.camera, canvas);
-    controls.target.set(0, 0, 0);
-    controls.update(); */
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color('white');
     this.renderer = new THREE.WebGLRenderer({ canvas });
