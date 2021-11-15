@@ -48,7 +48,7 @@ export class ControlPlayerSystem extends System {
         const speed = 30;
         barrel.getWorldPosition(pos);
         const dir = new Vector2(mousePos.x, mousePos.y);
-        generator.createBullet(pos, dir, speed);
+        generator.createBullet(pos, dir, speed, vectors.velocity);
       }
 
       // anim
@@ -74,7 +74,7 @@ export class TempHealthSystem extends System {
     const scale = (current / max);
     healthBar.bar.scale.set(scale * 5, 0.2, 1);
     healthBar.bar.position.x = (scale * 5 - 5) / 2;
-    healthBar.current -= 0.5;
+    healthBar.current -= 0.1;
     if (healthBar.current < 0) {
       healthBar.current = 0;
       player.addComponent(Dead)

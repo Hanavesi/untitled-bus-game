@@ -89,7 +89,7 @@ export class EntityGenerator {
       .addComponent(Gun, { barrel: barrel });
   }
 
-  createBullet(position, direction, speed) {
+  createBullet(position, direction, speed, launchVelocity) {
     const bulletMaterial = new THREE.SpriteMaterial({ color: 0x000000 });
     const bullet = new THREE.Sprite(bulletMaterial);
     bullet.scale.set(0.8, 0.8, 0.8);
@@ -98,7 +98,7 @@ export class EntityGenerator {
     const entity = this.world.createEntity();
     entity
       .addComponent(Object3D, { object: { moveRoot: bullet } })
-      .addComponent(Vectors, { direction: direction, speed: speed, velocity: direction.clone().multiplyScalar(speed) })
+      .addComponent(Vectors, { direction: direction, speed: speed, velocity: direction.clone().multiplyScalar(speed).add(launchVelocity) })
       .addComponent(HitBox, { size: new THREE.Vector2(0.3, 0.3), offset: new THREE.Vector2() })
       .addComponent(Bullet)
       .addComponent(TimeToLive, { age: 0, max: 1 });
