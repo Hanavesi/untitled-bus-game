@@ -42,7 +42,7 @@ export class ControlPlayerSystem extends System {
         }
       }
 
-      if (inputState.leftMouse.down) {
+      if (inputState.leftMouse.justPressed) {
         const barrel = entity.getComponent(Gun).barrel;
         const pos = new Vector3();
         const speed = 30;
@@ -300,13 +300,13 @@ export class CollisionSystem extends System {
       cell: for (const cellKey of Object.keys(cells[colKey])) {
         const cell = cells[colKey][cellKey];
         if (cell.length < 2) continue cell;
-        entity: for (let i = 0; i < cell.length; i++) {
+        cellEntities: for (let i = 0; i < cell.length; i++) {
           const entity1 = cell[i];
           const id1 = entity1.id;
 
-          // skip when entity1 is a tile
+          // skip when entity1 is a tile or is dead
           // so that only moving entities are checked
-          if (entity1.hasComponent(Tile) || entity1.hasComponent(Dead)) continue entity;
+          if (entity1.hasComponent(Tile) || entity1.hasComponent(Dead)) continue cellEntities;
 
           collision: for (let j = 0; j < cell.length; j++) {
             if (i === j) continue collision;
@@ -316,7 +316,7 @@ export class CollisionSystem extends System {
 
             // if both are bullets, skip
             if (entity1.hasComponent(Bullet) && entity2.hasComponent(Bullet)) continue collision;
-            if (entity2.hasComponent(Dead)) continue entity;
+            if (entity2.hasComponent(Dead)) continue cellEntities;
 
             // temp skip when target is not tile
             //if (!entity2.hasComponent(Tile)) continue collision;
@@ -355,9 +355,15 @@ export class CollisionSystem extends System {
               const r2 = { pos: new Vector2(entity2X, entity2Y).add(hitbox2.offset), size: hitbox2.size };
 
               const contactInfo = { contactNormal: null, contactPoint: null, tHitNear: 0 };
-              if (DynamicRectToRect(r1, vel1, delta, r2, contactInfo)) {
+
+              let collisionVelocity = vel1.clone().sub(vel2);
+              if (DynamicRectToRect(r1, collisionVelocity, delta, r2, contactInfo)) {
                 if (entity1.hasComponent(Bullet)) {
                   entity1.addComponent(Dead);
+                  continue collision;
+                }
+                if (entity2.hasComponent(Bullet)) {
+                  entity2.addComponent(Dead);
                   continue collision;
                 }
                 collisions.push({ time: contactInfo.tHitNear, r1: r1, r2: r2, vel: vel1, vectors: vectors1 });
