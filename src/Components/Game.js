@@ -1,11 +1,20 @@
 import React, { useRef, useState } from 'react';
 import { Engine } from '../Engine/Engine';
+import {Howl, Howler} from 'howler'
+import Running from '../music/run.mp3';
 
 export function Game({ mqttHandler }) {
     const [ready, setReady] = useState(false);
     const engine = useRef(null);
     const visible = { visibility: 'visible' };
     const hidden = { visibility: 'hidden' };
+    const sound = new Howl({
+        src: [Running],
+        volume: 0.05,
+        loop: true,
+        autoplay: true,
+      });
+      
 
     React.useEffect(() => {
         const canvas = document.getElementById("gameCanvas");

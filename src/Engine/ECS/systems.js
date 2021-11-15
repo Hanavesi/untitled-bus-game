@@ -1,9 +1,9 @@
 import { System } from "ecsy";
 import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Mouse, Bullet, EntityGeneratorComp, Gun, TimeToLive, Grid, Tile, Dead } from "./components";
 import { Vector3, Vector2 } from "three";
-import { DynamicRectToRect, getGridPosition, RayToRect, ResolveDynamicRectToRect } from "../util/collisions";
-
-const CELLSIZE = 6;
+import { DynamicRectToRect, RayToRect, ResolveDynamicRectToRect } from "../util/collisions";
+import {Howl, Howler} from 'howler'
+import piu from '../../music/piu.mp3';
 
 export class ControlPlayerSystem extends System {
   execute(delta) {
@@ -21,18 +21,25 @@ export class ControlPlayerSystem extends System {
       vectors.velocity = new Vector2().add(vectors.direction).multiplyScalar(vectors.speed).add(vectors.velocity);
       vectors.velocity.multiplyScalar(0.8);
 
-      const object = entity.getComponent(Object3D).object;
+            const angle = Math.atan2(mousePos.y, mousePos.x);
+            const newAngle = angle + Math.PI / 2;
+            animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), newAngle);
+            animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
 
-      const { x, y } = vectors.direction;
-      const animRoot = object.animRoot;
-      const fsm = entity.getComponent(StateMachine).fsm;
-      if (x === 0 && y === 0) { // If standing still, look "down"
-        if (fsm && fsm.state !== 'idle') {
-          fsm.transition('idle');
-        }
-      } else {
-        if (fsm && fsm.state !== 'run') {
-          fsm.transition('run');
+            if (inputState.leftMouse.down) {
+                const barrel = entity.getComponent(Gun).barrel;
+                const pos = new Vector3();
+                const speed = 30;
+                barrel.getWorldPosition(pos);
+                const dir = new Vector2(mousePos.x, mousePos.y);
+                generator.createBullet(pos, dir, speed);
+                const sound = new Howl({
+                    src: [piu],
+                    volume: 0.1,
+                  });
+                  
+                  sound.play();
+            }
         }
       }
 
