@@ -14,7 +14,6 @@ export class ControlPlayerSystem extends System {
     const mousePos = this.queries.mouse.results[0].getComponent(Mouse).pos;
     for (const entity of entities) {
       const object = entity.getComponent(Object3D).object;
-      const moveRoot = object.moveRoot;
       const animRoot = object.animRoot;
       const vectors = entity.getMutableComponent(Vectors);
       let newDir = new Vector2(0, 0);
@@ -31,6 +30,18 @@ export class ControlPlayerSystem extends System {
       animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), newAngle);
       animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
 
+      const { x, y } = vectors.direction;
+      const fsm = entity.getComponent(StateMachine).fsm;
+      if (x === 0 && y === 0) { // If standing still, look "down"
+        if (fsm && fsm.state !== 'idle') {
+          fsm.transition('idle');
+        }
+      } else {
+        if (fsm && fsm.state !== 'run') {
+          fsm.transition('run');
+        }
+      }
+
       if (inputState.leftMouse.down) {
         const barrel = entity.getComponent(Gun).barrel;
         const pos = new Vector3();
@@ -45,18 +56,18 @@ export class ControlPlayerSystem extends System {
         });
 
         sound.play();
-        // anim
       }
+      // anim
       object.update(delta);
     }
   }
 }
 
 ControlPlayerSystem.queries = {
-    entities: { components: [Object3D, Vectors, Playable] },
-    inputState: { components: [Input] },
-    mouse: { components: [Mouse] }
-  }
+  entities: { components: [Object3D, Vectors, Playable] },
+  inputState: { components: [Input] },
+  mouse: { components: [Mouse] }
+}
 
 export class TempHealthSystem extends System {
   execute() {
@@ -112,8 +123,6 @@ export class ControlEnemySystem extends System {
         if (fsm && fsm.state !== 'idle') {
           fsm.transition('idle');
         }
-        continue;
-        //animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), Math.PI * 2);
       } else {
         const angle = Math.atan2(x, -y);
         animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), angle);
