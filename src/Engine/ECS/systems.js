@@ -2,6 +2,8 @@ import { System } from "ecsy";
 import { Object3D, Playable, Vectors, Input, Tile, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Mouse, Bullet, EntityGeneratorComp, Gun, TimeToLive } from "./components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, RayToRect, ResolveDynamicRectToRect } from "../util/collisions";
+import {Howl, Howler} from 'howler'
+import piu from '../../music/piu.mp3';
 
 export class ControlPlayerSystem extends System {
     execute() {
@@ -45,6 +47,12 @@ export class ControlPlayerSystem extends System {
                 barrel.getWorldPosition(pos);
                 const dir = new Vector2(mousePos.x, mousePos.y);
                 generator.createBullet(pos, dir, speed);
+                const sound = new Howl({
+                    src: [piu],
+                    volume: 0.1,
+                  });
+                  
+                  sound.play();
             }
         }
     }

@@ -1,7 +1,7 @@
 import './App.css';
 import React from 'react';
-import Menu from './Components/Menu';
-import {useMousePosition} from './Components/useMousePosition';
+import Menu from './components/Menu';
+import {useMousePosition} from './components/useMousePosition';
 
 
 function App() {

@@ -91,7 +91,7 @@ export class EntityGenerator {
   createBullet(position, direction, speed) {
     const bulletMaterial = new THREE.SpriteMaterial({ color: 0x000000 });
     const bullet = new THREE.Sprite(bulletMaterial);
-    bullet.scale.set(0.8, 0.8, 0.8);
+    bullet.scale.set(0.8, 0.4, 1);
     bullet.position.set(position.x, position.y, 1);
     this.scene.add(bullet);
     const entity = this.world.createEntity();
