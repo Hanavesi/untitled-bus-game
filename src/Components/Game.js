@@ -35,4 +35,4 @@ export function Game() {
 
 }
 
-export const MemoizedGame = React.memo(Game);
+export default Game;
