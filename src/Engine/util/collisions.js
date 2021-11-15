@@ -1,49 +1,49 @@
 import { Vector2 } from "three";
 
 /*
-	One-Size-Fits-All Rectangle Vs Rectangle Collisions
-	"Stupid scanners... making me miss at archery..." - javidx9
-	License (OLC-3)
-	~~~~~~~~~~~~~~~
-	Copyright 2018-2020 OneLoneCoder.com
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions
-	are met:
-	1. Redistributions or derivations of source code must retain the above
-	copyright notice, this list of conditions and the following disclaimer.
-	2. Redistributions or derivative works in binary form must reproduce
-	the above copyright notice. This list of conditions and the following
-	disclaimer must be reproduced in the documentation and/or other
-	materials provided with the distribution.
-	3. Neither the name of the copyright holder nor the names of its
-	contributors may be used to endorse or promote products derived
-	from this software without specific prior written permission.
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-	"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-	LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-	A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-	HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-	SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-	LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-	DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-	THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-	OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-	Relevant Video: https://www.youtube.com/watch?v=8JJ-4JgR7Dg
-	Links
-	~~~~~
-	YouTube:	https://www.youtube.com/javidx9
-				https://www.youtube.com/javidx9extra
-	Discord:	https://discord.gg/WhwHUMV
-	Twitter:	https://www.twitter.com/javidx9
-	Twitch:		https://www.twitch.tv/javidx9
-	GitHub:		https://www.github.com/onelonecoder
-	Patreon:	https://www.patreon.com/javidx9
-	Homepage:	https://www.onelonecoder.com
-	Community Blog: https://community.onelonecoder.com
-	Author
-	~~~~~~
-	David Barr, aka javidx9, ©OneLoneCoder 2018, 2019, 2020
+    One-Size-Fits-All Rectangle Vs Rectangle Collisions
+    "Stupid scanners... making me miss at archery..." - javidx9
+    License (OLC-3)
+    ~~~~~~~~~~~~~~~
+    Copyright 2018-2020 OneLoneCoder.com
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:
+    1. Redistributions or derivations of source code must retain the above
+    copyright notice, this list of conditions and the following disclaimer.
+    2. Redistributions or derivative works in binary form must reproduce
+    the above copyright notice. This list of conditions and the following
+    disclaimer must be reproduced in the documentation and/or other
+    materials provided with the distribution.
+    3. Neither the name of the copyright holder nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+    HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    Relevant Video: https://www.youtube.com/watch?v=8JJ-4JgR7Dg
+    Links
+    ~~~~~
+    YouTube:	https://www.youtube.com/javidx9
+                https://www.youtube.com/javidx9extra
+    Discord:	https://discord.gg/WhwHUMV
+    Twitter:	https://www.twitter.com/javidx9
+    Twitch:		https://www.twitch.tv/javidx9
+    GitHub:		https://www.github.com/onelonecoder
+    Patreon:	https://www.patreon.com/javidx9
+    Homepage:	https://www.onelonecoder.com
+    Community Blog: https://community.onelonecoder.com
+    Author
+    ~~~~~~
+    David Barr, aka javidx9, ©OneLoneCoder 2018, 2019, 2020
 */
 // https://github.com/OneLoneCoder/olcPixelGameEngine/blob/master/Videos/OneLoneCoder_PGE_Rectangles.cpp
 
@@ -64,7 +64,7 @@ export const PointToRect = (p, r) => {
  * @returns true if given rectangles overlap
  */
 export const RectToRect = (r1, r2) => {
-    return (r1.pos.x < r2.pos.x + r2.size.x && r1.pos.x +r1.size.x > r2.pos.x && r1.pos.y < r2.pos.y + r2.size.y && r1.pos.y + r1.size.y > r2.pos.y);
+    return (r1.pos.x < r2.pos.x + r2.size.x && r1.pos.x + r1.size.x > r2.pos.x && r1.pos.y < r2.pos.y + r2.size.y && r1.pos.y + r1.size.y > r2.pos.y);
 }
 
 /**
@@ -87,8 +87,8 @@ export const RayToRect = (rayOrigin, rayDir, target, contactInfo) => {
 
     if (isNaN(tNear.x) || isNaN(tNear.y) || isNaN(tFar.x) || isNaN(tFar.y)) return false;
 
-    if (tNear.x > tFar.x) [tNear.x, tFar.x] = [ tFar.x, tNear.x];
-    if (tNear.y > tFar.y) [tNear.y, tFar.y] = [ tFar.y, tNear.y];
+    if (tNear.x > tFar.x) [tNear.x, tFar.x] = [tFar.x, tNear.x];
+    if (tNear.y > tFar.y) [tNear.y, tFar.y] = [tFar.y, tNear.y];
 
     if (tNear.x > tFar.y || tNear.y > tFar.x) return false;
 
@@ -155,10 +155,18 @@ export const DynamicRectToRect = (dr, vel, delta, sr, contactInfo) => {
  * @returns boolean on whether collision happens or not
  */
 export const ResolveDynamicRectToRect = (dr, vel, delta, sr) => {
-    const contactInfo = {contactNormal: null, contactPoint: null, tHitNear: null};
+    const contactInfo = { contactNormal: null, contactPoint: null, tHitNear: null };
     if (DynamicRectToRect(dr, vel, delta, sr, contactInfo)) {
         vel.addVectors(vel, new Vector2(Math.abs(vel.x), Math.abs(vel.y)).multiply(contactInfo.contactNormal).multiplyScalar(1 - contactInfo.tHitNear));
         return true;
     }
     return false;
+}
+
+/* ----------- License material ends ----------- */
+
+export const getGridPosition = (gridBounds, point, cellsize) => {
+    const cellX = Math.floor((point.x - gridBounds.botLeft.x) / cellsize);
+    const cellY = Math.floor((point.y - gridBounds.botLeft.y) / cellsize);
+    return { x: cellX, y: cellY };
 }

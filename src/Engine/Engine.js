@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Vector2 } from "three";
-import { Input, Tile, CameraComponent, Mouse, EntityGeneratorComp } from "./ECS/components";
+import { Input, Tile, CameraComponent, Mouse, EntityGeneratorComp, Grid, Object3D } from "./ECS/components";
 import { initWorld } from "./ECS/initializer";
 import { InputManager } from "./InputManager";
 import { ModelManager } from "./ModelManager";
@@ -75,27 +75,35 @@ export class Engine {
     /* for (let i = 0; i < 100; i++) {
       this.entityGenerator.createSoldier({ x: 0, y: 10 });
     } */
-    this.entityGenerator.createSoldier({ x: 0, y: 10 });
-    this.entityGenerator.createSoldier({ x: -20, y: 0 });
-    this.entityGenerator.createSoldier({ x: 20, y: 0 });
+    //this.entityGenerator.createSoldier({ x: 0, y: 10 });
+    //this.entityGenerator.createSoldier({ x: -20, y: 0 });
+    //this.entityGenerator.createSoldier({ x: 20, y: 0 });
 
     let entity;
-    const { meshes } = mapToMeshes(MAP_TEST);
+    const { meshes, bounds } = mapToMeshes(MAP_TEST);
     for (const tile of meshes) {
       this.scene.add(tile);
       if (tile.name === 'floor') continue;
-      entity = this.world.createEntity();
-      // Perhaps because of some black magic, the player may walk through s certain few of the tiles when
-      // tile size is set to 4. It may still happen but I haven't been able to recreate it
-      entity.addComponent(Tile, { position: new THREE.Vector2(tile.position.x, tile.position.y), size: new THREE.Vector2(3.5, 3.5) });
+      this.entityGenerator.createTile(tile, 3.5);
       // debug collision tiles
-      /* const material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); 
+      const material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); 
       const geometry = new THREE.PlaneGeometry(3.5, 3.5);
       const plane = new THREE.Mesh(geometry, material);
       plane.position.x = tile.position.x;
       plane.position.y = tile.position.y;
-      this.scene.add(plane); */
+      this.scene.add(plane);
     }
+    const grid = {};
+    let i, j;
+    for (i = 0; (i - 1) * CELLSIZE < bounds.width; i++) {
+      const column = {};
+      for (j = 0; (j - 1) * CELLSIZE < bounds.height; j++) {
+        column[j] = [];
+      }
+      grid[i] = column;
+    }
+    entity = this.world.createEntity();
+    entity.addComponent(Grid, { cells: grid, bounds: bounds });
 
     const mouseEntity = this.world.createEntity();
     mouseEntity.addComponent(Mouse, { pos: this.mousePos });
