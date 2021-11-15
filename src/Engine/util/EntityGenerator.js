@@ -87,14 +87,17 @@ export class EntityGenerator {
   }
 
   createBullet(entity, position, direction, speed, launchVelocity) {
-    const bulletMaterial = new THREE.SpriteMaterial({ color: 0x000000 });
+    const vel = direction.clone().multiplyScalar(speed).add(launchVelocity);
+    const dir = direction.clone().normalize();
+    const angle = Math.atan2(dir.y, dir.x);
+    const bulletMaterial = new THREE.SpriteMaterial({ color: 0x000000, rotation: angle });
     const bullet = new THREE.Sprite(bulletMaterial);
     bullet.scale.set(0.8, 0.4, 1);
     bullet.position.set(position.x, position.y, 1);
     this.scene.add(bullet);
     entity
       .addComponent(Object3D, { object: { moveRoot: bullet } })
-      .addComponent(Vectors, { direction: direction, speed: speed, velocity: direction.clone().multiplyScalar(speed).add(launchVelocity) })
+      .addComponent(Vectors, { direction: direction, speed: speed, velocity: vel })
       .addComponent(HitBox, { size: new THREE.Vector2(0.3, 0.3), offset: new THREE.Vector2() })
       .addComponent(Bullet)
       .addComponent(TimeToLive, { age: 0, max: 1 });

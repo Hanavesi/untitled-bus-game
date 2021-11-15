@@ -126,6 +126,7 @@ export class ControlEnemySystem extends System {
       } else {
         const angle = Math.atan2(x, -y);
         animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), angle);
+        animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
         if (fsm && fsm.state !== 'run') {
           fsm.transition('run');
         }
@@ -153,9 +154,6 @@ export class ControlEnemySystem extends System {
         const bulletEntity = this.world.createEntity();
         this.world.generator.createBullet(bulletEntity, pos.add(new Vector3(0, -0.5, 0)), dir, speed, vectors.velocity);
       }
-
-      animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
-
       // anim
       enemyObject.update(delta);
     }
