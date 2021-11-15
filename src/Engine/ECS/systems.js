@@ -9,7 +9,6 @@ export class ControlPlayerSystem extends System {
   execute(delta) {
     const entities = this.queries.entities.results;
     const inputState = this.queries.inputState.results[0].getComponent(Input).state;
-    const generator = this.queries.generator.results[0].getComponent(EntityGeneratorComp).generator;
     const mousePos = this.queries.mouse.results[0].getComponent(Mouse).pos;
     for (const entity of entities) {
       const vectors = entity.getMutableComponent(Vectors);
@@ -48,7 +47,8 @@ export class ControlPlayerSystem extends System {
         const speed = 30;
         barrel.getWorldPosition(pos);
         const dir = new Vector2(mousePos.x, mousePos.y);
-        generator.createBullet(pos, dir, speed, vectors.velocity);
+        const bulletEntity = this.world.createEntity();
+        this.world.generator.createBullet(bulletEntity, pos, dir, speed, vectors.velocity);
       }
 
       // anim
@@ -60,7 +60,6 @@ export class ControlPlayerSystem extends System {
 ControlPlayerSystem.queries = {
   entities: { components: [Object3D, Vectors, Playable] },
   inputState: { components: [Input] },
-  generator: { components: [EntityGeneratorComp] },
   mouse: { components: [Mouse] }
 }
 
@@ -93,7 +92,6 @@ export class ControlEnemySystem extends System {
     const playerMoveRoot = player.getComponent(Object3D).object.moveRoot;
     const playerPos = new Vector2(playerMoveRoot.position.x, playerMoveRoot.position.y);
     const playerVectors = player.getComponent(Vectors);
-    const generator = this.queries.generator.results[0].getComponent(EntityGeneratorComp).generator;
 
     const enemies = this.queries.enemies.results;
 
@@ -148,7 +146,8 @@ export class ControlEnemySystem extends System {
         //barrel.getWorldPosition(pos);
         /* const dir = new Vector2(playerMoveRoot.position.x, playerMoveRoot.position.y);
         dir.normalize() */
-        generator.createBullet(pos.add(new Vector3(0, -0.5, 0)), dir, speed, vectors.velocity);
+        const bulletEntity = this.world.createEntity();
+        this.world.generator.createBullet(bulletEntity, pos.add(new Vector3(0, -0.5, 0)), dir, speed, vectors.velocity);
       }
 
       animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
@@ -162,7 +161,6 @@ export class ControlEnemySystem extends System {
 ControlEnemySystem.queries = {
   player: { components: [Playable] },
   enemies: { components: [Enemy, Object3D, Vectors] },
-  generator: { components: [EntityGeneratorComp] },
 }
 
 export class CameraPositionSystem extends System {

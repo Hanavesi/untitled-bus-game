@@ -1,3 +1,4 @@
+import { World } from "ecsy";
 import * as THREE from "three";
 import { Vector2 } from "three";
 import { Input, Tile, CameraComponent, Mouse, EntityGeneratorComp, Grid, Object3D } from "./ECS/components";
@@ -16,7 +17,7 @@ export class Engine {
     this.inputManager = new InputManager();
     this.lastFrame = 0;
     this.mousePos = new Vector2();
-    this.world = initWorld();
+    this.world = new World();
     const aspectratio = width / height;
     this.camera = new THREE.OrthographicCamera(-15 * aspectratio, 15 * aspectratio, 15, -15, 1, 1000);
     this.camera.position.set(0, 0, 20);
@@ -64,13 +65,16 @@ export class Engine {
   }
 
   init() {
-    this.entityGenerator = new EntityGenerator(this.modelManager, this.world, this.scene);
-    this.world.createEntity().addComponent(EntityGeneratorComp, { generator: this.entityGenerator });
-    this.entityGenerator.createPlayer({ x: 0, y: 0 });
+    const entityGenerator = new EntityGenerator(this.modelManager, this.scene);
+    this.world.generator = entityGenerator;
+    console.log(this.world)
+    initWorld(this.world);
+    //this.world.createEntity().addComponent(EntityGeneratorComp, { generator: this.entityGenerator });
+    entityGenerator.createPlayer(this.world.createEntity(), { x: 0, y: 0 });
     /* for (let i = 0; i < 100; i++) {
       this.entityGenerator.createSoldier({ x: 0, y: 10 });
     } */
-    this.entityGenerator.createSoldier({ x: 0, y: 10 });
+    entityGenerator.createSoldier(this.world.createEntity(), { x: 0, y: 10 });
     //this.entityGenerator.createSoldier({ x: -20, y: 0 });
     //this.entityGenerator.createSoldier({ x: 20, y: 0 });
 
@@ -79,7 +83,7 @@ export class Engine {
     for (const tile of meshes) {
       this.scene.add(tile);
       if (tile.name === 'floor') continue;
-      this.entityGenerator.createTile(tile, 3.5);
+      entityGenerator.createTile(this.world.createEntity(), tile, 3.5);
       // debug collision tiles
       const material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); 
       const geometry = new THREE.PlaneGeometry(3.5, 3.5);
@@ -120,7 +124,6 @@ export class Engine {
   }
 
   loop(now) {
-
     now *= 0.001;
     const deltaTime = now - this.lastFrame;
     this.lastFrame = now;

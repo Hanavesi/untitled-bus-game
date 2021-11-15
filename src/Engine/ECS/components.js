@@ -67,12 +67,6 @@ Mouse.schema = {
     pos: { type: Types.Ref }
 }
 
-export class EntityGeneratorComp extends Component { }
-
-EntityGeneratorComp.schema = {
-    generator: { type: Types.Ref }
-}
-
 export class Gun extends Component { }
 
 Gun.schema = {

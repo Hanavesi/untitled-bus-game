@@ -4,13 +4,12 @@ import { Object3D, Playable, Vectors, HitBox, StateMachine, Enemy, HealthBar, Bu
 import * as THREE from 'three';
 
 export class EntityGenerator {
-  constructor(modelManager, world, scene) {
+  constructor(modelManager, scene) {
     this.modelManager = modelManager;
-    this.world = world;
     this.scene = scene;
   }
 
-  createPlayer(position) {
+  createPlayer(entity, position) {
     const object = new SkinInstance(this.modelManager.models['knight2'], this.scene);
     object.moveRoot.position.x = position.x;
     object.moveRoot.position.y = position.y;
@@ -50,7 +49,6 @@ export class EntityGenerator {
         }
       }
     }, 'idle');
-    const entity = this.world.createEntity();
     entity
       .addComponent(Vectors, { direction: new THREE.Vector2(1, 0), speed: 5, velocity: new THREE.Vector2() })
       .addComponent(Object3D, { object: object })
@@ -61,7 +59,7 @@ export class EntityGenerator {
       .addComponent(Gun, { barrel: barrel });
   }
 
-  createSoldier(position) {
+  createSoldier(entity, position) {
     const object = new SkinInstance(this.modelManager.models['soldier1'], this.scene);
     const barrel = object.moveRoot.getObjectByName('barrel');
     object.moveRoot.position.x = position.x;
@@ -79,7 +77,6 @@ export class EntityGenerator {
         }
       }
     }, 'idle');
-    const entity = this.world.createEntity();
     entity
       .addComponent(Vectors, { direction: new THREE.Vector2(0, 0), speed: 2, velocity: new THREE.Vector2() })
       .addComponent(Object3D, { object: object })
@@ -89,13 +86,12 @@ export class EntityGenerator {
       .addComponent(Gun, { barrel: barrel });
   }
 
-  createBullet(position, direction, speed, launchVelocity) {
+  createBullet(entity, position, direction, speed, launchVelocity) {
     const bulletMaterial = new THREE.SpriteMaterial({ color: 0x000000 });
     const bullet = new THREE.Sprite(bulletMaterial);
     bullet.scale.set(0.8, 0.8, 0.8);
     bullet.position.set(position.x, position.y, 1);
     this.scene.add(bullet);
-    const entity = this.world.createEntity();
     entity
       .addComponent(Object3D, { object: { moveRoot: bullet } })
       .addComponent(Vectors, { direction: direction, speed: speed, velocity: direction.clone().multiplyScalar(speed).add(launchVelocity) })
@@ -104,9 +100,8 @@ export class EntityGenerator {
       .addComponent(TimeToLive, { age: 0, max: 1 });
   }
 
-  createTile(tile, size) {
+  createTile(entity, tile, size) {
     this.scene.add(tile);
-    const entity = this.world.createEntity();
     entity
       .addComponent(Object3D, { object: { moveRoot: tile } })
       .addComponent(HitBox, { size: new THREE.Vector2(size, size), offset: new THREE.Vector2() })

@@ -13,7 +13,7 @@ export function Game({ mqttHandler }) {
         const height = canvas.clientHeight;
         engine.current = new Engine(canvas, width, height, setReady);
 
-        mqttHandler.setMessageCallback(onMessage)
+        //mqttHandler.setMessageCallback(onMessage)
 
         window.addEventListener('resize', () => {
             const canvas = document.getElementById("gameCanvas");
