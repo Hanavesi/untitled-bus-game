@@ -1,7 +1,6 @@
 import React from 'react'
-import wasdnew from './images/wasdnew.png'
+import wasdnew from '../Assets/images/wasdnew.png'
 import { useHistory } from "react-router-dom";
-import MenuList from './MenuList'
 
 
 

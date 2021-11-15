@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Engine } from '../Engine/Engine';
 import { Howl, Howler } from 'howler'
-import Running from '../music/run.mp3';
+import Running from '../Assets/music/run.mp3';
 
 export function Game({ mqttHandler }) {
   const [ready, setReady] = useState(false);

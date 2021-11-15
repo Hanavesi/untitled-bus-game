@@ -1,6 +1,6 @@
 import { FiniteStateMachine } from "../FSM";
 import { SkinInstance } from "../SkinInstance";
-import { Object3D, Playable, Vectors, HitBox, StateMachine, Enemy, Health, Bullet, Gun, TimeToLive, Tile } from "../ECS/components";
+import { Object3D, Playable, Vectors, HitBox, StateMachine, Enemy, Health, Bullet, Gun, TimeToLive, Tile } from "../ECS/Components";
 import * as THREE from 'three';
 
 export class EntityGenerator {

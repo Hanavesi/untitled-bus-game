@@ -1,5 +1,11 @@
-import { Bullet, Dead, Health } from "../ECS/components";
+import { Bullet, Dead, Health } from "../ECS/Components";
 
+/**
+ * updates entities' statuses according to entity types
+ * @param {*} entity1 
+ * @param {*} entity2 
+ * @returns boolean value on whether the collision should be resolved.
+ */
 export const checkCollisionCase = (entity1, entity2) => {
   if (entity1.hasComponent(Bullet)) {
     entity1.addComponent(Dead);

@@ -1,10 +1,10 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, EntityGeneratorComp, Gun, TimeToLive, Grid, Tile, Dead } from "./components";
+import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, EntityGeneratorComp, Gun, TimeToLive, Grid, Tile, Dead } from "./Components";
 import { Vector3, Vector2 } from "three";
-import { DynamicRectToRect, RayToRect, ResolveDynamicRectToRect, getGridPosition } from "../util/collisions";
+import { DynamicRectToRect, RayToRect, ResolveDynamicRectToRect, getGridPosition } from "../Util/Collisions";
 import { Howl, Howler } from 'howler'
-import piu from '../../music/piu.mp3';
-import { checkCollisionCase } from "../util/CollisionCases";
+import piu from '../../Assets/music/piu.mp3';
+import { checkCollisionCase } from "../Util/CollisionCases";
 
 const CELLSIZE = 6;
 

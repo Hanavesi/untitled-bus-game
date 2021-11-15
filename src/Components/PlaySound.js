@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Sound from 'react-sound';
-import Running from '../music/run.mp3';
+import Running from '../Assets/music/run.mp3';
 
 
 const PlaySound = () => {

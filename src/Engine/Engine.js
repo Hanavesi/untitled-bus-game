@@ -1,13 +1,13 @@
 import { World } from "ecsy";
 import * as THREE from "three";
 import { Vector2 } from "three";
-import { Input, Tile, CameraComponent, Mouse, EntityGeneratorComp, Grid, Object3D } from "./ECS/components";
-import { initWorld } from "./ECS/initializer";
+import { Input, Tile, CameraComponent, Mouse, EntityGeneratorComp, Grid, Object3D } from "./ECS/Components";
+import { initWorld } from "./ECS/Initializer";
 import { InputManager } from "./InputManager";
 import { ModelManager } from "./ModelManager";
 import { mapToMeshes } from "./TileGen";
 import { MAP_TEST } from "./TileMap";
-import { EntityGenerator } from "./util/EntityGenerator";
+import { EntityGenerator } from "./Util/EntityGenerator";
 
 const CELLSIZE = 6;
 
