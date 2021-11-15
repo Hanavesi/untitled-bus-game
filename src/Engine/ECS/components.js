@@ -53,9 +53,9 @@ StateMachine.schema = {
     fsm: { type: Types.Ref }
 };
 
-export class HealthBar extends Component {}
+export class Health extends Component {}
 
-HealthBar.schema = {
+Health.schema = {
     bar: { type: Types.Ref },
     max: { type: Types.Number },
     current: { type: Types.Number }

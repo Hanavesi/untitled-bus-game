@@ -1,9 +1,10 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Mouse, Bullet, EntityGeneratorComp, Gun, TimeToLive, Grid, Tile, Dead } from "./components";
+import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, EntityGeneratorComp, Gun, TimeToLive, Grid, Tile, Dead } from "./components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, RayToRect, ResolveDynamicRectToRect, getGridPosition } from "../util/collisions";
 import { Howl, Howler } from 'howler'
 import piu from '../../music/piu.mp3';
+import { checkCollisionCase } from "../util/CollisionCases";
 
 const CELLSIZE = 6;
 
@@ -42,7 +43,7 @@ export class ControlPlayerSystem extends System {
         }
       }
 
-      if (inputState.leftMouse.justPressed) {
+      if (inputState.leftMouse.down) {
         const barrel = entity.getComponent(Gun).barrel;
         const pos = new Vector3();
         const speed = 30;
@@ -69,26 +70,26 @@ ControlPlayerSystem.queries = {
   mouse: { components: [Mouse] }
 }
 
-export class TempHealthSystem extends System {
+export class HealthSystem extends System {
   execute() {
-    const player = this.queries.entities.results[0];
-    if (!player) return;
-    const healthBar = player.getMutableComponent(HealthBar);
-    const current = healthBar.current;
-    const max = healthBar.max;
-    const scale = (current / max);
-    healthBar.bar.scale.set(scale * 5, 0.2, 1);
-    healthBar.bar.position.x = (scale * 5 - 5) / 2;
-    healthBar.current -= 0.1;
-    if (healthBar.current < 0) {
-      healthBar.current = 0;
-      player.addComponent(Dead)
-    };
+    const entities = this.queries.entities.results;
+    for (const entity of entities) {
+      const healthBar = entity.getMutableComponent(Health);
+      const current = healthBar.current;
+      const max = healthBar.max;
+      const scale = (current / max);
+      healthBar.bar.scale.set(scale * 5, 0.2, 1);
+      healthBar.bar.position.x = (scale * 5 - 5) / 2;
+      if (healthBar.current < 0) {
+        healthBar.current = 0;
+        entity.addComponent(Dead);
+      };
+    }
   }
 }
 
-TempHealthSystem.queries = {
-  entities: { components: [HealthBar] }
+HealthSystem.queries = {
+  entities: { components: [Health] }
 }
 
 export class ControlEnemySystem extends System {
@@ -165,6 +166,22 @@ ControlEnemySystem.queries = {
   enemies: { components: [Enemy, Object3D, Vectors] },
 }
 
+export class EnemySpawnerSystem extends System {
+  execute() {
+    const enemies = this.queries.enemies.results;
+    if (enemies.length === 0) {
+      let entity = this.world.createEntity();
+      this.world.generator.createSoldier(entity, new Vector2(20, 0));
+      entity = this.world.createEntity();
+      this.world.generator.createSoldier(entity, new Vector2(-20, 0));
+    }
+  }
+}
+
+EnemySpawnerSystem.queries = {
+  enemies: { components: [Enemy] }
+}
+
 export class CameraPositionSystem extends System {
   execute() {
     const player = this.queries.entities.results[0];
@@ -180,50 +197,6 @@ CameraPositionSystem.queries = {
   camera: { components: [CameraComponent] }
 }
 
-export class UpdateBulletsSystem extends System {
-  execute(delta) {
-    const bullets = this.queries.bullets.results;
-    const entities = this.queries.entities.results;
-    bullets: for (const bullet of bullets) {
-      const object = bullet.getMutableComponent(Object3D).object.moveRoot;
-      const ttl = bullet.getMutableComponent(TimeToLive);
-      ttl.age += delta;
-      if (ttl.age >= ttl.max) {
-        object.geometry.dispose();
-        object.material.dispose();
-        object.removeFromParent();
-        bullet.remove();
-        continue bullets;
-      }
-      const vectors = bullet.getMutableComponent(Vectors);
-      const pos = new Vector2(object.position.x, object.position.y);
-      const ray = vectors.direction.clone().multiplyScalar(vectors.speed * delta);
-      entities: for (const entity of entities) {
-        const entityPos = entity.getComponent(Object3D).object.moveRoot.position;
-        const hitbox = entity.getComponent(HitBox);
-        const entityX = (entityPos.x - hitbox.size.x / 2) + hitbox.offset.x;
-        const entityY = (entityPos.y - hitbox.size.y / 2) + hitbox.offset.y;
-        const rect = { pos: new Vector2(entityX, entityY), size: hitbox.size };
-        const contactInfo = { contactNormal: null, contactPoint: null, tHitNear: 0 };
-        if (RayToRect(pos, ray, rect, contactInfo)) {
-          if (contactInfo.tHitNear >= 0 && contactInfo.tHitNear <= 1) {
-            object.geometry.dispose();
-            object.material.dispose();
-            object.removeFromParent();
-            bullet.remove();
-            continue bullets;
-          }
-        }
-      }
-      object.translateOnAxis(new Vector3(vectors.direction.x, vectors.direction.y, 0), vectors.speed * delta);
-    }
-  }
-}
-
-UpdateBulletsSystem.queries = {
-  bullets: { components: [Bullet] },
-  entities: { components: [Object3D, Vectors, HitBox] }
-}
 
 export class UpdateGridSystem extends System {
   execute(delta) {
@@ -358,14 +331,14 @@ export class CollisionSystem extends System {
 
               let collisionVelocity = vel1.clone().sub(vel2);
               if (DynamicRectToRect(r1, collisionVelocity, delta, r2, contactInfo)) {
+                // always check collision case with bullet as entity1 to make checking easier
+                let needsResolution;
                 if (entity1.hasComponent(Bullet)) {
-                  entity1.addComponent(Dead);
-                  continue collision;
+                  needsResolution = checkCollisionCase(entity1, entity2);
+                } else {
+                  needsResolution = checkCollisionCase(entity2, entity1);
                 }
-                if (entity2.hasComponent(Bullet)) {
-                  entity2.addComponent(Dead);
-                  continue collision;
-                }
+                if (!needsResolution) continue collision;
                 collisions.push({ time: contactInfo.tHitNear, r1: r1, r2: r2, vel: vel1, vectors: vectors1 });
               }
             }

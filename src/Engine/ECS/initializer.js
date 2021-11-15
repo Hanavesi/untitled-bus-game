@@ -1,7 +1,7 @@
-import { Vectors, Object3D, Playable, Input, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Cells, Mouse, Bullet, Gun, TimeToLive, Grid, Tile, Dead } from "./components";
-import { CameraPositionSystem, CleanUpSystem, CollisionSystem, ControlEnemySystem, ControlPlayerSystem, TempHealthSystem, UpdateBulletsSystem, UpdateGridSystem, UpdateVectorsSystem } from "./systems";
+import { Vectors, Object3D, Playable, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Cells, Mouse, Bullet, Gun, TimeToLive, Grid, Tile, Dead } from "./components";
+import { CameraPositionSystem, CleanUpSystem, CollisionSystem, ControlEnemySystem, ControlPlayerSystem, EnemySpawnerSystem, HealthSystem, UpdateGridSystem, UpdateVectorsSystem } from "./systems";
 
-export const initWorld = (world, entityGenerator) => {
+export const initWorld = (world) => {
     world
         .registerComponent(Vectors)
         .registerComponent(Object3D)
@@ -11,7 +11,7 @@ export const initWorld = (world, entityGenerator) => {
         .registerComponent(StateMachine)
         .registerComponent(CameraComponent)
         .registerComponent(Enemy)
-        .registerComponent(HealthBar)
+        .registerComponent(Health)
         .registerComponent(Cells)
         .registerComponent(Mouse)
         .registerComponent(Bullet)
@@ -24,11 +24,11 @@ export const initWorld = (world, entityGenerator) => {
     world
         .registerSystem(ControlPlayerSystem)
         .registerSystem(ControlEnemySystem)
-        .registerSystem(TempHealthSystem)
-        /* .registerSystem(UpdateBulletsSystem) */
         .registerSystem(UpdateGridSystem)
         .registerSystem(CollisionSystem)
         .registerSystem(UpdateVectorsSystem)
         .registerSystem(CameraPositionSystem)
         .registerSystem(CleanUpSystem)
+        .registerSystem(EnemySpawnerSystem)
+        .registerSystem(HealthSystem)
 }
