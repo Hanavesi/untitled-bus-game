@@ -1,7 +1,6 @@
 import './App.css';
 import React from 'react';
-import Menu from './components/Menu';
-import {useMousePosition} from './components/useMousePosition';
+import Menu from './Components/Menu';
 
 
 function App() {

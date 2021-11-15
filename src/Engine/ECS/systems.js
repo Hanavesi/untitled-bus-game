@@ -1,9 +1,11 @@
 import { System } from "ecsy";
 import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, HealthBar, Mouse, Bullet, EntityGeneratorComp, Gun, TimeToLive, Grid, Tile, Dead } from "./components";
 import { Vector3, Vector2 } from "three";
-import { DynamicRectToRect, RayToRect, ResolveDynamicRectToRect } from "../util/collisions";
-import {Howl, Howler} from 'howler'
+import { DynamicRectToRect, RayToRect, ResolveDynamicRectToRect, getGridPosition } from "../util/collisions";
+import { Howl, Howler } from 'howler'
 import piu from '../../music/piu.mp3';
+
+const CELLSIZE = 6;
 
 export class ControlPlayerSystem extends System {
   execute(delta) {
@@ -11,6 +13,9 @@ export class ControlPlayerSystem extends System {
     const inputState = this.queries.inputState.results[0].getComponent(Input).state;
     const mousePos = this.queries.mouse.results[0].getComponent(Mouse).pos;
     for (const entity of entities) {
+      const object = entity.getComponent(Object3D).object;
+      const moveRoot = object.moveRoot;
+      const animRoot = object.animRoot;
       const vectors = entity.getMutableComponent(Vectors);
       let newDir = new Vector2(0, 0);
       if (inputState.left.down) newDir.x -= 1;
@@ -20,28 +25,6 @@ export class ControlPlayerSystem extends System {
       vectors.direction = newDir.normalize();
       vectors.velocity = new Vector2().add(vectors.direction).multiplyScalar(vectors.speed).add(vectors.velocity);
       vectors.velocity.multiplyScalar(0.8);
-
-            const angle = Math.atan2(mousePos.y, mousePos.x);
-            const newAngle = angle + Math.PI / 2;
-            animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), newAngle);
-            animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
-
-            if (inputState.leftMouse.down) {
-                const barrel = entity.getComponent(Gun).barrel;
-                const pos = new Vector3();
-                const speed = 30;
-                barrel.getWorldPosition(pos);
-                const dir = new Vector2(mousePos.x, mousePos.y);
-                generator.createBullet(pos, dir, speed);
-                const sound = new Howl({
-                    src: [piu],
-                    volume: 0.1,
-                  });
-                  
-                  sound.play();
-            }
-        }
-      }
 
       const angle = Math.atan2(mousePos.y, mousePos.x);
       const newAngle = angle + Math.PI / 2;
@@ -56,19 +39,24 @@ export class ControlPlayerSystem extends System {
         const dir = new Vector2(mousePos.x, mousePos.y);
         const bulletEntity = this.world.createEntity();
         this.world.generator.createBullet(bulletEntity, pos, dir, speed, vectors.velocity);
-      }
+        const sound = new Howl({
+          src: [piu],
+          volume: 0.1,
+        });
 
-      // anim
+        sound.play();
+        // anim
+      }
       object.update(delta);
     }
   }
 }
 
 ControlPlayerSystem.queries = {
-  entities: { components: [Object3D, Vectors, Playable] },
-  inputState: { components: [Input] },
-  mouse: { components: [Mouse] }
-}
+    entities: { components: [Object3D, Vectors, Playable] },
+    inputState: { components: [Input] },
+    mouse: { components: [Mouse] }
+  }
 
 export class TempHealthSystem extends System {
   execute() {
