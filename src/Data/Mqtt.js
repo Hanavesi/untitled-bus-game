@@ -23,13 +23,17 @@ export class MqttHandler {
             this.client.on("reconnect", () => {
                 this.connectStatus = "Reconnecting";
             });
-            this.client.on("message", (topic, message) => {
-                const payload = { topic, message: message.toString() };
-                if (payload.topic) {
-                    messageCallback(payload.message, payload.topic);
-                }
-            });
+            this.setMessageCallback(messageCallback);
         }
+    }
+
+    setMessageCallback = (messageCallback) => {
+        this.client.on("message", (topic, message) => {
+            const payload = { topic, message: message.toString() };
+            if (payload.topic) {
+                messageCallback(payload.message, payload.topic);
+            }
+        });
     }
 
     subscribe = (topic, qos = 1) => {
@@ -63,12 +67,13 @@ export class MqttHandler {
     }
 
     disconnect = (callback) => {
-        console.log(this.client);
         if (this.client) {
             this.client.end(() => {
                 this.connectStatus = false;
                 this.subscriptions = [];
-                callback();
+                if (callback !== undefined) {
+                    callback();
+                }
             });
         }
     }

@@ -3,7 +3,7 @@ import { Engine } from '../Engine/Engine';
 import {Howl, Howler} from 'howler'
 import Running from '../music/run.mp3';
 
-export function Game() {
+export function Game({ mqttHandler }) {
     const [ready, setReady] = useState(false);
     const engine = useRef(null);
     const visible = { visibility: 'visible' };
@@ -22,6 +22,8 @@ export function Game() {
         const height = canvas.clientHeight;
         engine.current = new Engine(canvas, width, height, setReady);
 
+        mqttHandler.setMessageCallback(onMessage)
+
         window.addEventListener('resize', () => {
             const canvas = document.getElementById("gameCanvas");
             const width = canvas.clientWidth;
@@ -33,8 +35,15 @@ export function Game() {
             engine.current.setMousePos(pos);
         });
         
+        return(() => {
+            mqttHandler.disconnect();
+        });
     }, []);
 
+    const onMessage = (message, topic) => {
+        // do stufs
+        console.log(message);
+    }
 
     return (
         <div>
@@ -44,4 +53,4 @@ export function Game() {
 
 }
 
-export const MemoizedGame = React.memo(Game);
+export default Game;
