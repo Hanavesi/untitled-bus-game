@@ -50,6 +50,10 @@ const idToSrc = (id) => {
             return "images/back_window.png"
         case 7:
             return "images/rear_window.png"
+        case 0:
+            const rand = Math.random();
+            if (rand < 0.8) return "images/floor.png";
+            return "images/bench.png";
 
         default:
             return "images/floor.png";
