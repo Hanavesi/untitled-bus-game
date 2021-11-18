@@ -1,9 +1,22 @@
+
+/**
+ * Registers the list of event listeners to window.
+ * Expects list to contain sublists where first element is
+ * event type and second element is callback function.
+ * @param {[string, (() => void)[]]} eventListeners 
+ */
 export const addEventListeners = (eventListeners) => {
   for (const e of eventListeners) {
     window.addEventListener(e[0], e[1]);
   }
 }
 
+/**
+ * Creates the event listeners used with the game engine so they can be 
+ * registered and removed easily.
+ * @param {Engine} engine 
+ * @returns list of event listeners used in the game loop.
+ */
 export const getEventListeners = (engine) => {
   const eventListeners = [];
 
@@ -68,6 +81,12 @@ export const getEventListeners = (engine) => {
   return eventListeners;
 }
 
+ /**
+  * Removes the event listeners from use.
+  * Expects list to contain sublists where first element is
+  * event type and second element is callback function.
+  * @param {[string, (() => void)[]]} eventListeners 
+  */
 export const removeEventListeners = (eventListeners) => {
   for (const e of eventListeners) {
     window.removeEventListener(e[0], e[1]);
