@@ -6,6 +6,7 @@ import { getEventListeners, addEventListeners, removeEventListeners } from '../E
 
 export function Game({ mqttHandler }) {
   const [ready, setReady] = useState(false);
+  const [showGame, setShowGame] = useState(false);
   const engine = useRef(null);
   const visible = { visibility: 'visible' };
   const hidden = { visibility: 'hidden' };
@@ -35,6 +36,11 @@ export function Game({ mqttHandler }) {
     });
   }, []);
 
+  const startGameLoop = () => {
+    setShowGame(true);
+    engine.current.loop(performance.now());
+  }
+
   const onMessage = (message, topic) => {
     // do stufs
     console.log(message);
@@ -42,7 +48,8 @@ export function Game({ mqttHandler }) {
 
   return (
     <div>
-      <canvas id="gameCanvas" style={ready ? visible : hidden} />
+      <button style={ready && !showGame ? visible : hidden} onClick={startGameLoop}>start</button>
+      <canvas id="gameCanvas" style={showGame ? visible : hidden} />
     </div>
   );
 

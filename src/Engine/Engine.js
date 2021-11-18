@@ -15,9 +15,10 @@ export class Engine {
 
   constructor(canvas, width, height, onReady) {
     this.inputManager = new InputManager();
-    this.lastFrame = 0;
+    this.lastFrame = undefined;
     this.mousePos = new Vector2();
     this.world = new World();
+    initWorld(this.world);
     const aspectratio = width / height;
     this.camera = new THREE.OrthographicCamera(-15 * aspectratio, 15 * aspectratio, 15, -15, 1, 1000);
     this.camera.position.set(0, 0, 20);
@@ -31,8 +32,8 @@ export class Engine {
     this.modelManager = new ModelManager();
     this.modelManager.setModels(['knight.gltf', 'soldier1.gltf', 'uzi.gltf', 'knight2.gltf']);
     this.modelManager.load(() => {
-      this.init();
       onReady(true);
+      this.init();
     });
     this.onWindowResize(width, height);
   }
@@ -67,8 +68,6 @@ export class Engine {
   init() {
     const entityGenerator = new EntityGenerator(this.modelManager, this.scene);
     this.world.generator = entityGenerator;
-    console.log(this.world)
-    initWorld(this.world);
     //this.world.createEntity().addComponent(EntityGeneratorComp, { generator: this.entityGenerator });
     entityGenerator.createPlayer(this.world.createEntity(), { x: 0, y: 0 });
     /* for (let i = 0; i < 100; i++) {
@@ -78,7 +77,6 @@ export class Engine {
     //this.entityGenerator.createSoldier({ x: -20, y: 0 });
     //this.entityGenerator.createSoldier({ x: 20, y: 0 });
 
-    let entity;
     const { meshes, bounds } = mapToMeshes(MAP_TEST);
     for (const tile of meshes) {
       this.scene.add(tile);
@@ -101,7 +99,8 @@ export class Engine {
       }
       grid[i] = column;
     }
-    entity = this.world.createEntity();
+
+    const entity = this.world.createEntity();
     entity.addComponent(Grid, { cells: grid, bounds: bounds });
 
     const mouseEntity = this.world.createEntity();
@@ -120,11 +119,12 @@ export class Engine {
     const light = new THREE.AmbientLight(0x404040); // soft white light
     this.scene.add(light);
 
-    this.loop(performance.now());
+    //this.loop(performance.now());
   }
 
   loop(now) {
     now *= 0.001;
+    if (this.lastFrame === undefined) this.lastFrame = now;
     const deltaTime = now - this.lastFrame;
     this.lastFrame = now;
 
