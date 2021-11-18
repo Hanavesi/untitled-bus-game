@@ -11,17 +11,11 @@ export function Game({ mqttHandler }) {
   const visible = { visibility: 'visible' };
   const hidden = { visibility: 'hidden' };
 
-  // counter for which level is going (every stop increments counter)
-  let level = 0;
-
-  const mapToShow = (type) => {
+  useEffect(() => {
     const canvas = document.getElementById("gameCanvas");
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
-    engine.current = new Engine(canvas, width, height, setReady, type, level);
-  }
-  useEffect(() => {
-    mapToShow('GAME')
+    engine.current = new Engine(canvas, width, height, setReady);
     //mqttHandler.setMessageCallback(onMessage)
     const eventListeners = getEventListeners(engine.current);
     addEventListeners(eventListeners);
@@ -54,16 +48,15 @@ export function Game({ mqttHandler }) {
     // change room when bus arrives or leaves stop, or comes to endstop
     if (eventType === 'ARS') {
       console.log('bussi saapui pysäkille');
-      mapToShow('SHOP')
+      // todo: function to switch to shop
     }
     else if (eventType === 'DEP') {
       console.log('bussi lähti pysäkiltä');
-      level += 1;
-      mapToShow('GAME')
+      // todo: function to switch back to bus
     }
     else if (eventType === 'VJOUT') {
       console.log('bussi saapui PÄÄTTÄRILLE');
-
+      // todo: wat do now
     }
   }
 
