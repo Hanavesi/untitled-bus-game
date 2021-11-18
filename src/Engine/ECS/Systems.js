@@ -43,20 +43,28 @@ export class ControlPlayerSystem extends System {
         }
       }
 
-      if (inputState.leftMouse.down) {
-        const barrel = entity.getComponent(Gun).barrel;
-        const pos = new Vector3();
-        const speed = 30;
-        barrel.getWorldPosition(pos);
-        const dir = new Vector2(mousePos.x, mousePos.y);
-        const bulletEntity = this.world.createEntity();
-        this.world.generator.createBullet(bulletEntity, pos, dir, speed, vectors.velocity);
-        const sound = new Howl({
-          src: [piu],
-          volume: 0.1,
-        });
+      const gun = entity.getMutableComponent(Gun);
+      gun.lastShot -= delta;
+      if (gun.lastShot < 0) gun.lastShot = 0;
 
-        sound.play();
+      if (inputState.leftMouse.down) {
+        if (gun.lastShot <= 0) {
+          gun.lastShot += gun.cooldown;
+
+          const { barrel } = gun;
+          const pos = new Vector3();
+          const speed = 30;
+          barrel.getWorldPosition(pos);
+          const dir = new Vector2(mousePos.x, mousePos.y);
+          const bulletEntity = this.world.createEntity();
+          this.world.generator.createBullet(bulletEntity, pos, dir, speed, vectors.velocity);
+          const sound = new Howl({
+            src: [piu],
+            volume: 0.1,
+          });
+
+          sound.play();
+        }
       }
       // anim
       object.update(delta);

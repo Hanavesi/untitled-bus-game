@@ -70,7 +70,9 @@ Mouse.schema = {
 export class Gun extends Component { }
 
 Gun.schema = {
-    barrel: { type: Types.Ref }
+    barrel: { type: Types.Ref },
+    cooldown: { type: Types.Number },
+    lastShot: { type: Types.Number }
 }
 
 export class TimeToLive extends Component { }

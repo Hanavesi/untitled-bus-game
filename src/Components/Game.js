@@ -15,8 +15,8 @@ export function Game({ mqttHandler }) {
     const canvas = document.getElementById("gameCanvas");
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
-    engine.current = new Engine(canvas, width, height, setReady);
-    //mqttHandler.setMessageCallback(onMessage)
+    engine.current = new Engine(canvas, width, height, startGameLoop);
+    //mqttHandler.setMessageCallback(onMessage);
     const eventListeners = getEventListeners(engine.current);
     addEventListeners(eventListeners);
 
@@ -49,10 +49,12 @@ export function Game({ mqttHandler }) {
     if (eventType === 'ARS') {
       console.log('bussi saapui pysäkille');
       // todo: function to switch to shop
+      engine.current.enterShop();
     }
     else if (eventType === 'DEP') {
       console.log('bussi lähti pysäkiltä');
       // todo: function to switch back to bus
+      engine.current.enterBus();
     }
     else if (eventType === 'VJOUT') {
       console.log('bussi saapui PÄÄTTÄRILLE');
@@ -62,7 +64,7 @@ export function Game({ mqttHandler }) {
 
   return (
     <div>
-      <button style={ready && !showGame ? visible : hidden} onClick={startGameLoop}>start</button>
+      {/* <button style={ready && !showGame ? visible : hidden} onClick={startGameLoop}>start</button> */}
       <canvas id="gameCanvas" style={showGame ? visible : hidden} />
     </div>
   );

@@ -38,7 +38,7 @@ const BusMap = ({ mqttHandler }) => {
     const [busChosen, setBusChosen] = useState(false);
 
     useEffect(() => {
-        const interval = setInterval(update, 5000);
+        const interval = setInterval(update, 30000);
         connect();
         initMap();
         return (() => clearInterval(interval));
@@ -243,7 +243,6 @@ const BusMap = ({ mqttHandler }) => {
      */
     const clickEvent = (bus) => {
         mqttHandler.unsubscribeAll();
-        console.log(bus.topic);
         // Sometimes subsctiption fails somehow and further messages from hte chosen bus are not received
         mqttHandler.subscribe(bus.topic);
         setBusChosen(true);

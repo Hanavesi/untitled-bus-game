@@ -31,8 +31,8 @@ export class Engine {
     this.modelManager = new ModelManager();
     this.modelManager.setModels(['knight.gltf', 'soldier1.gltf', 'uzi.gltf', 'knight2.gltf']);
     this.modelManager.load(() => {
-      onReady(true);
       this.init();
+      onReady(true);
     });
     this.onWindowResize(width, height);
   }
@@ -208,6 +208,14 @@ export class Engine {
 
     this.renderer.render(stage.scene, this.camera);
     requestAnimationFrame(this.loop.bind(this));
+  }
+
+  enterShop() {
+    this.currentStage = 1;
+  }
+
+  enterBus() {
+    this.currentStage = 0;
   }
 
   addLight(pos, scene) {
