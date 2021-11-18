@@ -1,22 +1,32 @@
 import { TextureLoader, MeshLambertMaterial, Mesh, PlaneGeometry } from "three"
 
+// size of one tile, 4 width, 4 height
 const TILESIZE = 4;
 
+// creates a tilemap
 export const mapToMeshes = (map) => {
     const loader = new TextureLoader();
+    // map size, hight determined by how many objects in whole array
     const height = map.length;
+    // width determined by how many variable in first array object
     const width = map[0].length;
     const meshes = [];
 
+    // loops given map array
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
+            // fetches tile based on which case it is and loads it
             const tileSrc = idToSrc(map[y][x]);
             const material = new MeshLambertMaterial({
                 map: loader.load(tileSrc)
             });
             const geometry = new PlaneGeometry(TILESIZE, TILESIZE);
+            // Actual tile is made here with geometry and material as settings
             const mesh = new Mesh(geometry, material);
+
+            // Give position for tile, each tile gets different cos of x and y
             mesh.position.set(-width * 2 + x * TILESIZE, height * 2 - y * TILESIZE, -1);
+            // Naming the tile
             if (tileSrc.includes('floor')) {
                 mesh.name = 'floor';
             } else if (tileSrc.includes('door')) {
@@ -31,9 +41,11 @@ export const mapToMeshes = (map) => {
             meshes.push(mesh);
         }
     }
-    return { meshes: meshes, bounds: { width: width * TILESIZE, height: height * TILESIZE, botLeft: {x: -width * 2, y: -height * 2} } };
+    // returns meshes (created tilemap as array) and bounds for grid system
+    return { meshes: meshes, bounds: { width: width * TILESIZE, height: height * TILESIZE, botLeft: { x: -width * 2, y: -height * 2 } } };
 }
 
+// returns the right image based on specific value in the map array
 const idToSrc = (id) => {
     switch (id) {
         case 1:
@@ -50,6 +62,8 @@ const idToSrc = (id) => {
             return "images/back_window.png"
         case 7:
             return "images/rear_window.png"
+        // Case 0 is used for randomizing floor and bench tiles,
+        // so every stage is different
         case 0:
             const rand = Math.random();
             if (rand < 0.8) return "images/floor.png";
