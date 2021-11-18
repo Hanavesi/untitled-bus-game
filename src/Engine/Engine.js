@@ -1,19 +1,19 @@
 import { World } from "ecsy";
 import * as THREE from "three";
 import { Vector2 } from "three";
-import { Input, Tile, CameraComponent, Mouse, EntityGeneratorComp, Grid, Object3D } from "./ECS/Components";
+import { CameraComponent, Grid, Input, Mouse } from "./ECS/Components";
 import { initWorld } from "./ECS/Initializer";
 import { InputManager } from "./InputManager";
 import { ModelManager } from "./ModelManager";
 import { mapToMeshes } from "./TileGen";
-import { MAP_TEST } from "./TileMap";
+import { MAP_TEST, SHOP_MAP } from "./TileMap";
 import { EntityGenerator } from "./Util/EntityGenerator";
 
 const CELLSIZE = 6;
 
 export class Engine {
 
-  constructor(canvas, width, height, onReady) {
+  constructor(canvas, width, height, onReady, tilemap, level) {
     this.inputManager = new InputManager();
     this.lastFrame = 0;
     this.mousePos = new Vector2();
@@ -27,6 +27,8 @@ export class Engine {
     this.renderer.setSize(width, height, false);
     this.renderer.render(this.scene, this.camera);
     this.scene.background = new THREE.Color(0x000000);
+    this.tilemap = tilemap;
+    this.level = level
 
     this.modelManager = new ModelManager();
     this.modelManager.setModels(['knight.gltf', 'soldier1.gltf', 'uzi.gltf', 'knight2.gltf']);
@@ -64,28 +66,26 @@ export class Engine {
     this.mousePos = this.mousePos.set(pos.x, pos.y).normalize();
   }
 
-  init() {
+  mapCreator(tilemap) {
+    // decide via tilemap that which room is created, shop or game
+    let mapToBeCreated;
+    if (tilemap === 'SHOP') {
+      mapToBeCreated = SHOP_MAP;
+    } else if (tilemap === 'GAME') {
+      mapToBeCreated = MAP_TEST;
+    }
+    // Create tilemap based on previous decision and add Grid to to it
     const entityGenerator = new EntityGenerator(this.modelManager, this.scene);
     this.world.generator = entityGenerator;
-    console.log(this.world)
     initWorld(this.world);
-    //this.world.createEntity().addComponent(EntityGeneratorComp, { generator: this.entityGenerator });
-    entityGenerator.createPlayer(this.world.createEntity(), { x: 0, y: 0 });
-    /* for (let i = 0; i < 100; i++) {
-      this.entityGenerator.createSoldier({ x: 0, y: 10 });
-    } */
-    entityGenerator.createSoldier(this.world.createEntity(), { x: 0, y: 10 });
-    //this.entityGenerator.createSoldier({ x: -20, y: 0 });
-    //this.entityGenerator.createSoldier({ x: 20, y: 0 });
-
     let entity;
-    const { meshes, bounds } = mapToMeshes(MAP_TEST);
+    const { meshes, bounds } = mapToMeshes(mapToBeCreated);
     for (const tile of meshes) {
       this.scene.add(tile);
       if (tile.name === 'floor') continue;
       entityGenerator.createTile(this.world.createEntity(), tile, 3.5);
       // debug collision tiles
-      const material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); 
+      const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
       const geometry = new THREE.PlaneGeometry(3.5, 3.5);
       const plane = new THREE.Mesh(geometry, material);
       plane.position.x = tile.position.x;
@@ -103,6 +103,61 @@ export class Engine {
     }
     entity = this.world.createEntity();
     entity.addComponent(Grid, { cells: grid, bounds: bounds });
+  }
+
+  init() {
+    const entityGenerator = new EntityGenerator(this.modelManager, this.scene);
+    // this.world.generator = entityGenerator;
+    // console.log(this.world)
+    // initWorld(this.world);
+    // //this.world.createEntity().addComponent(EntityGeneratorComp, { generator: this.entityGenerator });
+    // /* for (let i = 0; i < 100; i++) {
+    //   this.entityGenerator.createSoldier({ x: 0, y: 10 });
+    // } */
+    // entityGenerator.createSoldier(this.world.createEntity(), { x: 0, y: 10 });
+    // //this.entityGenerator.createSoldier({ x: -20, y: 0 });
+    // //this.entityGenerator.createSoldier({ x: 20, y: 0 });
+
+    // let entity;
+    // const { meshes, bounds } = mapToMeshes(MAP_TEST);
+    // for (const tile of meshes) {
+    //   this.scene.add(tile);
+    //   if (tile.name === 'floor') continue;
+    //   entityGenerator.createTile(this.world.createEntity(), tile, 3.5);
+    //   // debug collision tiles
+    //   const material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); 
+    //   const geometry = new THREE.PlaneGeometry(3.5, 3.5);
+    //   const plane = new THREE.Mesh(geometry, material);
+    //   plane.position.x = tile.position.x;
+    //   plane.position.y = tile.position.y;
+    //   this.scene.add(plane);
+    // }
+    // const grid = {};
+    // let i, j;
+    // for (i = 0; (i - 1) * CELLSIZE < bounds.width; i++) {
+    //   const column = {};
+    //   for (j = 0; (j - 1) * CELLSIZE < bounds.height; j++) {
+    //     column[j] = [];
+    //   }
+    //   grid[i] = column;
+    // }
+    // entity = this.world.createEntity();
+    // entity.addComponent(Grid, { cells: grid, bounds: bounds });
+    this.mapCreator(this.tilemap);
+
+    entityGenerator.createPlayer(this.world.createEntity(), { x: 0, y: 0 });
+    console.log('LEVEL', this.level);
+    // Create enemies depending on the room level
+    if (this.level > 0) {
+      for (let i = 0; i <= this.level; i++) {
+        entityGenerator.createSoldier(this.world.createEntity(), { x: 10, y: 0 });
+        entityGenerator.createSoldier(this.world.createEntity(), { x: -10, y: 0 });
+      }
+    } else if (this.level = 0) {
+      entityGenerator.createSoldier(this.world.createEntity(), { x: 0, y: 10 });
+    }
+
+
 
     const mouseEntity = this.world.createEntity();
     mouseEntity.addComponent(Mouse, { pos: this.mousePos });

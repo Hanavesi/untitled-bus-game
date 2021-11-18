@@ -169,12 +169,12 @@ ControlEnemySystem.queries = {
 export class EnemySpawnerSystem extends System {
   execute() {
     const enemies = this.queries.enemies.results;
-    if (enemies.length === 0) {
+    /* if (enemies.length === 0) {
       let entity = this.world.createEntity();
       this.world.generator.createSoldier(entity, new Vector2(20, 0));
       entity = this.world.createEntity();
       this.world.generator.createSoldier(entity, new Vector2(-20, 0));
-    }
+    } */
   }
 }
 
