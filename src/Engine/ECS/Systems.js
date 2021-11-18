@@ -289,7 +289,7 @@ export class CollisionSystem extends System {
 
             // if both are bullets, skip
             if (entity1.hasComponent(Bullet) && entity2.hasComponent(Bullet)) continue collision;
-            if (entity2.hasComponent(Dead)) continue cellEntities;
+            if (entity2.hasComponent(Dead)) continue collision;
 
             // temp skip when target is not tile
             //if (!entity2.hasComponent(Tile)) continue collision;

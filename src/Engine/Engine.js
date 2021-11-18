@@ -142,10 +142,9 @@ export class Engine {
     }; */
 
     // Wait before starting loop
-    if (now > 2) {
-      this.world.execute(deltaTime, now);
-      this.inputManager.update();
-    }
+
+    this.world.execute(deltaTime, now);
+    this.inputManager.update();
 
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.loop.bind(this));
