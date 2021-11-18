@@ -1,7 +1,7 @@
 import { World } from "ecsy";
 import * as THREE from "three";
 import { Vector2 } from "three";
-import { CameraComponent, Grid, Input, Mouse } from "./ECS/Components";
+import { Input, CameraComponent, Mouse, Grid } from "./ECS/Components";
 import { initWorld } from "./ECS/Initializer";
 import { InputManager } from "./InputManager";
 import { ModelManager } from "./ModelManager";
@@ -85,12 +85,12 @@ export class Engine {
       if (tile.name === 'floor') continue;
       entityGenerator.createTile(this.world.createEntity(), tile, 3.5);
       // debug collision tiles
-      const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+      /* const material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); 
       const geometry = new THREE.PlaneGeometry(3.5, 3.5);
       const plane = new THREE.Mesh(geometry, material);
       plane.position.x = tile.position.x;
       plane.position.y = tile.position.y;
-      this.scene.add(plane);
+      this.scene.add(plane); */
     }
     const grid = {};
     let i, j;
@@ -175,7 +175,7 @@ export class Engine {
     const light = new THREE.AmbientLight(0x404040); // soft white light
     this.scene.add(light);
 
-    this.loop(0);
+    this.loop(performance.now());
   }
 
   loop(now) {
@@ -197,10 +197,9 @@ export class Engine {
     }; */
 
     // Wait before starting loop
-    if (now > 2) {
-      this.world.execute(deltaTime, now);
-      this.inputManager.update();
-    }
+
+    this.world.execute(deltaTime, now);
+    this.inputManager.update();
 
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.loop.bind(this));

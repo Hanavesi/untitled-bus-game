@@ -1,4 +1,3 @@
-import PlaySound from './PlaySound';
 import { Link } from "react-router-dom";
 
 
@@ -21,7 +20,6 @@ export default function MenuList() {
         <button className="menuButton">Credits</button>
       </Link>{''}
       <br />
-      <PlaySound />
     </div>
   );
 }

@@ -1,8 +1,8 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, EntityGeneratorComp, Gun, TimeToLive, Grid, Tile, Dead } from "./Components";
+import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, Gun, Grid, Tile, Dead } from "./Components";
 import { Vector3, Vector2 } from "three";
-import { DynamicRectToRect, RayToRect, ResolveDynamicRectToRect, getGridPosition } from "../Util/Collisions";
-import { Howl, Howler } from 'howler'
+import { DynamicRectToRect, ResolveDynamicRectToRect, getGridPosition } from "../Util/Collisions";
+import { Howl } from 'howler'
 import piu from '../../Assets/music/piu.mp3';
 import { checkCollisionCase } from "../Util/CollisionCases";
 
@@ -289,7 +289,7 @@ export class CollisionSystem extends System {
 
             // if both are bullets, skip
             if (entity1.hasComponent(Bullet) && entity2.hasComponent(Bullet)) continue collision;
-            if (entity2.hasComponent(Dead)) continue cellEntities;
+            if (entity2.hasComponent(Dead)) continue collision;
 
             // temp skip when target is not tile
             //if (!entity2.hasComponent(Tile)) continue collision;
