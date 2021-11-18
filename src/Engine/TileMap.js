@@ -11,8 +11,17 @@ export const MAP_TEST = [
     [6, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 7],
     [2, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 7],
     [2, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 7],
-    [2, 3, 5, 3, 3, 3, 3, 3, 3, 3, 5, 3, 3, 3, 3, 3, 3, 3, 5, 2] 
+    [2, 3, 5, 3, 3, 3, 3, 3, 3, 3, 5, 3, 3, 3, 3, 3, 3, 3, 5, 2]
 ];
+
+export const SHOP_MAP = [
+    [2, 3, 3, 3, 3, 3, 3, 2],
+    [3, 1, 1, 1, 1, 1, 1, 3],
+    [3, 1, 1, 1, 1, 1, 1, 3],
+    [3, 1, 1, 1, 1, 1, 1, 3],
+    [3, 1, 1, 1, 1, 1, 1, 3],
+    [2, 3, 3, 3, 3, 3, 3, 2]
+]
 
 function TileMap(type) {
 
@@ -27,13 +36,13 @@ function TileMap(type) {
                 return "images/window.png";
             case 4:
                 return "images/bench.png";
-            case 5: 
+            case 5:
                 return "images/door.png";
             case 6:
                 return "images/back_window.png"
             case 7:
                 return "images/rear_window.png"
-            
+
 
             default:
                 return "images/floor.png";
