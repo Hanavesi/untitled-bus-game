@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Engine } from '../Engine/Engine';
 import { Howl, Howler } from 'howler'
 import Running from '../Assets/music/run.mp3';
+import { getEventListeners, addEventListeners, removeEventListeners } from '../Engine/Util/EventListeners';
 
 export function Game({ mqttHandler }) {
   const [ready, setReady] = useState(false);
@@ -16,17 +17,8 @@ export function Game({ mqttHandler }) {
     engine.current = new Engine(canvas, width, height, setReady);
 
     //mqttHandler.setMessageCallback(onMessage)
-
-    window.addEventListener('resize', () => {
-      const canvas = document.getElementById("gameCanvas");
-      const width = canvas.clientWidth;
-      const height = canvas.clientHeight;
-      engine.current.onWindowResize(width, height);
-    });
-    window.addEventListener('mousemove', (e) => {
-      const pos = { x: (e.clientX / window.innerWidth) * 2 - 1, y: -(e.clientY / window.innerHeight) * 2 + 1 };
-      engine.current.setMousePos(pos);
-    });
+    const eventListeners = getEventListeners(engine.current);
+    addEventListeners(eventListeners);
 
     const sound = new Howl({
       src: [Running],
@@ -39,6 +31,7 @@ export function Game({ mqttHandler }) {
       mqttHandler.disconnect();
       sound.stop();
       sound.unload();
+      removeEventListeners(eventListeners);
     });
   }, []);
 
