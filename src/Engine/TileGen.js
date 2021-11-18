@@ -3,7 +3,12 @@ import { TextureLoader, MeshLambertMaterial, Mesh, PlaneGeometry } from "three"
 // size of one tile, 4 width, 4 height
 const TILESIZE = 4;
 
-// creates a tilemap
+/**
+ * Generates a tilemap from the given map matrix.
+ * @param {number[][]} map 
+ * @returns an object containing a list of tile meshes
+ * and the bounds of the generated map.
+ */
 export const mapToMeshes = (map) => {
     const loader = new TextureLoader();
     // map size, hight determined by how many objects in whole array
@@ -45,7 +50,11 @@ export const mapToMeshes = (map) => {
     return { meshes: meshes, bounds: { width: width * TILESIZE, height: height * TILESIZE, botLeft: { x: -width * 2, y: -height * 2 } } };
 }
 
-// returns the right image based on specific value in the map array
+/**
+ * returns the right image based on specific value in the map array
+ * @param {number} id 
+ * @returns image source file path.
+ */
 const idToSrc = (id) => {
     switch (id) {
         case 1:
