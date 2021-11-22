@@ -104,8 +104,8 @@ export class EntityGenerator {
   }
 
   createBullet(entity, position, direction, speed, launchVelocity) {
-    const vel = direction.clone().multiplyScalar(speed).add(launchVelocity);
     const dir = direction.clone().normalize();
+    const vel = dir.clone().multiplyScalar(speed).add(launchVelocity);
     const angle = Math.atan2(dir.y, dir.x);
     const bulletMaterial = new THREE.SpriteMaterial({ color: 0x000000, rotation: angle });
     const bullet = new THREE.Sprite(bulletMaterial);
