@@ -1,4 +1,4 @@
-import { Bullet, Dead, Health } from "../ECS/Components";
+import { Bullet, Dead, Health, Playable, Tile } from "../ECS/Components";
 
 /**
  * updates entities' statuses according to entity types
@@ -17,8 +17,5 @@ export const checkCollisionCase = (entity1, entity2) => {
 
     return false;
   }
-
-
-
   return true;
 }

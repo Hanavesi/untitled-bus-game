@@ -6,7 +6,7 @@ import { Howl } from 'howler'
 import piu from '../../Assets/music/piu.mp3';
 import { checkCollisionCase } from "../Util/CollisionCases";
 
-const CELLSIZE = 6;
+const CELLSIZE = 12.1;
 
 export class ControlPlayerSystem extends System {
   execute(delta) {
@@ -26,7 +26,8 @@ export class ControlPlayerSystem extends System {
       vectors.velocity = new Vector2().add(vectors.direction).multiplyScalar(vectors.speed).add(vectors.velocity);
       vectors.velocity.multiplyScalar(0.8);
 
-      const angle = Math.atan2(mousePos.y, mousePos.x);
+      const normMouse = mousePos.clone().normalize();
+      const angle = Math.atan2(normMouse.y, normMouse.x);
       const newAngle = angle + Math.PI / 2;
       animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), newAngle);
       animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
@@ -53,11 +54,10 @@ export class ControlPlayerSystem extends System {
 
           const { barrel } = gun;
           const pos = new Vector3();
-          const speed = 30;
+          const speed = 60;
           barrel.getWorldPosition(pos);
-          const dir = new Vector2(mousePos.x, mousePos.y);
           const bulletEntity = this.world.createEntity();
-          this.world.generator.createBullet(bulletEntity, pos, dir, speed, vectors.velocity);
+          this.world.generator.createBullet(bulletEntity, pos, mousePos, speed, vectors.velocity);
           const sound = new Howl({
             src: [piu],
             volume: 0.1,
