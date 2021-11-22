@@ -3,6 +3,7 @@ import { Engine } from '../Engine/Engine';
 import { Howl, Howler } from 'howler'
 import Running from '../Assets/music/run.mp3';
 import { getEventListeners, addEventListeners, removeEventListeners } from '../Engine/Util/EventListeners';
+import BusMap from '../Data/BusMap';
 
 export function Game({ mqttHandler }) {
   const [ready, setReady] = useState(false);
@@ -15,8 +16,7 @@ export function Game({ mqttHandler }) {
     const canvas = document.getElementById("gameCanvas");
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
-    engine.current = new Engine(canvas, width, height, startGameLoop);
-   // mqttHandler.setMessageCallback(onMessage);
+    engine.current = new Engine(canvas, width, height, setReady);
     const eventListeners = getEventListeners(engine.current);
     addEventListeners(eventListeners);
 
@@ -40,7 +40,7 @@ export function Game({ mqttHandler }) {
     engine.current.loop(performance.now());
   }
 
-  const onMessage = (message, topic) => {
+  const onMessage = (message) => {
     // do stufs
     //console.log(message);
     const data = JSON.parse(message);
@@ -63,9 +63,17 @@ export function Game({ mqttHandler }) {
   }
 
   return (
-    <div>
-      {/* <button style={ready && !showGame ? visible : hidden} onClick={startGameLoop}>start</button> */}
+    <div id="gameContainer">
       <canvas id="gameCanvas" style={showGame ? visible : hidden} />
+      {
+        ready ?
+          <BusMap
+            mqttHandler={mqttHandler}
+            gameMessageHandler={onMessage}
+            initGame={startGameLoop}
+          />
+          : null
+      }
     </div>
   );
 

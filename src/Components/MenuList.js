@@ -8,10 +8,6 @@ export default function MenuList() {
         <button className="menuButton">Game</button>
       </Link>{' '}
       <br />
-      <Link className="text-link" to="/Map">
-        <button className="menuButton">Bus Map</button>
-      </Link>{' '}
-      <br />
       <Link className="text-link" to="/instructions">
         <button className="menuButton">instructions</button>
       </Link>{' '}

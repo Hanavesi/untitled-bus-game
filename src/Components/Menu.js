@@ -18,7 +18,6 @@ export default function Menu() {
       <Switch>
         <Route exact path="/" render={MenuList} />
         <Route path="/Game" render={(props) => <Game {...props} mqttHandler={mqttHandler} />} />
-        <Route path="/Map" render={(props) => <BusMap {...props} mqttHandler={mqttHandler} />} />
         <Route path="/instructions" component={HowToPlay} />
         <Route path="/Credits" component={Credits} />
         <Route path="/Gameover" component={GameOver} />

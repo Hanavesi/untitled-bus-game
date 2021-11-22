@@ -56,7 +56,7 @@ export class EntityGenerator {
       .addComponent(HitBox, { size: new THREE.Vector2(1.5, 3), offset: new THREE.Vector2(0, 1.5) })
       .addComponent(StateMachine, { fsm: fsm })
       .addComponent(Health, { max: 100, current: 100, bar: health })
-      .addComponent(Gun, { barrel: barrel, cooldown: 0.2, lastShot: 0 });
+      .addComponent(Gun, { barrel: barrel, cooldown: 0.1, lastShot: 0 });
   }
 
   createSoldier(entity, position) {
@@ -114,7 +114,7 @@ export class EntityGenerator {
     this.scene.add(bullet);
     entity
       .addComponent(Object3D, { object: { moveRoot: bullet } })
-      .addComponent(Vectors, { direction: direction, speed: speed, velocity: vel })
+      .addComponent(Vectors, { direction: dir, speed: speed, velocity: vel })
       .addComponent(HitBox, { size: new THREE.Vector2(0.3, 0.3), offset: new THREE.Vector2() })
       .addComponent(Bullet)
       .addComponent(TimeToLive, { age: 0, max: 1 });

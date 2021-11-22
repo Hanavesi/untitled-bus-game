@@ -9,7 +9,7 @@ import { mapToMeshes } from "./TileGen";
 import { MAP_TEST, SHOP_MAP } from "./TileMap";
 import { EntityGenerator } from "./Util/EntityGenerator";
 
-const CELLSIZE = 6;
+const CELLSIZE = 12.1;
 
 export class Engine {
 
@@ -61,10 +61,11 @@ export class Engine {
       this.scene.add(plane); */
     }
     const grid = {};
-    let i, j;
-    for (i = 0; (i - 1) * CELLSIZE < bounds.width; i++) {
+    let iMax = Math.floor(bounds.width / CELLSIZE) + 1;
+    let jMax = Math.floor(bounds.height / CELLSIZE) + 1;
+    for (let i = 0; i < iMax; i++) {
       const column = {};
-      for (j = 0; (j - 1) * CELLSIZE < bounds.height; j++) {
+      for (let j = 0; j < jMax; j++) {
         column[j] = [];
       }
       grid[i] = column;
@@ -107,14 +108,17 @@ export class Engine {
       this.scene.add(plane); */
     }
     const grid = {};
-    let i, j;
-    for (i = 0; (i - 1) * CELLSIZE < bounds.width; i++) {
+    let iMax = Math.floor(bounds.width / CELLSIZE) + 1;
+    let jMax = Math.floor(bounds.height / CELLSIZE) + 1;
+    for (let i = 0; i < iMax; i++) {
       const column = {};
-      for (j = 0; (j - 1) * CELLSIZE < bounds.height; j++) {
+      for (let j = 0; j < jMax; j++) {
         column[j] = [];
       }
       grid[i] = column;
     }
+
+    console.log(grid, bounds)
 
     const entity = world.createEntity();
     entity.addComponent(Grid, { cells: grid, bounds: bounds });
@@ -152,7 +156,7 @@ export class Engine {
   }
 
   setMousePos(pos) {
-    this.mousePos = this.mousePos.set(pos.x, pos.y).normalize();
+    this.mousePos = this.mousePos.set(pos.x, pos.y);
   }
 
   init() {
