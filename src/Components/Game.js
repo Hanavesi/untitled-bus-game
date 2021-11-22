@@ -16,7 +16,7 @@ export function Game({ mqttHandler }) {
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
     engine.current = new Engine(canvas, width, height, startGameLoop);
-    //mqttHandler.setMessageCallback(onMessage);
+   // mqttHandler.setMessageCallback(onMessage);
     const eventListeners = getEventListeners(engine.current);
     addEventListeners(eventListeners);
 

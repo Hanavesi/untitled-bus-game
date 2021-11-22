@@ -44,6 +44,15 @@ body {
   letter-spacing: 5px;
   text-align: center;
 }
+.GameScreens {
+  font-size: 40px;
+  font-family: 'Games', sans-serif;           
+  border: 1;
+  border-color: #000000;
+  color: rgb(255, 255, 255);
+  letter-spacing: 5px;
+  text-align: center;
+}
 
 .nimet, h2 {
   color: #ffffff;
@@ -53,6 +62,7 @@ body {
 .Juuso {
   color: gold;
 }
+
 
 
 #gameCanvas {

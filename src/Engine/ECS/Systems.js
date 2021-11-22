@@ -2,7 +2,8 @@ import { System } from "ecsy";
 import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, Gun, Grid, Tile, Dead } from "./Components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect, getGridPosition } from "../Util/Collisions";
-import { Howl } from 'howler'
+import { Howl } from 'howler';
+import GameOver from '../../Screens/GameOver';
 import piu from '../../Assets/music/piu.mp3';
 import { checkCollisionCase } from "../Util/CollisionCases";
 
@@ -147,7 +148,7 @@ export class ControlEnemySystem extends System {
       } else {
         enemy.timeToShoot += delta;
       }
-      waitTime = Math.random() * 2 + 5;
+      waitTime = 0.1;
       //console.log(enemy.timeToShoot);
       if (enemy.timeToShoot > waitTime) {
         const barrel = enemy.getComponent(Gun).barrel;
@@ -155,7 +156,7 @@ export class ControlEnemySystem extends System {
         barrel.getWorldPosition(pos);
         //console.log('2s menny');
         enemy.timeToShoot = 0;
-        const speed = 15;
+        const speed = 155;
         //const pos = new Vector2(enemyMoveRoot.position.x, enemyMoveRoot.position.y);
         //barrel.getWorldPosition(pos);
         /* const dir = new Vector2(playerMoveRoot.position.x, playerMoveRoot.position.y);
