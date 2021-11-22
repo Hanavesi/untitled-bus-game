@@ -100,7 +100,7 @@ export class EntityGenerator {
       .addComponent(StateMachine, { fsm: fsm })
       .addComponent(Enemy)
       .addComponent(Health, { max: 100, current: 100, bar: health })
-      .addComponent(Gun, { barrel: barrel, cooldown: 1, lastShot: 0 });
+      .addComponent(Gun, { barrel: barrel, cooldown: 0.2, lastShot: 0 });
   }
 
   createBullet(entity, position, direction, speed, launchVelocity) {
