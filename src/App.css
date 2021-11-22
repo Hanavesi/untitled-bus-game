@@ -44,6 +44,15 @@ body {
   letter-spacing: 5px;
   text-align: center;
 }
+.GameScreens {
+  font-size: 40px;
+  font-family: 'Games', sans-serif;           
+  border: 1;
+  border-color: #000000;
+  color: rgb(255, 255, 255);
+  letter-spacing: 5px;
+  text-align: center;
+}
 
 .nimet, h2 {
   color: #ffffff;
@@ -54,11 +63,20 @@ body {
   color: gold;
 }
 
+#gameContainer {
+  display: block;
+  margin: auto;
+  height: 100vh;
+  width: 100vw;
+}
+
 
 #gameCanvas {
   display: block;
+  position: absolute;
   margin: auto;
-  min-height: 70vh;
-  max-height: 100vh;
+  left: 0;
+  top: 0;
+  height: 100vh;
   width: 100vw;
 }
