@@ -53,7 +53,7 @@ StateMachine.schema = {
     fsm: { type: Types.Ref }
 };
 
-export class Health extends Component {}
+export class Health extends Component { }
 
 Health.schema = {
     bar: { type: Types.Ref },

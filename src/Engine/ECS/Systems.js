@@ -1,10 +1,11 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, Gun, Grid, Tile, Dead } from "./Components";
+import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, Gun, Grid, Tile, Dead, Level } from "./Components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect, getGridPosition } from "../Util/Collisions";
 import { Howl } from 'howler'
 import piu from '../../Assets/music/piu.mp3';
 import { checkCollisionCase } from "../Util/CollisionCases";
+
 
 const CELLSIZE = 12.1;
 
@@ -175,19 +176,21 @@ ControlEnemySystem.queries = {
 }
 
 export class EnemySpawnerSystem extends System {
+
   execute() {
     const enemies = this.queries.enemies.results;
-    if (enemies.length === 0) {
+    const x = Math.ceil(Math.random() * 20) * (Math.round(Math.random()) ? 1 : -1);
+    const y = Math.ceil(Math.random() * 10) * (Math.round(Math.random()) ? 1 : -1);
+
+    /* if (enemies.length === 0) {
       let entity = this.world.createEntity();
-      this.world.generator.createSoldier(entity, new Vector2(20, 0));
-      entity = this.world.createEntity();
-      this.world.generator.createSoldier(entity, new Vector2(-20, 0));
-    }
+      this.world.generator.createSoldier(entity, new Vector2(x, y));
+    } */
   }
 }
 
 EnemySpawnerSystem.queries = {
-  enemies: { components: [Enemy] }
+  enemies: { components: [Enemy] },
 }
 
 export class CameraPositionSystem extends System {

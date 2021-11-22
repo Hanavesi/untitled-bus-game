@@ -1,7 +1,7 @@
 import { World } from "ecsy";
 import * as THREE from "three";
 import { Vector2 } from "three";
-import { Input, CameraComponent, Mouse, Grid } from "./ECS/Components";
+import { Input, CameraComponent, Mouse, Grid, Level } from "./ECS/Components";
 import { initWorld } from "./ECS/Initializer";
 import { InputManager } from "./InputManager";
 import { ModelManager } from "./ModelManager";
@@ -26,12 +26,12 @@ export class Engine {
     this.camera.position.set(0, 0, 20);
     this.renderer = new THREE.WebGLRenderer({ canvas });
     this.renderer.setSize(width, height, false);
-    this.level = 0;
+    this.level = 1;
 
     this.modelManager = new ModelManager();
     this.modelManager.setModels(['knight.gltf', 'soldier1.gltf', 'uzi.gltf', 'knight2.gltf']);
     this.modelManager.load(() => {
-      this.init();
+      this.init(1);
       onReady(true);
     });
     this.onWindowResize(width, height);
@@ -76,10 +76,12 @@ export class Engine {
 
     this.addLight([5, 5, 2], scene);
     this.addLight([-5, 5, 2], scene);
+    const name = 'shop';
 
     this.stages.push({
       scene: scene,
-      world: world
+      world: world,
+      name: name
     });
   }
 
@@ -121,14 +123,16 @@ export class Engine {
     console.log(grid, bounds)
 
     const entity = world.createEntity();
-    entity.addComponent(Grid, { cells: grid, bounds: bounds });
+    entity
+      .addComponent(Grid, { cells: grid, bounds: bounds });
 
     this.addLight([5, 5, 2], scene);
     this.addLight([-5, 5, 2], scene);
-
+    const name = 'bus';
     this.stages.push({
       scene: scene,
-      world: world
+      world: world,
+      name: name
     });
   }
 
@@ -159,6 +163,12 @@ export class Engine {
     this.mousePos = this.mousePos.set(pos.x, pos.y);
   }
 
+  prepareNextStage() {
+    this.stages = [];
+    this.level += 1;
+    this.init()
+  }
+
   init() {
     this.createBus();
     this.createShop();
@@ -178,6 +188,17 @@ export class Engine {
 
       const light = new THREE.AmbientLight(0x404040); // soft white light
       stage.scene.add(light);
+
+      if (stage.name === 'bus') {
+        console.log('level', this.level);
+        for (let i = 0; i < (this.level * 5); i++) {
+          const x = Math.ceil(Math.random() * 20) * (Math.round(Math.random()) ? 1 : -1);
+          const y = Math.ceil(Math.random() * 10) * (Math.round(Math.random()) ? 1 : -1);
+          let entity = stage.world.createEntity();
+          stage.world.generator.createSoldier(entity, new Vector2(x, y));
+        }
+
+      }
     }
 
     //this.loop(performance.now());
@@ -189,25 +210,14 @@ export class Engine {
     const deltaTime = now - this.lastFrame;
     this.lastFrame = now;
 
-    /* if (this.inputManager.keys.left.justPressed) {
-        console.log("left")
-    };
-    if (this.inputManager.keys.right.justPressed) {
-        console.log("right")
-    };
-    if (this.inputManager.keys.up.justPressed) {
-        console.log("up")
-    };
-    if (this.inputManager.keys.down.justPressed) {
-        console.log("down")
-    }; */
-
     if (this.inputManager.keys.b.justPressed) {
       this.currentStage = (this.currentStage + 1) % 2;
     }
 
     const stage = this.stages[this.currentStage];
     stage.world.execute(deltaTime, now);
+
+
     this.inputManager.update();
 
     this.renderer.render(stage.scene, this.camera);
