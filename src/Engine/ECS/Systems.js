@@ -85,15 +85,12 @@ export class HealthSystem extends System {
         healthBar.current = 0;
         entity.addComponent(Dead);
       };
-      if (entity.hasComponent(Playable) && entity.hasComponent(Dead)) {
-        // what to do when player dies?
-      }
     }
   }
 }
 
 HealthSystem.queries = {
-  entities: { components: [Health, Playable] }
+  entities: { components: [Health] }
 }
 
 export class ControlEnemySystem extends System {
