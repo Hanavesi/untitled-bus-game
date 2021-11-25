@@ -12,6 +12,7 @@ import { SoundController } from "./Util/SoundController";
 
 import run from '../Assets/sounds/run.mp3';
 import piu from '../Assets/sounds/piu.mp3';
+import busMusic from '../Assets/sounds/busMusic.mp3';
 
 const CELLSIZE = 12.1;
 
@@ -19,9 +20,10 @@ export class Engine {
 
   constructor(canvas, width, height, onReady) {
     this.sounds = new SoundController();
-    this.sounds.registerSound(run, true);
-    this.sounds.registerSound(piu);
-    this.sounds.setVolume(0.05);
+    this.sounds.registerSound(run, true, 0.05);
+    this.sounds.registerSound(busMusic, true);
+    this.sounds.registerSound(piu, false, 0.05);
+    this.sounds.setVolume(0.5);
 
     this.inputManager = new InputManager();
     this.lastFrame = undefined;
@@ -238,10 +240,13 @@ export class Engine {
 
   enterShop() {
     this.currentStage = 1;
+    this.sounds.stopSound('run');
+    this.sounds.playSound('busMusic');
   }
 
   enterBus() {
     this.currentStage = 0;
+    this.sounds.stopSound('busMusic');
   }
 
   addLight(pos, scene) {

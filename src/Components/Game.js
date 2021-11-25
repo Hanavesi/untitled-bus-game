@@ -3,12 +3,15 @@ import { Engine } from '../Engine/Engine';
 import { getEventListeners, addEventListeners, removeEventListeners } from '../Engine/Util/EventListeners';
 import BusMap from '../Data/BusMap';
 
+
+
 export function Game({ mqttHandler }) {
   const [ready, setReady] = useState(false);
   const [showGame, setShowGame] = useState(false);
   const engine = useRef(null);
   const visible = { visibility: 'visible' };
   const hidden = { visibility: 'hidden' };
+  const [level, setLevel] = useState(1)
 
   useEffect(() => {
     const canvas = document.getElementById("gameCanvas");
@@ -18,10 +21,13 @@ export function Game({ mqttHandler }) {
     const eventListeners = getEventListeners(engine.current);
     addEventListeners(eventListeners);
 
+  
+
     return (() => {
       mqttHandler.disconnect();
+      sound.stop();
+      sound.unload();
       removeEventListeners(eventListeners);
-      engine.current.sounds.stop();
     });
   }, []);
 
@@ -40,6 +46,7 @@ export function Game({ mqttHandler }) {
       console.log('bussi saapui pysäkille');
       // todo: function to switch to shop
       engine.current.enterShop();
+      
     }
     else if (eventType === 'DEP') {
       console.log('bussi lähti pysäkiltä');

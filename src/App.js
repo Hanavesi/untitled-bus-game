@@ -1,6 +1,6 @@
 import './App.css';
 import React from 'react';
-import Menu from './Components/Menu';
+import Menu from './components/Menu';
 import GameOver from './Screens/GameOver';
 
 
