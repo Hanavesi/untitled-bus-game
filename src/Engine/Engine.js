@@ -217,7 +217,6 @@ export class Engine {
     const stage = this.stages[this.currentStage];
     stage.world.execute(deltaTime, now);
 
-
     this.inputManager.update();
 
     this.renderer.render(stage.scene, this.camera);

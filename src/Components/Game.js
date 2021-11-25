@@ -4,6 +4,8 @@ import { Howl, Howler } from 'howler'
 import Running from '../Assets/music/run.mp3';
 import { getEventListeners, addEventListeners, removeEventListeners } from '../Engine/Util/EventListeners';
 import BusMap from '../Data/BusMap';
+import YouWon from '../Screens/YouWon';
+import GameOver from '../Screens/GameOver';
 
 export function Game({ mqttHandler }) {
   const [ready, setReady] = useState(false);
@@ -11,6 +13,7 @@ export function Game({ mqttHandler }) {
   const engine = useRef(null);
   const visible = { visibility: 'visible' };
   const hidden = { visibility: 'hidden' };
+  const [gameStatus, setGameStatus] = useState('ingame');
   const [level, setLevel] = useState(1)
 
   useEffect(() => {
@@ -60,8 +63,22 @@ export function Game({ mqttHandler }) {
     }
     else if (eventType === 'VJOUT') {
       console.log('bussi saapui PÄÄTTÄRILLE');
-      // todo: wat do now
+      mqttHandler.unsubscribeAll();
+      mqttHandler.disconnect();
+      setGameStatus('won')
     }
+  }
+
+  if (gameStatus === 'won') {
+    return (
+      <YouWon />
+    )
+  }
+
+  if (gameStatus === 'lost') {
+    return (
+      <GameOver />
+    )
   }
 
   return (
@@ -78,6 +95,10 @@ export function Game({ mqttHandler }) {
       }
     </div>
   );
+
+
+
+
 
 }
 

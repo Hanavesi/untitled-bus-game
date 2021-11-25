@@ -90,8 +90,9 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
       if (eventType !== 'VP') return;
       const subData = data[eventType];
       const { long, lat } = subData;
-      if ( isNaN(long) || isNaN(lat) ) return;
-      map.setView([lat, long], 16);
+      if (long !== undefined && lat !== undefined) {
+        map.setView([lat, long], 16);
+      }
     });
   }
 
@@ -121,7 +122,11 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
       newBus.lastUpdate = timeStamp;
       newBus.drst = drst;
       const marker = newBus.marker;
-      marker.setLatLng([lat, long]);
+      if (lat === undefined || long === undefined) {
+        return;
+      } else {
+        marker.setLatLng([lat, long]);
+      }
     } else {
       const marker = new L.Marker([lat, long], { icon: busIcon }).addTo(map).bindPopup('no data');
       newBus = {

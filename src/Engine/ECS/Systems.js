@@ -3,10 +3,8 @@ import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraCompone
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect, getGridPosition } from "../Util/Collisions";
 import { Howl } from 'howler';
-import GameOver from '../../Screens/GameOver';
 import piu from '../../Assets/music/piu.mp3';
 import { checkCollisionCase } from "../Util/CollisionCases";
-
 
 const CELLSIZE = 12.1;
 
@@ -94,12 +92,15 @@ export class HealthSystem extends System {
         healthBar.current = 0;
         entity.addComponent(Dead);
       };
+      if (entity.hasComponent(Playable) && entity.hasComponent(Dead)) {
+        // what to do when player dies?
+      }
     }
   }
 }
 
 HealthSystem.queries = {
-  entities: { components: [Health] }
+  entities: { components: [Health, Playable] }
 }
 
 export class ControlEnemySystem extends System {
