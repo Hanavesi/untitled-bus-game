@@ -3,7 +3,6 @@ import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraCompone
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect, getGridPosition } from "../Util/Collisions";
 import { Howl } from 'howler';
-import GameOver from '../../Screens/GameOver';
 import piu from '../../Assets/music/piu.mp3';
 import { checkCollisionCase } from "../Util/CollisionCases";
 
@@ -25,7 +24,7 @@ export class ControlPlayerSystem extends System {
       if (inputState.up.down) newDir.y += 1;
       if (inputState.down.down) newDir.y -= 1;
       vectors.direction = newDir.normalize();
-      vectors.velocity = new Vector2().add(vectors.direction).multiplyScalar(vectors.speed).add(vectors.velocity);
+      vectors.velocity.add(vectors.direction.clone().multiplyScalar(vectors.speed));
       vectors.velocity.multiplyScalar(0.8);
 
       const normMouse = mousePos.clone().normalize();
@@ -112,20 +111,37 @@ export class ControlEnemySystem extends System {
 
     const enemies = this.queries.enemies.results;
 
-    for (const enemy of enemies) {
+    for (let i = 0; i < enemies.length; i++) {
+      const enemy = enemies[i]
       const enemyObject = enemy.getComponent(Object3D).object;
       const enemyMoveRoot = enemyObject.moveRoot;
       const enemyPos = new Vector2(enemyMoveRoot.position.x, enemyMoveRoot.position.y);
-      const enemyToPlayer = new Vector2().addVectors(enemyPos.negate(), playerPos);
-      const dist = Math.sqrt(enemyToPlayer.x * enemyToPlayer.x + enemyToPlayer.y * enemyToPlayer.y);
+      const enemyToPlayer = new Vector2().addVectors(enemyPos.clone().negate(), playerPos);
+      const distToPlayer = Math.sqrt(enemyToPlayer.x * enemyToPlayer.x + enemyToPlayer.y * enemyToPlayer.y);
       const dir = enemyToPlayer.clone().normalize();
       const vectors = enemy.getMutableComponent(Vectors);
-      if (dist <= 2) {
-        playerVectors.velocity.add(dir.multiplyScalar(20));
+      if (distToPlayer <= 2) {
+        playerVectors.velocity.add(dir.multiplyScalar(30));
+        vectors.velocity.add(dir.clone().negate().multiplyScalar(5));
       }
-      vectors.direction = dir.normalize();
-      vectors.velocity = new Vector2().add(vectors.direction).multiplyScalar(vectors.speed).add(vectors.velocity);
+      vectors.direction = dir.clone();
+      vectors.velocity.add(vectors.direction.clone().multiplyScalar(vectors.speed));
       vectors.velocity.multiplyScalar(0.8);
+
+      for (let j = 0; j < enemies.length; j++) {
+        if (j === i) continue;
+        const enemy2 = enemies[j];
+        const enemy2Object = enemy2.getComponent(Object3D).object;
+        const enemy2Vectors = enemy2.getMutableComponent(Vectors);
+        const enemy2MoveRoot = enemy2Object.moveRoot;
+        const enemy2Pos = new Vector2(enemy2MoveRoot.position.x, enemy2MoveRoot.position.y);
+        const enemyToEnemy2 = new Vector2().addVectors(enemyPos.clone().negate(), enemy2Pos);
+        const distToEnemy = Math.sqrt(enemyToEnemy2.x * enemyToEnemy2.x + enemyToEnemy2.y * enemyToEnemy2.y);
+        enemyToEnemy2.normalize();
+        if (distToEnemy <= 2) {
+          enemy2Vectors.velocity.add(enemyToEnemy2.multiplyScalar(20));
+        }
+      }
 
       const { x, y } = vectors.direction;
       const animRoot = enemyObject.animRoot;
