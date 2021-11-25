@@ -1,5 +1,5 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, Gun, Grid, Tile, Dead, Level, Sleeping } from "./Components";
+import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, Gun, Grid, Tile, Dead, Level, Sleeping, TimeToLive } from "./Components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect, getGridPosition } from "../Util/Collisions";
 import { checkCollisionCase } from "../Util/CollisionCases";
@@ -109,6 +109,24 @@ export class SleepingSystem extends System {
 
 SleepingSystem.queries = {
   entities: { components: [Sleeping] }
+}
+
+export class TTLSystem extends System {
+  execute(delta) {
+    const entities = this.queries.entities.results;
+    for (const entity of entities) {
+      const ttl = entity.getMutableComponent(TimeToLive);
+      ttl.age += delta;
+      if (ttl.age >= ttl.max) {
+        if (!entity.hasComponent(Dead))
+          entity.addComponent(Dead);
+      }
+    }
+  }
+}
+
+TTLSystem.queries = {
+  entities: { components: [TimeToLive] }
 }
 
 export class ControlEnemySystem extends System {
