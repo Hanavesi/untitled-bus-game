@@ -28,8 +28,6 @@ export function Game({ mqttHandler }) {
 
     return (() => {
       mqttHandler.disconnect();
-      sound.stop();
-      sound.unload();
       removeEventListeners(eventListeners);
     });
   }, []);
