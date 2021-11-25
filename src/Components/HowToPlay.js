@@ -18,7 +18,7 @@ function HowToPlay() {
             <br />
             <h3>Pick a bus you want to get in, to start the game</h3>
             <br />
-            <h3>// lisätään tekstejä mitä halutaan </h3>
+            <h3>While the bus is on bus-stop, you are tranferred to store</h3>
             <br />
             <h3>Use
                 <img src={wasdnew}
