@@ -145,7 +145,7 @@ This is an example of how to list things you need to use the software and how to
    ```
 3. Start the project
    ```sh
-   npm start;
+   npm start
    ```
 4. Menu appears
 
@@ -211,37 +211,37 @@ _For more examples, please refer to the [Documentation](https://example.com)_
   - Leaflet map
 - [x] Adding Entity-Component-System
   - components, systems, initializer etc.
-- [] Collisions
+- [ ] Collisions
   - [x] Player-to-Enemy
   - [x] Bullets-to-any
-  - [] Enemy-to-Enemy
+  - [ ] Enemy-to-Enemy
 - [x] Health & Damage system
   - Health bar and damage loss
-- [] Bus messages determines the stages
+- [ ] Bus messages determines the stages
   - [x] Bus at stop
     - Show shop
   - [x] Bus on the move
     - Show stage
-  - [] Bus arrives to final destination
+  - [ ] Bus arrives to final destination
     - Show game won screen
-- [] Stages
+- [ ] Stages
   - [x] Randomize tiles
-    - [] Randomize shape
-  - [] Enemy spawn system
-- [] Score system
+    - [ ] Randomize shape
+  - [ ] Enemy spawn system
+- [ ] Score system
   - Get scores by beating levels and/or defeating enemies
-- [] Shop
+- [ ] Shop
   - [x] Tiles created
   - Safe haven between stages
-  - [] Items to buy/get
+  - [ ] Items to buy/get
     - Health
     - Guns
     - More items
-- [] Game over
-- [] Game win
-- [] Different kind of enemies
-- [] Different kind of weapons
-- [] Different kind of items
+- [ ] Game over
+- [ ] Game win
+- [ ] Different kind of enemies
+- [ ] Different kind of weapons
+- [ ] Different kind of items
 
 See the [open issues](https://github.com/Hanavesi/untitled-bus-game/issues) for a full list of proposed features (and known issues).
 
