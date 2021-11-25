@@ -14,7 +14,6 @@ export function Game({ mqttHandler }) {
   const visible = { visibility: 'visible' };
   const hidden = { visibility: 'hidden' };
   const [gameStatus, setGameStatus] = useState('ingame');
-  const [level, setLevel] = useState(1)
 
   useEffect(() => {
     const canvas = document.getElementById("gameCanvas");
@@ -24,16 +23,16 @@ export function Game({ mqttHandler }) {
     const eventListeners = getEventListeners(engine.current);
     addEventListeners(eventListeners);
 
-  
-
     return (() => {
       mqttHandler.disconnect();
       removeEventListeners(eventListeners);
+      engine.current.sounds.stop();
     });
   }, []);
 
   const startGameLoop = () => {
     setShowGame(true);
+    engine.current.enterBus();
     engine.current.loop(performance.now());
   }
 

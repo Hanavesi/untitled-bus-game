@@ -134,8 +134,6 @@ export class Engine {
       grid[i] = column;
     }
 
-    console.log(grid, bounds)
-
     const entity = world.createEntity();
     entity
       .addComponent(Grid, { cells: grid, bounds: bounds });
@@ -220,8 +218,7 @@ export class Engine {
 
   loop(now) {
     now *= 0.001;
-    if (this.lastFrame === undefined) this.lastFrame = now;
-    const deltaTime = now - this.lastFrame;
+    const deltaTime = now - (this.lastFrame || 0);
     this.lastFrame = now;
 
     if (this.inputManager.keys.b.justPressed) {
@@ -246,6 +243,7 @@ export class Engine {
   enterBus() {
     this.currentStage = 0;
     this.sounds.stopSound('busMusic');
+    this.sounds.playSound('run');
   }
 
   addLight(pos, scene) {
