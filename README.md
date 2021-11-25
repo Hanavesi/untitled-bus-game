@@ -149,7 +149,7 @@ This is an example of how to list things you need to use the software and how to
    ```
 4. Menu appears
 
-![menu](/src/Assets/images/menu.png)
+![menu](/src/Assets/images/men.png)
 
 5. See instructions
 
