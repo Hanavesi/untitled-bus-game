@@ -11,6 +11,7 @@ import { MqttHandler } from '../Data/Mqtt';
 
 export default function Menu() {
   const mqttHandler = new MqttHandler();
+  const status = 'ingame';
 
   return (
 
@@ -18,7 +19,7 @@ export default function Menu() {
       <Switch>
         <Route exact path="/" render={MenuList} />
         <Route path="/Game" render={(props) =>
-          <Game {...props} mqttHandler={mqttHandler} />} />
+          <Game {...props} mqttHandler={mqttHandler} status={status} />} />
         <Route path="/instructions" component={HowToPlay} />
         <Route path="/Credits" component={Credits} />
         <Route path="/Gameover" component={GameOver} />

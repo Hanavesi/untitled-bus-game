@@ -84,6 +84,9 @@ export class HealthSystem extends System {
       if (healthBar.current < 0) {
         healthBar.current = 0;
         entity.addComponent(Dead);
+        if (entity.hasComponent(Playable)) {
+          this.world.stop()
+        }
       };
     }
   }

@@ -5,14 +5,13 @@ import BusMap from '../Data/BusMap';
 import YouWon from '../Screens/YouWon';
 import GameOver from '../Screens/GameOver';
 
-export function Game({ mqttHandler }) {
+export function Game({ mqttHandler, status }) {
   const [ready, setReady] = useState(false);
   const [showGame, setShowGame] = useState(false);
   const engine = useRef(null);
   const visible = { visibility: 'visible' };
   const hidden = { visibility: 'hidden' };
-  const [gameStatus, setGameStatus] = useState('ingame');
-  const [level, setLevel] = useState(1)
+  const [gameStatus, setGameStatus] = useState(status);
 
   useEffect(() => {
     const canvas = document.getElementById("gameCanvas");

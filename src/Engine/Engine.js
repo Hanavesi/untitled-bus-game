@@ -13,6 +13,7 @@ import { SoundController } from "./Util/SoundController";
 import run from '../Assets/sounds/run.mp3';
 import piu from '../Assets/sounds/piu.mp3';
 
+
 const CELLSIZE = 12.1;
 
 export class Engine {
@@ -205,7 +206,7 @@ export class Engine {
         console.log('level', this.level);
         for (let i = 0; i < (this.level * 5); i++) {
           const x = Math.ceil(Math.random() * 20) * (Math.round(Math.random()) ? 1 : -1);
-          const y = Math.ceil(Math.random() * 10) * (Math.round(Math.random()) ? 1 : -1);
+          const y = Math.ceil(Math.random() * 8) * (Math.round(Math.random()) ? 1 : -1);
           let entity = stage.world.createEntity();
           stage.world.generator.createSoldier(entity, new Vector2(x, y));
         }
@@ -215,6 +216,7 @@ export class Engine {
 
     //this.loop(performance.now());
   }
+
 
   loop(now) {
     now *= 0.001;
@@ -233,6 +235,13 @@ export class Engine {
 
     this.renderer.render(stage.scene, this.camera);
     requestAnimationFrame(this.loop.bind(this));
+
+    if (!stage.world.enabled) {
+      this.renderer.setAnimationLoop(null)
+      return (
+        window.location = 'http://localhost:3000/GameOver'
+      )
+    }
   }
 
   enterShop() {

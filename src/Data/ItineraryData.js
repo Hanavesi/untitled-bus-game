@@ -68,7 +68,7 @@ export const fuzzyTripQuery = async (data) => {
     const { route, direction, date, time } = data;
     const requestBody = `
     {
-        fuzzyTrip(route: "${route}", direction:${direction-1}, date: "${date}", time: ${time}) {
+        fuzzyTrip(route: "${route}", direction:${direction - 1}, date: "${date}", time: ${time}) {
             route { shortName }
             pattern { name }
         }
@@ -129,7 +129,7 @@ export const fetchRouteId = async (name) => {
             return route.gtfsId;
         }
     }
-    console.log(name);
+    //console.log(name);
     return undefined;
 }
 
