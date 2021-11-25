@@ -100,6 +100,7 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
     const timeStamp = Date.now();
     const topicData = topic.split('/');
     const destination = topicData[11];
+    const oper = topicData[7];
 
     const data = JSON.parse(message);
     const eventType = Object.keys(data)[0];
@@ -114,7 +115,7 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
      */
     const operatorId = subData.oper.toString().padStart(4, '0');
     const busId = vehicleNumber + operatorId;
-    const busTopic = `/hfp/v2/journey/ongoing/+/bus/+/${vehicleNumber}/#`;
+    const busTopic = `/hfp/v2/journey/ongoing/+/bus/${oper}/${vehicleNumber}/#`;
 
     let newBus;
     if (busId in buses) {
@@ -276,7 +277,7 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
    */
   const clickEvent = (bus) => {
     mqttHandler.unsubscribeAll();
-    // Sometimes subsctiption fails somehow and further messages from hte chosen bus are not received
+    // Sometimes subsctiption fails somehow and further messages from the chosen bus are not received
     mqttHandler.subscribe(bus.topic);
     bus.marker.closePopup();
     setFocus(false);
