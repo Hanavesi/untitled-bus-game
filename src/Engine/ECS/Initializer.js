@@ -1,5 +1,5 @@
 import { Vectors, Object3D, Playable, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Cells, Mouse, Bullet, Gun, TimeToLive, Grid, Tile, Dead, Sleeping } from "./Components";
-import { CameraPositionSystem, CleanUpSystem, CollisionSystem, ControlEnemySystem, ControlPlayerSystem, EnemySpawnerSystem, HealthSystem, SleepingSystem, UpdateGridSystem, UpdateVectorsSystem } from "./Systems";
+import { CameraPositionSystem, CleanUpSystem, CollisionSystem, ControlEnemySystem, ControlPlayerSystem, EnemySpawnerSystem, HealthSystem, SleepingSystem, TTLSystem, UpdateGridSystem, UpdateVectorsSystem } from "./Systems";
 
 export const initWorld = (world) => {
   world
@@ -24,6 +24,7 @@ export const initWorld = (world) => {
 
   world
     .registerSystem(SleepingSystem)
+    .registerSystem(TTLSystem)
     .registerSystem(ControlPlayerSystem)
     .registerSystem(ControlEnemySystem)
     .registerSystem(UpdateGridSystem)
