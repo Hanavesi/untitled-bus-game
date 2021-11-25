@@ -1,6 +1,6 @@
 import { World } from "ecsy";
 import * as THREE from "three";
-import { Vector2 } from "three";
+import { Vector2, Vector4 } from "three";
 import { Input, CameraComponent, Mouse, Grid, Level } from "./ECS/Components";
 import { initWorld } from "./ECS/Initializer";
 import { InputManager } from "./InputManager";
@@ -173,7 +173,8 @@ export class Engine {
   }
 
   setMousePos(pos) {
-    this.mousePos = this.mousePos.set(pos.x, pos.y);
+    const { top, right } = this.camera;
+    this.mousePos.set(pos.x * right, pos.y * top);
   }
 
   prepareNextStage() {
@@ -246,13 +247,15 @@ export class Engine {
   enterShop() {
     this.currentStage = 1;
     this.sounds.stopSound('run');
-    this.sounds.playSound('busMusic');
+    if (!this.sounds.isPlaying('busMusic'))
+      this.sounds.playSound('busMusic');
   }
 
   enterBus() {
     this.currentStage = 0;
     this.sounds.stopSound('busMusic');
-    this.sounds.playSound('run');
+    if (!this.sounds.isPlaying('run'))
+      this.sounds.playSound('run');
   }
 
   addLight(pos, scene) {

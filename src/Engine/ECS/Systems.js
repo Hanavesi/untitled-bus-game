@@ -15,6 +15,7 @@ export class ControlPlayerSystem extends System {
 
     const object = player.getComponent(Object3D).object;
     const animRoot = object.animRoot;
+    const moveRoot = object.moveRoot;
     const vectors = player.getMutableComponent(Vectors);
     let newDir = new Vector2(0, 0);
     if (inputState.left.down) newDir.x -= 1;
@@ -55,8 +56,17 @@ export class ControlPlayerSystem extends System {
         const pos = new Vector3();
         const speed = 60;
         barrel.getWorldPosition(pos);
+
+        let dir = new Vector2();
+        const barrelToMouse = new Vector2().addVectors(pos.clone().negate(), new Vector2(moveRoot.position.x, moveRoot.position.y).add(mousePos));
+        if (barrelToMouse.length() >= 5) {
+          dir = barrelToMouse.clone().normalize();
+        } else {
+          dir = normMouse;
+        }
+
         const bulletEntity = this.world.createEntity();
-        this.world.generator.createBullet(bulletEntity, pos, mousePos, speed, vectors.velocity);
+        this.world.generator.createBullet(bulletEntity, pos, dir, speed, vectors.velocity);
         this.world.sounds.playSound('piu');
       }
     }
