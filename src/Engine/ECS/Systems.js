@@ -4,7 +4,6 @@ import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect, getGridPosition } from "../Util/Collisions";
 import { checkCollisionCase } from "../Util/CollisionCases";
 
-
 const CELLSIZE = 12.1;
 
 export class ControlPlayerSystem extends System {
