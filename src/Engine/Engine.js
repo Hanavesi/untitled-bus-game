@@ -226,7 +226,7 @@ export class Engine {
     }
 
     const stage = this.stages[this.currentStage];
-    stage.world.execute(deltaTime, now);
+    stage.world.execute(deltaTime);
 
     this.inputManager.update();
 

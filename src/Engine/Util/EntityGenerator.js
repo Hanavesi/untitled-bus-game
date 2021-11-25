@@ -1,6 +1,6 @@
 import { FiniteStateMachine } from "../FSM";
 import { SkinInstance } from "../SkinInstance";
-import { Object3D, Playable, Vectors, HitBox, StateMachine, Enemy, Health, Bullet, Gun, TimeToLive, Tile } from "../ECS/Components";
+import { Object3D, Playable, Vectors, HitBox, StateMachine, Enemy, Health, Bullet, Gun, TimeToLive, Tile, Sleeping } from "../ECS/Components";
 import * as THREE from 'three';
 
 export class EntityGenerator {
@@ -56,7 +56,8 @@ export class EntityGenerator {
       .addComponent(HitBox, { size: new THREE.Vector2(1.5, 3), offset: new THREE.Vector2(0, 1.5) })
       .addComponent(StateMachine, { fsm: fsm })
       .addComponent(Health, { max: 100, current: 100, bar: health })
-      .addComponent(Gun, { barrel: barrel, cooldown: 0.1, lastShot: 0 });
+      .addComponent(Gun, { barrel: barrel, cooldown: 0.1, lastShot: 0 })
+      .addComponent(Sleeping, { tts: 120, time: 0 });
   }
 
   createSoldier(entity, position) {
@@ -100,7 +101,8 @@ export class EntityGenerator {
       .addComponent(StateMachine, { fsm: fsm })
       .addComponent(Enemy)
       .addComponent(Health, { max: 100, current: 100, bar: health })
-      .addComponent(Gun, { barrel: barrel, cooldown: 0.2, lastShot: 0 });
+      .addComponent(Gun, { barrel: barrel, cooldown: 0.2, lastShot: 0 })
+      .addComponent(Sleeping, { tts: 120, time: 0 });
   }
 
   createBullet(entity, position, direction, speed, launchVelocity) {

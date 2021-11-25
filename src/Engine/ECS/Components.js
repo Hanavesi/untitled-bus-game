@@ -88,3 +88,10 @@ Grid.schema = {
     cells: { type: Types.Ref },
     bounds: { type: Types.Ref }
 }
+
+export class Sleeping extends Component { }
+
+Sleeping.schema = {
+    tts: { type: Types.Number },
+    time: { type: Types.Number }
+}
