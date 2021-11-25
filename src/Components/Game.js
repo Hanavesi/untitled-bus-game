@@ -5,13 +5,15 @@ import BusMap from '../Data/BusMap';
 import YouWon from '../Screens/YouWon';
 import GameOver from '../Screens/GameOver';
 
-export function Game({ mqttHandler, status }) {
+
+
+export function Game({ mqttHandler }) {
   const [ready, setReady] = useState(false);
   const [showGame, setShowGame] = useState(false);
   const engine = useRef(null);
   const visible = { visibility: 'visible' };
   const hidden = { visibility: 'hidden' };
-  const [gameStatus, setGameStatus] = useState(status);
+  const [gameStatus, setGameStatus] = useState('ingame');
 
   useEffect(() => {
     const canvas = document.getElementById("gameCanvas");
@@ -30,6 +32,7 @@ export function Game({ mqttHandler, status }) {
 
   const startGameLoop = () => {
     setShowGame(true);
+    engine.current.enterBus();
     engine.current.loop(performance.now());
   }
 
@@ -43,6 +46,7 @@ export function Game({ mqttHandler, status }) {
       console.log('bussi saapui pysäkille');
       // todo: function to switch to shop
       engine.current.enterShop();
+
     }
     else if (eventType === 'DEP') {
       console.log('bussi lähti pysäkiltä');

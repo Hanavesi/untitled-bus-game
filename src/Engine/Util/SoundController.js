@@ -29,6 +29,13 @@ export class SoundController {
     }
   }
 
+  isPlaying(name) {
+    if (this.sounds[name] !== undefined) {
+      return this.sounds[name].playing();
+    }
+    return false;
+  }
+
   stopSound(name) {
     if (this.sounds[name] !== undefined) {
       this.sounds[name].stop();

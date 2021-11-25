@@ -12,6 +12,7 @@ import { SoundController } from "./Util/SoundController";
 
 import run from '../Assets/sounds/run.mp3';
 import piu from '../Assets/sounds/piu.mp3';
+import busMusic from '../Assets/sounds/busMusic.mp3';
 
 
 const CELLSIZE = 12.1;
@@ -20,9 +21,10 @@ export class Engine {
 
   constructor(canvas, width, height, onReady) {
     this.sounds = new SoundController();
-    this.sounds.registerSound(run, true);
-    this.sounds.registerSound(piu);
-    this.sounds.setVolume(0.05);
+    this.sounds.registerSound(run, true, 0.05);
+    this.sounds.registerSound(busMusic, true);
+    this.sounds.registerSound(piu, false, 0.05);
+    this.sounds.setVolume(0.5);
 
     this.inputManager = new InputManager();
     this.lastFrame = undefined;
@@ -51,6 +53,7 @@ export class Engine {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
     const world = new World();
+
     initWorld(world);
     const entityGenerator = new EntityGenerator(this.modelManager, scene);
     world.generator = entityGenerator;
@@ -104,7 +107,6 @@ export class Engine {
     const entityGenerator = new EntityGenerator(this.modelManager, scene);
     world.generator = entityGenerator;
     world.sounds = this.sounds;
-    this.sounds.playSound('run');
 
     entityGenerator.createPlayer(world.createEntity(), { x: 0, y: 0 });
     entityGenerator.createSoldier(world.createEntity(), { x: 0, y: 10 });
@@ -132,8 +134,6 @@ export class Engine {
       }
       grid[i] = column;
     }
-
-    console.log(grid, bounds)
 
     const entity = world.createEntity();
     entity
@@ -220,8 +220,7 @@ export class Engine {
 
   loop(now) {
     now *= 0.001;
-    if (this.lastFrame === undefined) this.lastFrame = now;
-    const deltaTime = now - this.lastFrame;
+    const deltaTime = now - (this.lastFrame || 0);
     this.lastFrame = now;
 
     if (this.inputManager.keys.b.justPressed) {
@@ -229,7 +228,7 @@ export class Engine {
     }
 
     const stage = this.stages[this.currentStage];
-    stage.world.execute(deltaTime, now);
+    stage.world.execute(deltaTime);
 
     this.inputManager.update();
 
@@ -246,10 +245,14 @@ export class Engine {
 
   enterShop() {
     this.currentStage = 1;
+    this.sounds.stopSound('run');
+    this.sounds.playSound('busMusic');
   }
 
   enterBus() {
     this.currentStage = 0;
+    this.sounds.stopSound('busMusic');
+    this.sounds.playSound('run');
   }
 
   addLight(pos, scene) {

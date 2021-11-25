@@ -1,5 +1,5 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, Gun, Grid, Tile, Dead, Level } from "./Components";
+import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, Gun, Grid, Tile, Dead, Level, Sleeping } from "./Components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect, getGridPosition } from "../Util/Collisions";
 import { checkCollisionCase } from "../Util/CollisionCases";
@@ -8,60 +8,61 @@ const CELLSIZE = 12.1;
 
 export class ControlPlayerSystem extends System {
   execute(delta) {
-    const entities = this.queries.entities.results;
+    const player = this.queries.entities.results[0];
+    if (!player || player.hasComponent(Sleeping)) return;
     const inputState = this.queries.inputState.results[0].getComponent(Input).state;
     const mousePos = this.queries.mouse.results[0].getComponent(Mouse).pos;
-    for (const entity of entities) {
-      const object = entity.getComponent(Object3D).object;
-      const animRoot = object.animRoot;
-      const vectors = entity.getMutableComponent(Vectors);
-      let newDir = new Vector2(0, 0);
-      if (inputState.left.down) newDir.x -= 1;
-      if (inputState.right.down) newDir.x += 1;
-      if (inputState.up.down) newDir.y += 1;
-      if (inputState.down.down) newDir.y -= 1;
-      vectors.direction = newDir.normalize();
-      vectors.velocity.add(vectors.direction.clone().multiplyScalar(vectors.speed));
-      vectors.velocity.multiplyScalar(0.8);
 
-      const normMouse = mousePos.clone().normalize();
-      const angle = Math.atan2(normMouse.y, normMouse.x);
-      const newAngle = angle + Math.PI / 2;
-      animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), newAngle);
-      animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
+    const object = player.getComponent(Object3D).object;
+    const animRoot = object.animRoot;
+    const vectors = player.getMutableComponent(Vectors);
+    let newDir = new Vector2(0, 0);
+    if (inputState.left.down) newDir.x -= 1;
+    if (inputState.right.down) newDir.x += 1;
+    if (inputState.up.down) newDir.y += 1;
+    if (inputState.down.down) newDir.y -= 1;
+    vectors.direction = newDir.normalize();
+    vectors.velocity.add(vectors.direction.clone().multiplyScalar(vectors.speed));
+    vectors.velocity.multiplyScalar(0.8);
 
-      const { x, y } = vectors.direction;
-      const fsm = entity.getComponent(StateMachine).fsm;
-      if (x === 0 && y === 0) { // If standing still, look "down"
-        if (fsm && fsm.state !== 'idle') {
-          fsm.transition('idle');
-        }
-      } else {
-        if (fsm && fsm.state !== 'run') {
-          fsm.transition('run');
-        }
+    const normMouse = mousePos.clone().normalize();
+    const angle = Math.atan2(normMouse.y, normMouse.x);
+    const newAngle = angle + Math.PI / 2;
+    animRoot.setRotationFromAxisAngle(new Vector3(0, 1, 0), newAngle);
+    animRoot.rotateOnWorldAxis(new Vector3(1, 0, 0), 0.8);
+
+    const { x, y } = vectors.direction;
+    const fsm = player.getComponent(StateMachine).fsm;
+    if (x === 0 && y === 0) { // If standing still, look "down"
+      if (fsm && fsm.state !== 'idle') {
+        fsm.transition('idle');
       }
-
-      const gun = entity.getMutableComponent(Gun);
-      gun.lastShot -= delta;
-      if (gun.lastShot < 0) gun.lastShot = 0;
-
-      if (inputState.leftMouse.down) {
-        if (gun.lastShot <= 0) {
-          gun.lastShot += gun.cooldown;
-
-          const { barrel } = gun;
-          const pos = new Vector3();
-          const speed = 60;
-          barrel.getWorldPosition(pos);
-          const bulletEntity = this.world.createEntity();
-          this.world.generator.createBullet(bulletEntity, pos, mousePos, speed, vectors.velocity);
-          this.world.sounds.playSound('piu');
-        }
+    } else {
+      if (fsm && fsm.state !== 'run') {
+        fsm.transition('run');
       }
-      // anim
-      object.update(delta);
     }
+
+    const gun = player.getMutableComponent(Gun);
+    gun.lastShot -= delta;
+    if (gun.lastShot < 0) gun.lastShot = 0;
+
+    if (inputState.leftMouse.down) {
+      if (gun.lastShot <= 0) {
+        gun.lastShot += gun.cooldown;
+
+        const { barrel } = gun;
+        const pos = new Vector3();
+        const speed = 60;
+        barrel.getWorldPosition(pos);
+        const bulletEntity = this.world.createEntity();
+        this.world.generator.createBullet(bulletEntity, pos, mousePos, speed, vectors.velocity);
+        this.world.sounds.playSound('piu');
+      }
+    }
+    // anim
+    object.update(delta);
+
   }
 }
 
@@ -96,10 +97,28 @@ HealthSystem.queries = {
   entities: { components: [Health] }
 }
 
+export class SleepingSystem extends System {
+  execute() {
+    const entities = this.queries.entities.results;
+    for (const entity of entities) {
+      const sleep = entity.getMutableComponent(Sleeping);
+      sleep.time += 1;
+      if (sleep.time > sleep.tts) {
+        entity.removeComponent(Sleeping);
+      }
+    }
+  }
+}
+
+SleepingSystem.queries = {
+  entities: { components: [Sleeping] }
+}
+
 export class ControlEnemySystem extends System {
   execute(delta) {
     const player = this.queries.player.results[0];
     if (!player) return;
+
     const playerMoveRoot = player.getComponent(Object3D).object.moveRoot;
     const playerPos = new Vector2(playerMoveRoot.position.x, playerMoveRoot.position.y);
     const playerVectors = player.getComponent(Vectors);
@@ -107,7 +126,7 @@ export class ControlEnemySystem extends System {
     const enemies = this.queries.enemies.results;
 
     for (let i = 0; i < enemies.length; i++) {
-      const enemy = enemies[i]
+      const enemy = enemies[i];
       const enemyObject = enemy.getComponent(Object3D).object;
       const enemyMoveRoot = enemyObject.moveRoot;
       const enemyPos = new Vector2(enemyMoveRoot.position.x, enemyMoveRoot.position.y);
@@ -120,7 +139,8 @@ export class ControlEnemySystem extends System {
         vectors.velocity.add(dir.clone().negate().multiplyScalar(5));
       }
       vectors.direction = dir.clone();
-      vectors.velocity.add(vectors.direction.clone().multiplyScalar(vectors.speed));
+      if (!enemy.hasComponent(Sleeping))
+        vectors.velocity.add(vectors.direction.clone().multiplyScalar(vectors.speed));
       vectors.velocity.multiplyScalar(0.8);
 
       for (let j = 0; j < enemies.length; j++) {
