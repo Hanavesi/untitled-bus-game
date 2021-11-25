@@ -8,12 +8,21 @@ import { ModelManager } from "./ModelManager";
 import { mapToMeshes } from "./TileGen";
 import { MAP_TEST, SHOP_MAP } from "./TileMap";
 import { EntityGenerator } from "./Util/EntityGenerator";
+import { SoundController } from "./Util/SoundController";
+
+import run from '../Assets/sounds/run.mp3';
+import piu from '../Assets/sounds/piu.mp3';
 
 const CELLSIZE = 12.1;
 
 export class Engine {
 
   constructor(canvas, width, height, onReady) {
+    this.sounds = new SoundController();
+    this.sounds.registerSound(run, true);
+    this.sounds.registerSound(piu);
+    this.sounds.setVolume(0.05);
+
     this.inputManager = new InputManager();
     this.lastFrame = undefined;
 
@@ -44,6 +53,7 @@ export class Engine {
     initWorld(world);
     const entityGenerator = new EntityGenerator(this.modelManager, scene);
     world.generator = entityGenerator;
+    world.sounds = this.sounds;
 
     entityGenerator.createPlayer(world.createEntity(), { x: 0, y: 0 });
 
@@ -92,6 +102,8 @@ export class Engine {
     initWorld(world);
     const entityGenerator = new EntityGenerator(this.modelManager, scene);
     world.generator = entityGenerator;
+    world.sounds = this.sounds;
+    this.sounds.playSound('run');
 
     entityGenerator.createPlayer(world.createEntity(), { x: 0, y: 0 });
     entityGenerator.createSoldier(world.createEntity(), { x: 0, y: 10 });

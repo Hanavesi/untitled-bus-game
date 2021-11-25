@@ -2,8 +2,6 @@ import { System } from "ecsy";
 import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, Gun, Grid, Tile, Dead, Level } from "./Components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect, getGridPosition } from "../Util/Collisions";
-import { Howl } from 'howler';
-import piu from '../../Assets/music/piu.mp3';
 import { checkCollisionCase } from "../Util/CollisionCases";
 
 
@@ -59,12 +57,7 @@ export class ControlPlayerSystem extends System {
           barrel.getWorldPosition(pos);
           const bulletEntity = this.world.createEntity();
           this.world.generator.createBullet(bulletEntity, pos, mousePos, speed, vectors.velocity);
-          const sound = new Howl({
-            src: [piu],
-            volume: 0.1,
-          });
-
-          sound.play();
+          this.world.sounds.playSound('piu');
         }
       }
       // anim
