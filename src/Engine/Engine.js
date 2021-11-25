@@ -52,6 +52,7 @@ export class Engine {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
     const world = new World();
+    
     initWorld(world);
     const entityGenerator = new EntityGenerator(this.modelManager, scene);
     world.generator = entityGenerator;
@@ -105,7 +106,6 @@ export class Engine {
     const entityGenerator = new EntityGenerator(this.modelManager, scene);
     world.generator = entityGenerator;
     world.sounds = this.sounds;
-    this.sounds.playSound('run');
 
     entityGenerator.createPlayer(world.createEntity(), { x: 0, y: 0 });
     entityGenerator.createSoldier(world.createEntity(), { x: 0, y: 10 });

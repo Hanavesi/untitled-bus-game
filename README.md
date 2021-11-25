@@ -22,26 +22,14 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
 
-
-
-<!-- PROJECT LOGO -->
-<br />
-<div align="center">
-  <a href="https://github.com/Hanavesi/untitled-bus-game">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
 
 <h3 align="center">untitled-bus-game</h3>
 
   <p align="center">
     Sort of dungeon game made with javascript that depends on mqtt data.
     <br />
-    <a href="https://github.com/Hanavesi/untitled-bus-game"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/Hanavesi/untitled-bus-game">View Demo</a>
+    <a href="http://hanavesi.com">View Demo</a>
     ·
     <a href="https://github.com/Hanavesi/untitled-bus-game/issues">Report Bug</a>
     ·
@@ -107,7 +95,7 @@ The game's course is based on [HSL](https://www.hsl.fi/) bus data gathered from 
 
 * [React.js](https://reactjs.org/)
 * [Three.js](https://threejs.org/)
-* [MQTT](https://mqtt.org/)
+* [MQTT](https://www.npmjs.com/package/mqtt)
 * [Digitransit](https://digitransit.fi/en/developers/apis/4-realtime-api/vehicle-positions/)
 * [Howler](https://howlerjs.com/)
 * [ECSY](https://ecsy.io/)
@@ -127,7 +115,6 @@ To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
 * npm
   ```sh
   npm install npm@latest -g
@@ -174,17 +161,19 @@ This is an example of how to list things you need to use the software and how to
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+Here is some basic information about the building blocks of this project
 
-Here info about ECS components and systems
+### Mqtt
 
-Here info about MQTT
+The **MQTT** protocol is used to get data from buses through [Digitransit's realtime API](https://digitransit.fi/en/developers/apis/4-realtime-api/). To make use of this data, we use the [mqtt npm package](https://www.npmjs.com/package/mqtt) to either get all bus updates on a specific Helsinki region and set them visible on a [Leaflet](https://leafletjs.com/) map, or get the updates of a single drive forward our gameplay loop.
 
-Anything else?
+### ECS
 
-Current notes in ![notes.md](https://github.com/Hanavesi/untitled-bus-game/blob/main/notes.md)
+Most of the game logic is built around the [ecsy](https://ecsy.io/) Entity Component System -library. Relevant game data is stored in components that are tied to entities. Then there are systems that update entities based on what components they possess.
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+### [Three.js](https://threejs.org/)
+
+Three.js is used to draw everything on the screen except the map. It allows easy loading of 3D files and images as well as rendering basic meshes and sprites.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -212,8 +201,8 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - [x] Adding Entity-Component-System
   - components, systems, initializer etc.
 - [ ] Collisions
-  - [x] Player-to-Enemy
   - [x] Bullets-to-any
+  - [ ] Player-to-Enemy
   - [ ] Enemy-to-Enemy
 - [x] Health & Damage system
   - Health bar and damage loss
