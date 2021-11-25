@@ -9,7 +9,7 @@ function Credits() {
         history.push("/");
     }
     return (
-        <div class="nimet">
+        <div className="nimet">
             <h1 className="Juuso">Juuso Kalliomäki</h1>
             <h1 className="Jesse">Jesse Karsimus</h1>
             <h1>Jose Junninen</h1>
