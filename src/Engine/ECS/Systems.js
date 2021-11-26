@@ -24,7 +24,6 @@ export class ControlPlayerSystem extends System {
     if (inputState.down.down) newDir.y -= 1;
     vectors.direction = newDir.normalize();
     vectors.velocity.add(vectors.direction.clone().multiplyScalar(vectors.speed));
-    vectors.velocity.multiplyScalar(0.8);
 
     const normMouse = mousePos.clone().normalize();
     const angle = Math.atan2(normMouse.y, normMouse.x);
@@ -169,7 +168,6 @@ export class ControlEnemySystem extends System {
       vectors.direction = dir.clone();
       if (!enemy.hasComponent(Sleeping))
         vectors.velocity.add(vectors.direction.clone().multiplyScalar(vectors.speed));
-      vectors.velocity.multiplyScalar(0.8);
 
       for (let j = 0; j < enemies.length; j++) {
         if (j === i) continue;
@@ -439,11 +437,12 @@ export class UpdateVectorsSystem extends System {
     const entities = this.queries.entities.results;
     for (const entity of entities) {
       const object = entity.getComponent(Object3D).object;
-      const vectors = entity.getMutableComponent(Vectors);
+      const vectors = entity.getComponent(Vectors);
       const moveRoot = object.moveRoot;
       const vel = vectors.velocity;
       moveRoot.translateX(vel.x * delta);
       moveRoot.translateY(vel.y * delta);
+      if (!entity.hasComponent(Bullet)) vectors.velocity.multiplyScalar(0.8);
     }
   }
 }
