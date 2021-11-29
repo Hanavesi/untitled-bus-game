@@ -163,9 +163,8 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
       doubleClickZoom: false })
       .setView([current_lat, current_long], 14);
 
-    L.tileLayer("https://cdn.digitransit.fi/map/v1/{id}/{z}/{x}/{y}.png", {
-      attribution: `Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors,
-      <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>`,
+    L.tileLayer("https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}@2x.png", {
+      attribution: `Map data &copy; <a href="https://carto.com/basemaps/">"Map tiles by Carto, under CC BY 3.0. Data by OpenStreetMap, under ODbL."</a>`,
       maxZoom: 19,
       tileSize: 512,
       zoomOffset: -1,
