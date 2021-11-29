@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchDuration, fetchRouteId, fuzzyTripQuery, fetchStopLocation } from "./ItineraryData";
-
+import bus_icon from "../Assets/images/bus_icon.png"
 /**
  * ------- DISCLAIMER ---------
  * Those who appreciate their sanity
@@ -30,7 +30,7 @@ const topicAreas = [
 ];
 
 const busIcon = new L.Icon({
-  iconUrl: 'https://cdn-icons-png.flaticon.com/512/4550/4550988.png',
+  iconUrl: bus_icon,
 
   iconSize: [40, 40],
   iconAnchor: [15, 35],
