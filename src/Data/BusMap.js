@@ -299,7 +299,8 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
       ...(focus ? full : mini),
       position: 'absolute',
       top: 0,
-      left: 0
+      left: 0,
+      zIndex: 1
     }}>
     </div>
   );
