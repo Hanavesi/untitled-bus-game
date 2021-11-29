@@ -14,6 +14,7 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 
 import run from '../Assets/sounds/run.mp3';
+import hurt from '../Assets/sounds/hurt.wav';
 import piu from '../Assets/sounds/piu.mp3';
 import busMusic from '../Assets/sounds/busMusic.mp3';
 
@@ -27,6 +28,7 @@ export class Engine {
     this.sounds.registerSound(run, true, 0.05);
     this.sounds.registerSound(busMusic, true);
     this.sounds.registerSound(piu, false, 0.05);
+    this.sounds.registerSound(hurt, false, 0.3);
     this.sounds.setVolume(0.5);
 
     this.inputManager = new InputManager();

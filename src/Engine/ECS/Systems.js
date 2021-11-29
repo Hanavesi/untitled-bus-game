@@ -431,9 +431,9 @@ export class CollisionSystem extends System {
                 // always check collision case with bullet as entity1 to make checking easier
                 let needsResolution;
                 if (entity1.hasComponent(Bullet)) {
-                  needsResolution = checkCollisionCase(entity1, entity2);
+                  needsResolution = checkCollisionCase(entity1, entity2, this.world);
                 } else {
-                  needsResolution = checkCollisionCase(entity2, entity1);
+                  needsResolution = checkCollisionCase(entity2, entity1, this.world);
                 }
                 if (!needsResolution) continue collision;
                 collisions.push({ time: contactInfo.tHitNear, r1: r1, r2: r2, vel: vel1, vectors: vectors1 });
