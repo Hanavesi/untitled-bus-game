@@ -27,6 +27,7 @@ export function Game({ mqttHandler }) {
       mqttHandler.disconnect();
       removeEventListeners(eventListeners);
       engine.current.sounds.stop();
+      engine.current.running = false;
     });
   }, []);
 

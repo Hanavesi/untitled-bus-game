@@ -9,6 +9,9 @@ import { mapToMeshes } from "./TileGen";
 import { MAP_TEST, SHOP_MAP } from "./TileMap";
 import { EntityGenerator } from "./Util/EntityGenerator";
 import { SoundController } from "./Util/SoundController";
+import { HalftonePass } from "three/examples/jsm/postprocessing/HalftonePass";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 
 import run from '../Assets/sounds/run.mp3';
 import piu from '../Assets/sounds/piu.mp3';
@@ -31,6 +34,7 @@ export class Engine {
 
     this.stages = [];
     this.currentStage = 0;
+    this.running = true;
 
     this.mousePos = new Vector2();
     const aspectratio = width / height;
@@ -38,6 +42,13 @@ export class Engine {
     this.camera.position.set(0, 0, 20);
     this.renderer = new THREE.WebGLRenderer({ canvas });
     this.renderer.setSize(width, height, false);
+    this.composer = new EffectComposer(this.renderer);
+    this.renderPass = new RenderPass(new THREE.Scene(), this.camera);
+    this.composer.addPass(this.renderPass);
+    this.composer.addPass(new HalftonePass(width, height, {
+      radius: 2,
+      shape: 1,
+    }));
     this.level = 1;
 
     this.modelManager = new ModelManager();
@@ -164,6 +175,7 @@ export class Engine {
       right = 30 * ratio;
     }
     this.renderer.setSize(width, height, false);
+    this.composer.setSize(width, height);
     this.camera.top = top;
     this.camera.bottom = bottom;
     this.camera.left = left;
@@ -200,7 +212,7 @@ export class Engine {
       this.addLight([5, 5, 2], stage.scene);
       this.addLight([-5, 5, 2], stage.scene);
 
-      const light = new THREE.AmbientLight(0x404040); // soft white light
+      const light = new THREE.AmbientLight(0x808080); // soft white light
       stage.scene.add(light);
 
       if (stage.name === 'bus') {
@@ -211,10 +223,8 @@ export class Engine {
           let entity = stage.world.createEntity();
           stage.world.generator.createSoldier(entity, new Vector2(x, y));
         }
-
       }
     }
-
     //this.loop(performance.now());
   }
 
@@ -224,17 +234,13 @@ export class Engine {
     const deltaTime = now - (this.lastFrame || 0);
     this.lastFrame = now;
 
-    if (this.inputManager.keys.b.justPressed) {
-      this.currentStage = (this.currentStage + 1) % 2;
-    }
-
     const stage = this.stages[this.currentStage];
     stage.world.execute(deltaTime);
 
     this.inputManager.update();
 
-    this.renderer.render(stage.scene, this.camera);
-    requestAnimationFrame(this.loop.bind(this));
+    //this.renderer.render(stage.scene, this.camera);
+    this.composer.render();
 
     if (!stage.world.enabled) {
       this.renderer.setAnimationLoop(null)
@@ -242,10 +248,13 @@ export class Engine {
         window.location = 'http://localhost:3000/GameOver'
       )
     }
+    if (this.running)
+      requestAnimationFrame(this.loop.bind(this));
   }
 
   enterShop() {
     this.currentStage = 1;
+    this.renderPass.scene = this.stages[1].scene;
     this.sounds.stopSound('run');
     if (!this.sounds.isPlaying('busMusic'))
       this.sounds.playSound('busMusic');
@@ -253,6 +262,7 @@ export class Engine {
 
   enterBus() {
     this.currentStage = 0;
+    this.renderPass.scene = this.stages[0].scene;
     this.sounds.stopSound('busMusic');
     if (!this.sounds.isPlaying('run'))
       this.sounds.playSound('run');

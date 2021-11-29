@@ -57,7 +57,7 @@ export class EntityGenerator {
       .addComponent(StateMachine, { fsm: fsm })
       .addComponent(Health, { max: 100, current: 100, bar: health })
       .addComponent(Gun, { barrel: barrel, cooldown: 0.1, lastShot: 0 })
-      .addComponent(Sleeping, { tts: 120, time: 0 });
+      .addComponent(Sleeping, { tts: 30, time: 0 });
   }
 
   createSoldier(entity, position) {
@@ -102,14 +102,14 @@ export class EntityGenerator {
       .addComponent(Enemy)
       .addComponent(Health, { max: 100, current: 100, bar: health })
       .addComponent(Gun, { barrel: barrel, cooldown: 0.2, lastShot: 0 })
-      .addComponent(Sleeping, { tts: 120, time: 0 });
+      .addComponent(Sleeping, { tts: 60, time: 0 });
   }
 
   createBullet(entity, position, direction, speed, launchVelocity) {
     const dir = direction.clone().normalize();
     const vel = dir.clone().multiplyScalar(speed).add(launchVelocity);
     const angle = Math.atan2(dir.y, dir.x);
-    const bulletMaterial = new THREE.SpriteMaterial({ color: 0x000000, rotation: angle });
+    const bulletMaterial = new THREE.SpriteMaterial({ color: 0xffaaaa, rotation: angle });
     const bullet = new THREE.Sprite(bulletMaterial);
     bullet.scale.set(0.8, 0.4, 1);
     bullet.position.set(position.x, position.y, 1);

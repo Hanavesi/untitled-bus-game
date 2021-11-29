@@ -165,9 +165,9 @@ export class ControlEnemySystem extends System {
         playerVectors.velocity.add(dir.multiplyScalar(30));
         vectors.velocity.add(dir.clone().negate().multiplyScalar(5));
       }
-      vectors.direction = dir.clone();
-      if (!enemy.hasComponent(Sleeping))
-        vectors.velocity.add(vectors.direction.clone().multiplyScalar(vectors.speed));
+      if (enemy.hasComponent(Sleeping)) continue;
+      vectors.direction = dir.clone();      
+      vectors.velocity.add(vectors.direction.clone().multiplyScalar(vectors.speed));
 
       for (let j = 0; j < enemies.length; j++) {
         if (j === i) continue;

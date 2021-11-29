@@ -156,10 +156,16 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
     // BASIC LEAFLET WITH HSL TILELAYER
 
     // The <div id="map"> must be added to the dom before calling L.map('map')
-    map = L.map('map', { dragging: false, zoomControl: false, scrollWheelZoom: false, doubleClickZoom: false }).setView([current_lat, current_long], 14);
+    map = L.map('map', {
+      dragging: false,
+      zoomControl: false,
+      scrollWheelZoom: false,
+      doubleClickZoom: false })
+      .setView([current_lat, current_long], 14);
 
     L.tileLayer("https://cdn.digitransit.fi/map/v1/{id}/{z}/{x}/{y}.png", {
-
+      attribution: `Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors,
+      <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>`,
       maxZoom: 19,
       tileSize: 512,
       zoomOffset: -1,
@@ -244,9 +250,9 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
   const createPopupContent = (bus) => {
     const container = document.createElement('div');
     const info = document.createElement('div');
-    info.innerText = `dest: ${bus.destination}; duration: ${bus.duration}min; route: ${bus.route}; door: ${bus.drst}`;
+    info.innerText = `dest: ${bus.destination}; duration: ${bus.duration}min;`;
     const button = document.createElement('button');
-    button.innerText = 'Press Me!';
+    button.innerText = 'Protect this bus!';
     button.onclick = () => clickEvent(bus);
     container.append(info);
     container.append(button);
