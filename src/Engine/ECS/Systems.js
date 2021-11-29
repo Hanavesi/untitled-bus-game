@@ -1,5 +1,5 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, Gun, Grid, Tile, Dead, Level, Sleeping, TimeToLive } from "./Components";
+import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, Gun, Grid, Tile, Dead, Level, Sleeping, TimeToLive, Shop, Bus } from "./Components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect, getGridPosition } from "../Util/Collisions";
 import { checkCollisionCase } from "../Util/CollisionCases";
@@ -166,7 +166,7 @@ export class ControlEnemySystem extends System {
         vectors.velocity.add(dir.clone().negate().multiplyScalar(5));
       }
       if (enemy.hasComponent(Sleeping)) continue;
-      vectors.direction = dir.clone();      
+      vectors.direction = dir.clone();
       vectors.velocity.add(vectors.direction.clone().multiplyScalar(vectors.speed));
 
       for (let j = 0; j < enemies.length; j++) {
@@ -236,19 +236,47 @@ ControlEnemySystem.queries = {
 export class EnemySpawnerSystem extends System {
 
   execute() {
+    const stage = this.queries.stages.results[0];
     const enemies = this.queries.enemies.results;
-    const x = Math.ceil(Math.random() * 20) * (Math.round(Math.random()) ? 1 : -1);
-    const y = Math.ceil(Math.random() * 10) * (Math.round(Math.random()) ? 1 : -1);
 
-    /* if (enemies.length === 0) {
-      let entity = this.world.createEntity();
-      this.world.generator.createSoldier(entity, new Vector2(x, y));
-    } */
+    if (stage.hasComponent(Bus)) {
+      const level = stage.getComponent(Level).stageNumber;
+      //console.log(level);
+      //console.log('on bussissa');
+
+      // Adds more enemies if count drops to less than 2
+      if (enemies.length < 2) {
+        // Adds enemies based on level and multiplies it with 2 to make levels 
+        // exponentially harder for now
+        for (let i = 0; i < (level * 2); i++) {
+          const x = Math.ceil(Math.random() * 30) * (Math.round(Math.random()) ? 1 : -1);
+          const y = Math.ceil(Math.random() * 18) * (Math.round(Math.random()) ? 1 : -1);
+          let entity = this.world.createEntity();
+          this.world.generator.createSoldier(entity, new Vector2(x, y));
+        }
+      }
+    }
   }
 }
 
 EnemySpawnerSystem.queries = {
   enemies: { components: [Enemy] },
+  stages: { components: [Grid] }
+}
+
+export class ShopSystem extends System {
+
+  execute() {
+    const stage = this.queries.stages.results[0];
+
+    if (stage) {
+      //console.log('kaupassa');
+    }
+  }
+}
+
+ShopSystem.queries = {
+  stages: { components: [Shop] },
 }
 
 export class CameraPositionSystem extends System {

@@ -6,6 +6,9 @@ export class Enemy extends TagComponent { }
 export class Bullet extends TagComponent { }
 export class Tile extends TagComponent { }
 export class Dead extends TagComponent { }
+export class Shop extends TagComponent { }
+export class Bus extends TagComponent { }
+
 
 export class Object3D extends Component { }
 
@@ -94,4 +97,10 @@ export class Sleeping extends Component { }
 Sleeping.schema = {
     tts: { type: Types.Number },
     time: { type: Types.Number }
+}
+
+export class Level extends Component { }
+
+Level.schema = {
+    stageNumber: { type: Types.Number }
 }

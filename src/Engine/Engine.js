@@ -1,7 +1,7 @@
 import { World } from "ecsy";
 import * as THREE from "three";
 import { Vector2, Vector4 } from "three";
-import { Input, CameraComponent, Mouse, Grid, Level } from "./ECS/Components";
+import { Input, CameraComponent, Mouse, Grid, Level, Shop, Bus } from "./ECS/Components";
 import { initWorld } from "./ECS/Initializer";
 import { InputManager } from "./InputManager";
 import { ModelManager } from "./ModelManager";
@@ -97,7 +97,9 @@ export class Engine {
     }
 
     const entity = world.createEntity();
-    entity.addComponent(Grid, { cells: grid, bounds: bounds });
+    entity
+      .addComponent(Grid, { cells: grid, bounds: bounds })
+      .addComponent(Shop);
 
     this.addLight([5, 5, 2], scene);
     this.addLight([-5, 5, 2], scene);
@@ -148,7 +150,9 @@ export class Engine {
 
     const entity = world.createEntity();
     entity
-      .addComponent(Grid, { cells: grid, bounds: bounds });
+      .addComponent(Grid, { cells: grid, bounds: bounds })
+      .addComponent(Level, { stageNumber: this.level })
+      .addComponent(Bus);
 
     this.addLight([5, 5, 2], scene);
     this.addLight([-5, 5, 2], scene);
@@ -218,8 +222,8 @@ export class Engine {
       if (stage.name === 'bus') {
         console.log('level', this.level);
         for (let i = 0; i < (this.level * 5); i++) {
-          const x = Math.ceil(Math.random() * 20) * (Math.round(Math.random()) ? 1 : -1);
-          const y = Math.ceil(Math.random() * 8) * (Math.round(Math.random()) ? 1 : -1);
+          const x = Math.ceil(Math.random() * 30) * (Math.round(Math.random()) ? 1 : -1);
+          const y = Math.ceil(Math.random() * 18) * (Math.round(Math.random()) ? 1 : -1);
           let entity = stage.world.createEntity();
           stage.world.generator.createSoldier(entity, new Vector2(x, y));
         }
