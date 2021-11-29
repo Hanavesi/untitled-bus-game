@@ -13,10 +13,10 @@ import { HalftonePass } from "three/examples/jsm/postprocessing/HalftonePass";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 
-import run from '../Assets/sounds/run.mp3';
+import busMusic from '../Assets/sounds/bus.mp3';
 import hurt from '../Assets/sounds/hurt.wav';
 import piu from '../Assets/sounds/piu.mp3';
-import busMusic from '../Assets/sounds/busMusic.mp3';
+import shopMusic from '../Assets/sounds/shop.mp3';
 
 
 const CELLSIZE = 12.1;
@@ -25,8 +25,8 @@ export class Engine {
 
   constructor(canvas, width, height, onReady) {
     this.sounds = new SoundController();
-    this.sounds.registerSound(run, true, 0.05);
-    this.sounds.registerSound(busMusic, true);
+    this.sounds.registerSound(busMusic, true, 0.05);
+    this.sounds.registerSound(shopMusic, true);
     this.sounds.registerSound(piu, false, 0.05);
     this.sounds.registerSound(hurt, false, 0.3);
     this.sounds.setVolume(0.5);
@@ -54,7 +54,7 @@ export class Engine {
     this.level = 1;
 
     this.modelManager = new ModelManager();
-    this.modelManager.setModels(['knight.gltf', 'soldier1.gltf', 'uzi.gltf', 'knight2.gltf']);
+    this.modelManager.setModels(['knight', 'soldier', 'uzi']);
     this.modelManager.load(() => {
       this.init(1);
       onReady(true);
@@ -261,17 +261,17 @@ export class Engine {
   enterShop() {
     this.currentStage = 1;
     this.renderPass.scene = this.stages[1].scene;
-    this.sounds.stopSound('run');
-    if (!this.sounds.isPlaying('busMusic'))
-      this.sounds.playSound('busMusic');
+    this.sounds.stopSound('busMusic');
+    if (!this.sounds.isPlaying('shopMusic'))
+      this.sounds.playSound('shopMusic');
   }
 
   enterBus() {
     this.currentStage = 0;
     this.renderPass.scene = this.stages[0].scene;
-    this.sounds.stopSound('busMusic');
-    if (!this.sounds.isPlaying('run'))
-      this.sounds.playSound('run');
+    this.sounds.stopSound('shopMusic');
+    if (!this.sounds.isPlaying('busMusic'))
+      this.sounds.playSound('busMusic');
   }
 
   addLight(pos, scene) {

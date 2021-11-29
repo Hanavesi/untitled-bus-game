@@ -17,7 +17,7 @@ export class ModelManager {
     setModels(models) {
         for (const model of models) {
             const name = model.split('.')[0];
-            const path = 'assets/' + model;
+            const path = `assets/models/${model}.gltf`;
             this.models[name] = { url: path, gltf: undefined, animations: [] }
         }
     }

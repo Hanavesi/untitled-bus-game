@@ -10,7 +10,7 @@ export class EntityGenerator {
   }
 
   createPlayer(entity, position) {
-    const object = new SkinInstance(this.modelManager.models['knight2'], this.scene);
+    const object = new SkinInstance(this.modelManager.models['knight'], this.scene);
     object.moveRoot.position.x = position.x;
     object.moveRoot.position.y = position.y;
 
@@ -61,7 +61,7 @@ export class EntityGenerator {
   }
 
   createSoldier(entity, position) {
-    const object = new SkinInstance(this.modelManager.models['soldier1'], this.scene);
+    const object = new SkinInstance(this.modelManager.models['soldier'], this.scene);
     const barrel = object.moveRoot.getObjectByName('barrel');
     object.moveRoot.position.x = position.x;
     object.moveRoot.position.y = position.y;
