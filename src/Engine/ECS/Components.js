@@ -8,6 +8,8 @@ export class Tile extends TagComponent { }
 export class Dead extends TagComponent { }
 export class Shop extends TagComponent { }
 export class Bus extends TagComponent { }
+export class SpawnPoint extends TagComponent { }
+
 
 
 export class Object3D extends Component { }

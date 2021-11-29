@@ -1,6 +1,6 @@
 import { World } from "ecsy";
 import * as THREE from "three";
-import { Vector2, Vector4 } from "three";
+import { Vector2 } from "three";
 import { Input, CameraComponent, Mouse, Grid, Level, Shop, Bus } from "./ECS/Components";
 import { initWorld } from "./ECS/Initializer";
 import { InputManager } from "./InputManager";
@@ -124,13 +124,12 @@ export class Engine {
     world.sounds = this.sounds;
 
     entityGenerator.createPlayer(world.createEntity(), { x: 0, y: 0 });
-    entityGenerator.createSoldier(world.createEntity(), { x: 0, y: 10 });
 
     const { meshes, bounds } = mapToMeshes(MAP_TEST);
     for (const tile of meshes) {
       scene.add(tile);
       if (tile.name === 'floor') continue;
-      entityGenerator.createTile(world.createEntity(), tile, 3.5);
+      entityGenerator.createTile(world.createEntity(), tile, 3.5, tile.name === 'hole');
       // debug collision tiles
       /* const material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); 
       const geometry = new THREE.PlaneGeometry(3.5, 3.5);
@@ -221,7 +220,7 @@ export class Engine {
       const light = new THREE.AmbientLight(0x808080); // soft white light
       stage.scene.add(light);
 
-      if (stage.name === 'bus') {
+      /* if (stage.name === 'bus') {
         console.log('level', this.level);
         for (let i = 0; i < (this.level * 5); i++) {
           const x = Math.ceil(Math.random() * 30) * (Math.round(Math.random()) ? 1 : -1);
@@ -229,7 +228,7 @@ export class Engine {
           let entity = stage.world.createEntity();
           stage.world.generator.createSoldier(entity, new Vector2(x, y));
         }
-      }
+      } */
     }
     //this.loop(performance.now());
   }

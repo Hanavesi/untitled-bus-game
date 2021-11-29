@@ -1,6 +1,6 @@
 import { FiniteStateMachine } from "../FSM";
 import { SkinInstance } from "../SkinInstance";
-import { Object3D, Playable, Vectors, HitBox, StateMachine, Enemy, Health, Bullet, Gun, TimeToLive, Tile, Sleeping } from "../ECS/Components";
+import { Object3D, Playable, Vectors, HitBox, StateMachine, Enemy, Health, Bullet, Gun, TimeToLive, Tile, Sleeping, SpawnPoint } from "../ECS/Components";
 import * as THREE from 'three';
 
 export class EntityGenerator {
@@ -122,11 +122,15 @@ export class EntityGenerator {
       .addComponent(TimeToLive, { age: 0, max: 0.5 });
   }
 
-  createTile(entity, tile, size) {
+  createTile(entity, tile, size, spawnPoint = false) {
     this.scene.add(tile);
     entity
       .addComponent(Object3D, { object: { moveRoot: tile } })
       .addComponent(HitBox, { size: new THREE.Vector2(size, size), offset: new THREE.Vector2() })
       .addComponent(Tile);
+    if (spawnPoint) {
+      entity.addComponent(SpawnPoint);
+    };
+    return entity;
   }
 }

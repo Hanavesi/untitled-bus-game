@@ -17,11 +17,17 @@ export const mapToMeshes = (map) => {
     const width = map[0].length;
     const meshes = [];
 
+    let numSpawns = 0;
+
     // loops given map array
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
             // fetches tile based on which case it is and loads it
-            const tileSrc = idToSrc(map[y][x]);
+            const tileSrc = idToSrc(map[y][x], 1 / (1 + numSpawns));
+            const name = tileSrc.split('/')[1].split('.')[0];
+            if (name === 'hole') {
+                numSpawns++;
+            }
             const material = new MeshLambertMaterial({
                 map: loader.load(tileSrc)
             });
@@ -32,17 +38,7 @@ export const mapToMeshes = (map) => {
             // Give position for tile, each tile gets different cos of x and y
             mesh.position.set(-width * 2 + x * TILESIZE, height * 2 - y * TILESIZE, -1);
             // Naming the tile
-            if (tileSrc.includes('floor')) {
-                mesh.name = 'floor';
-            } else if (tileSrc.includes('door')) {
-                mesh.name = 'door';
-            } else if (tileSrc.includes('window')) {
-                mesh.name = 'window';
-            } else if (tileSrc.includes('wall')) {
-                mesh.name = 'wall';
-            } else if (tileSrc.includes('bench')) {
-                mesh.name = 'bench';
-            }
+            mesh.name = name;
             meshes.push(mesh);
         }
     }
@@ -55,7 +51,7 @@ export const mapToMeshes = (map) => {
  * @param {number} id 
  * @returns image source file path.
  */
-const idToSrc = (id) => {
+const idToSrc = (id, spawnRatio) => {
     switch (id) {
         case 1:
             return "images/floor.png";
@@ -75,7 +71,12 @@ const idToSrc = (id) => {
         // so every stage is different
         case 0:
             const rand = Math.random();
-            if (rand < 0.8) return "images/floor.png";
+            if (rand < 0.8) {
+                return "images/floor.png";
+            };
+            if (rand + spawnRatio > 1.24) {
+                return "images/hole.png";
+            }
             return "images/bench.png";
 
         default:

@@ -1,5 +1,5 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, Gun, Grid, Tile, Dead, Level, Sleeping, TimeToLive, Shop, Bus } from "./Components";
+import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, Gun, Grid, Tile, Dead, Level, Sleeping, TimeToLive, Shop, Bus, SpawnPoint } from "./Components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect, getGridPosition } from "../Util/Collisions";
 import { checkCollisionCase } from "../Util/CollisionCases";
@@ -238,6 +238,8 @@ export class EnemySpawnerSystem extends System {
   execute() {
     const stage = this.queries.stages.results[0];
     const enemies = this.queries.enemies.results;
+    const spawnPoints = this.queries.spawnPoints.results;
+    const num = spawnPoints.length;
 
     if (stage.hasComponent(Bus)) {
       const level = stage.getComponent(Level).stageNumber;
@@ -249,8 +251,11 @@ export class EnemySpawnerSystem extends System {
         // Adds enemies based on level and multiplies it with 2 to make levels 
         // exponentially harder for now
         for (let i = 0; i < (level * 2); i++) {
-          const x = Math.ceil(Math.random() * 30) * (Math.round(Math.random()) ? 1 : -1);
-          const y = Math.ceil(Math.random() * 18) * (Math.round(Math.random()) ? 1 : -1);
+          const spawn = Math.floor(Math.random() * num);
+          const tile = spawnPoints[spawn];
+          const pos = tile.getComponent(Object3D).object.moveRoot.position;
+          const x = pos.x;
+          const y = pos.y;
           let entity = this.world.createEntity();
           this.world.generator.createSoldier(entity, new Vector2(x, y));
         }
@@ -261,7 +266,8 @@ export class EnemySpawnerSystem extends System {
 
 EnemySpawnerSystem.queries = {
   enemies: { components: [Enemy] },
-  stages: { components: [Grid] }
+  stages: { components: [Grid] },
+  spawnPoints: { components: [SpawnPoint] }
 }
 
 export class ShopSystem extends System {
@@ -386,6 +392,7 @@ export class CollisionSystem extends System {
 
             // if both are bullets, skip
             if (entity1.hasComponent(Bullet) && entity2.hasComponent(Bullet)) continue collision;
+            if (entity1.hasComponent(Bullet) && entity2.hasComponent(SpawnPoint)) continue collision;
             if (entity2.hasComponent(Dead)) continue collision;
 
             // temp skip when target is not tile
