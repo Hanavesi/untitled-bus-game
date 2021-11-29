@@ -21,7 +21,8 @@ export function Game({ mqttHandler }) {
     const canvas = document.getElementById("gameCanvas");
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
-    engine.current = new Engine(canvas, width, height, setReady);
+    const scoreElem = document.getElementById("score");
+    engine.current = new Engine(canvas, scoreElem, width, height, setReady);
     const eventListeners = getEventListeners(engine.current);
     addEventListeners(eventListeners);
 
@@ -81,12 +82,12 @@ export function Game({ mqttHandler }) {
     <div id="gameContainer">
       {
         showGame ?
-          <GameStats />
+          null
           :
           <Info />
       }
       <canvas id="gameCanvas" style={showGame ? visible : hidden} />
-
+      <GameStats style={showGame ? visible : hidden} />
       {
         ready ?
           <div>

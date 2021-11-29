@@ -241,6 +241,8 @@ export class EnemySpawnerSystem extends System {
     const spawnPoints = this.queries.spawnPoints.results;
     const num = spawnPoints.length;
 
+    if (num === 0) return;
+
     if (stage.hasComponent(Bus)) {
       const level = stage.getComponent(Level).stageNumber;
       //console.log(level);
@@ -491,6 +493,9 @@ export class CleanUpSystem extends System {
   execute() {
     const entities = this.queries.entities.results;
     for (const entity of entities) {
+      if (entity.hasComponent(Enemy)) {
+        this.world.updateScore(10);
+      }
       if (entity.hasComponent(Object3D)) {
         const objectComponent = entity.getComponent(Object3D);
         const moveRoot = objectComponent.object.moveRoot

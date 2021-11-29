@@ -23,7 +23,7 @@ const CELLSIZE = 12.1;
 
 export class Engine {
 
-  constructor(canvas, width, height, onReady) {
+  constructor(canvas, scoreElem, width, height, onReady) {
     this.sounds = new SoundController();
     this.sounds.registerSound(busMusic, true, 0.05);
     this.sounds.registerSound(shopMusic, true);
@@ -51,12 +51,15 @@ export class Engine {
       radius: 2,
       shape: 1,
     }));
+
     this.level = 1;
+    this.score = 0;
+    this.scoreboard = scoreElem;
 
     this.modelManager = new ModelManager();
     this.modelManager.setModels(['knight', 'soldier', 'uzi']);
     this.modelManager.load(() => {
-      this.init(1);
+      this.init();
       onReady(true);
     });
     this.onWindowResize(width, height);
@@ -71,6 +74,7 @@ export class Engine {
     const entityGenerator = new EntityGenerator(this.modelManager, scene);
     world.generator = entityGenerator;
     world.sounds = this.sounds;
+    world.updateScore = () => this.updateScore();
 
     entityGenerator.createPlayer(world.createEntity(), { x: 0, y: 0 });
 
@@ -122,6 +126,7 @@ export class Engine {
     const entityGenerator = new EntityGenerator(this.modelManager, scene);
     world.generator = entityGenerator;
     world.sounds = this.sounds;
+    world.updateScore = () => this.updateScore();
 
     entityGenerator.createPlayer(world.createEntity(), { x: 0, y: 0 });
 
@@ -194,6 +199,10 @@ export class Engine {
     this.mousePos.set(pos.x * right, pos.y * top);
   }
 
+  updateScore() {
+    this.score += 5;
+  }
+
   prepareNextStage() {
     this.stages = [];
     this.level += 1;
@@ -230,6 +239,7 @@ export class Engine {
         }
       } */
     }
+    this.enterBus();
     //this.loop(performance.now());
   }
 
@@ -247,6 +257,8 @@ export class Engine {
     //this.renderer.render(stage.scene, this.camera);
     this.composer.render();
 
+    this.scoreboard.innerText = this.score;
+
     if (!stage.world.enabled) {
       this.renderer.setAnimationLoop(null)
       return (
@@ -260,17 +272,17 @@ export class Engine {
   enterShop() {
     this.currentStage = 1;
     this.renderPass.scene = this.stages[1].scene;
-    this.sounds.stopSound('busMusic');
-    if (!this.sounds.isPlaying('shopMusic'))
-      this.sounds.playSound('shopMusic');
+    this.sounds.stopSound('bus');
+    if (!this.sounds.isPlaying('shop'))
+      this.sounds.playSound('shop');
   }
 
   enterBus() {
     this.currentStage = 0;
     this.renderPass.scene = this.stages[0].scene;
-    this.sounds.stopSound('shopMusic');
-    if (!this.sounds.isPlaying('busMusic'))
-      this.sounds.playSound('busMusic');
+    this.sounds.stopSound('shop');
+    if (!this.sounds.isPlaying('bus'))
+      this.sounds.playSound('bus');
   }
 
   addLight(pos, scene) {
