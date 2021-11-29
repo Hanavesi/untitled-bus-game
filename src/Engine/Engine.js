@@ -1,6 +1,6 @@
 import { World } from "ecsy";
 import * as THREE from "three";
-import { Vector2, Vector4 } from "three";
+import { Vector2 } from "three";
 import { Input, CameraComponent, Mouse, Grid, Level } from "./ECS/Components";
 import { initWorld } from "./ECS/Initializer";
 import { InputManager } from "./InputManager";
