@@ -90,11 +90,12 @@ export function Game({ mqttHandler }) {
               gameMessageHandler={onMessage}
               initGame={startGameLoop}
             />
+            {!showGame ?
+              <Info />
+              :
+              null}
           </div>
-          : !showGame ?
-            <Info />
-            :
-            null
+          : null
       }
     </div>
   );

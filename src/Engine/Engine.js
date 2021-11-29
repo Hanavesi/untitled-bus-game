@@ -260,7 +260,7 @@ export class Engine {
     this.composer.render();
 
     if (!stage.world.enabled) {
-      this.renderer.setAnimationLoop(null);
+      this.running = false;
       this.endGame('lost');
     }
     if (this.running)
