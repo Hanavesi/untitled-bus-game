@@ -33,7 +33,7 @@ const busIcon = new L.Icon({
   iconUrl: bus_icon,
 
   iconSize: [40, 40],
-  iconAnchor: [15, 35],
+  iconAnchor: [20, 30],
   popupAnchor: [5, -25]
 
 });
