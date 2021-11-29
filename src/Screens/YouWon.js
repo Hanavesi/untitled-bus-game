@@ -1,8 +1,7 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useHistory } from "react-router-dom";
 
-function YouWon() {
-
+function YouWon({ score }) {
     const history = useHistory();
 
     const handleRoute = () => {
@@ -16,10 +15,10 @@ function YouWon() {
             {/* <h2>YOU FAILED TO BE THE SIGMALEST MALE THERE IS</h2>
             <h2>YOU DIED LIKE A FKING MOUTHBREATHER BETA LADY</h2> */}
 
-            <h5>Your score was MILLIONS POINTS NICE</h5>
-        
+            <h5>Your score was {score}</h5>
 
-        <button onClick={handleRoute} className="backButton">Back</button>
+
+            <button onClick={handleRoute} className="backButton">Back</button>
         </div>
     )
 }

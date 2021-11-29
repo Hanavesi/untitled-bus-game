@@ -1,7 +1,7 @@
 import React from 'react'
 import { useHistory } from "react-router-dom";
 
-function GameOver() {
+function GameOver({ score }) {
 
     const history = useHistory();
 
@@ -16,7 +16,7 @@ function GameOver() {
             {/* <h2>YOU FAILED TO BE THE SIGMALEST MALE THERE IS</h2>
             <h2>YOU DIED LIKE A FKING MOUTHBREATHER BETA LADY</h2> */}
 
-            <h5>Your score was zero</h5>
+            <h5>Your score was {score}</h5>
         
 
         <button onClick={handleRoute} className="backButton">Back</button>

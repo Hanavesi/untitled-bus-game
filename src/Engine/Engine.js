@@ -23,7 +23,7 @@ const CELLSIZE = 12.1;
 
 export class Engine {
 
-  constructor(canvas, scoreElem, width, height, onReady) {
+  constructor(canvas, width, height, onReady, setScore, endGame) {
     this.sounds = new SoundController();
     this.sounds.registerSound(busMusic, true, 0.05);
     this.sounds.registerSound(shopMusic, true);
@@ -54,7 +54,8 @@ export class Engine {
 
     this.level = 1;
     this.score = 0;
-    this.scoreboard = scoreElem;
+    this.setScore = setScore;
+    this.endGame = endGame;
 
     this.modelManager = new ModelManager();
     this.modelManager.setModels(['knight', 'soldier', 'uzi']);
@@ -201,6 +202,7 @@ export class Engine {
 
   updateScore() {
     this.score += 5;
+    this.setScore(this.score);
   }
 
   prepareNextStage() {
@@ -257,13 +259,9 @@ export class Engine {
     //this.renderer.render(stage.scene, this.camera);
     this.composer.render();
 
-    this.scoreboard.innerText = this.score;
-
     if (!stage.world.enabled) {
-      this.renderer.setAnimationLoop(null)
-      return (
-        window.location = 'http://localhost:3000/GameOver'
-      )
+      this.renderer.setAnimationLoop(null);
+      this.endGame('lost');
     }
     if (this.running)
       requestAnimationFrame(this.loop.bind(this));

@@ -1,6 +1,13 @@
+import { useEffect, useState } from "react";
 
 
-export default function GameStats({ style }) {
+export default function GameStats(props) {
+  const [score, setScore] = useState(0);
+
+  useEffect(() => {
+    setScore(props.score);
+  }, [props.score])
+
   return (
     <div
       style={{
@@ -13,10 +20,10 @@ export default function GameStats({ style }) {
         margin: 'auto',
         zIndex: 2,
         backgroundColor: 'white',
-        ...style
+        ...props.style
       }}>
       <p style={{ flex: 3, textAlign: 'center' }}>Score</p>
-      <p style={{ flex: 1 }} id='score'>0</p>
+      <p style={{ flex: 1 }} id='score'>{score}</p>
     </div>
   );
 }

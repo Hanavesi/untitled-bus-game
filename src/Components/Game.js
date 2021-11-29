@@ -12,6 +12,7 @@ import GameStats from './GameStats';
 export function Game({ mqttHandler }) {
   const [ready, setReady] = useState(false);
   const [showGame, setShowGame] = useState(false);
+  const [score, setScore] = useState(0);
   const engine = useRef(null);
   const visible = { visibility: 'visible' };
   const hidden = { visibility: 'hidden' };
@@ -21,8 +22,7 @@ export function Game({ mqttHandler }) {
     const canvas = document.getElementById("gameCanvas");
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
-    const scoreElem = document.getElementById("score");
-    engine.current = new Engine(canvas, scoreElem, width, height, setReady);
+    engine.current = new Engine(canvas, width, height, setReady, setScore, setGameStatus);
     const eventListeners = getEventListeners(engine.current);
     addEventListeners(eventListeners);
 
@@ -68,26 +68,20 @@ export function Game({ mqttHandler }) {
 
   if (gameStatus === 'won') {
     return (
-      <YouWon />
+      <YouWon score={score} />
     )
   }
 
   if (gameStatus === 'lost') {
     return (
-      <GameOver />
+      <GameOver score={score} />
     )
   }
 
   return (
     <div id="gameContainer">
-      {
-        showGame ?
-          null
-          :
-          <Info />
-      }
       <canvas id="gameCanvas" style={showGame ? visible : hidden} />
-      <GameStats style={showGame ? visible : hidden} />
+      <GameStats score={score} style={showGame ? visible : hidden} />
       {
         ready ?
           <div>
@@ -97,7 +91,10 @@ export function Game({ mqttHandler }) {
               initGame={startGameLoop}
             />
           </div>
-          : null
+          : !showGame ?
+            <Info />
+            :
+            null
       }
     </div>
   );
