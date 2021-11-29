@@ -11,7 +11,7 @@ export default function Info() {
       fontSize: 25,
       width: "30%"
     }}>
-      On vuosi 2021. Supermegavirus on levinnyt ympäri maailmaa. Virus muuttaa ihmisen punaiseksi ja vihamieliseksi. Bussi on ainoa turva virukselta. Suojele bussia vihollisilta ja pelastaudu päätepysäkille saakka. Hyppää bussiin ja taistele!
+      It's year 2021. Supermegavirus has spread all over the world. The virus transforms humans red and hostile. Buses are the only place where you are safe from the virus. Protect the bus from enemies and survive to the final stop. Get on to the bus and fight!
     </div>
   );
 }
