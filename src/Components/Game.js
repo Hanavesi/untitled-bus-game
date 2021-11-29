@@ -4,6 +4,7 @@ import { getEventListeners, addEventListeners, removeEventListeners } from '../E
 import BusMap from '../Data/BusMap';
 import YouWon from '../Screens/YouWon';
 import GameOver from '../Screens/GameOver';
+import Info from './Info';
 
 
 
@@ -80,11 +81,14 @@ export function Game({ mqttHandler }) {
       <canvas id="gameCanvas" style={showGame ? visible : hidden} />
       {
         ready ?
+        <div>
           <BusMap
             mqttHandler={mqttHandler}
             gameMessageHandler={onMessage}
             initGame={startGameLoop}
           />
+          <Info />
+        </div>
           : null
       }
     </div>
