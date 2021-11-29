@@ -3,13 +3,15 @@
 export default function Info() {
   return (
     <div style={{
-      position: 'absolute',
+      position: 'right',
       top: 0,
-      left: 0,
+      right: 0,
       zIndex: 5,
-      backgroundColor: 'white'
+      backgroundColor: 'red',
+      fontSize: 25,
+      width: "30%"
     }}>
-      kirjoita tänne kiva tarina
+      On vuosi 2021. Supermegavirus on levinnyt ympäri maailmaa. Virus muuttaa ihmisen punaiseksi ja vihamieliseksi. Bussi on ainoa turva virukselta. Suojele bussia vihollisilta ja pelastaudu päätepysäkille saakka. Hyppää bussiin ja taistele!
     </div>
   );
 }
