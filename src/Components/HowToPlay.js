@@ -18,8 +18,9 @@ function HowToPlay() {
             <br />
             <h3>Pick a bus you want to get in, to start the game</h3>
             <br />
-            <h3>While the bus is on bus-stop, you are tranferred to store</h3>
+            <h3>While the bus is on bus-stop, you are transferred to store</h3>
             <br />
+            <h3>You will win if you make it to the final stop</h3>
             <h3>Use
                 <img src={wasdnew}
                     style={{
@@ -32,9 +33,8 @@ function HowToPlay() {
                     }} />
                 to move</h3>
             <br />
-            <h3>Use mouse to aim and shoot</h3>
+            <h3>Use mouse to aim and left-click to shoot</h3>
             <br />
-            <h3>Enemies have diffirent capabilities</h3>
             <button onClick={handleRoute} className="backButton">Back</button>
         </div>
     )
