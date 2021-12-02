@@ -88,7 +88,6 @@ export class Engine {
     const playerEntity = world.createEntity();
     if (this.players[1]) {
       const health = this.players[1].getComponent(Health).current;
-      console.log(health);
       entityGenerator.createPlayer(playerEntity, { x: 0, y: 0 }, health);
     } else {
       entityGenerator.createPlayer(playerEntity, { x: 0, y: 0 });
@@ -148,7 +147,6 @@ export class Engine {
     const playerEntity = world.createEntity();
     if (this.players[0]) {
       const health = this.players[0].getComponent(Health).current;
-      console.log(health);
       entityGenerator.createPlayer(playerEntity, { x: 0, y: 0 }, health);
     } else {
       entityGenerator.createPlayer(playerEntity, { x: 0, y: 0 });
