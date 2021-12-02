@@ -20,6 +20,11 @@ import shopMusic from '../Assets/sounds/shop.mp3';
 import lowhp from '../Assets/sounds/lowHp.mp3';
 import win from '../Assets/sounds/win.mp3';
 import lose from '../Assets/sounds/lose.mp3';
+import vaikea from '../Assets/sounds/vaikea.mp3';
+import ota from '../Assets/sounds/ota.mp3';
+import mitro from '../Assets/sounds/mitro.mp3';
+import scream from '../Assets/sounds/scream.mp3';
+import gowork from '../Assets/sounds/gowork.mp3';
 
 
 const CELLSIZE = 12.1;
@@ -35,6 +40,11 @@ export class Engine {
     this.sounds.registerSound(hurt, false, 0.3);
     this.sounds.registerSound(win, false, 0.5);
     this.sounds.registerSound(lose, false, 0.5);
+    this.sounds.registerSound(vaikea, false, 0.5);
+    this.sounds.registerSound(ota, false, 0.5);
+    this.sounds.registerSound(mitro, false, 0.5);
+    this.sounds.registerSound(gowork, false, 0.5);
+    this.sounds.registerSound(scream, false, 0.5);
     this.sounds.setVolume(0.5);
 
     this.inputManager = new InputManager();
@@ -209,8 +219,19 @@ export class Engine {
   updateScore() {
     this.score += 5;
     this.setScore(this.score);
+    if (this.score == 50){
+      this.sounds.playSound('vaikea');
+    } if (this.score == 100){
+      this.sounds.playSound('ota');
+    }
+      if (this.score == 150){
+        this.sounds.playSound('mitro');
+     }if (this.score == 200){
+      this.sounds.playSound('scream');
+    } if (this.score == 1000){
+        this.sounds.playSound('gowork');
+     }
   }
-
   prepareNextStage() {
     if (this.currentStage === 0) return;
     this.stages = [];
