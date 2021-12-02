@@ -134,11 +134,10 @@ export class Engine {
       .addComponent(Grid, { cells: grid, bounds: bounds })
       .addComponent(Shop);
 
-    const healthEntity = world.createEntity();
 
     for (let i = 0; i < this.level; i++) {
       const position = { x: this.level + 2, y: this.level + 2 }
-      entityGenerator.createHealth(healthEntity, position)
+      entityGenerator.createHealth(world.createEntity(), position)
     }
 
     this.addLight([5, 5, 2], scene);
@@ -243,18 +242,18 @@ export class Engine {
   updateScore() {
     this.score += 5;
     this.setScore(this.score);
-    if (this.score == 50){
+    if (this.score == 50) {
       this.sounds.playSound('vaikea');
-    } if (this.score == 100){
+    } if (this.score == 100) {
       this.sounds.playSound('ota');
     }
-      if (this.score == 150){
-        this.sounds.playSound('mitro');
-     }if (this.score == 200){
+    if (this.score == 150) {
+      this.sounds.playSound('mitro');
+    } if (this.score == 200) {
       this.sounds.playSound('scream');
-    } if (this.score == 1000){
-        this.sounds.playSound('gowork');
-     }
+    } if (this.score == 1000) {
+      this.sounds.playSound('gowork');
+    }
   }
   prepareNextStage() {
     if (this.currentStage === 0) return;
