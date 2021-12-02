@@ -27,6 +27,7 @@ export const checkCollisionCase = (entity1, entity2, world) => {
       const health = entity2.getMutableComponent(Health);
       health.current += 20;
       console.log((health.current));
+      entity1.addComponent(Dead)
       return false;
     }
   }
