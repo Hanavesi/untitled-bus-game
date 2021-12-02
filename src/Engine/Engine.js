@@ -1,7 +1,7 @@
 import { World } from "ecsy";
 import * as THREE from "three";
 import { Vector2 } from "three";
-import { Input, CameraComponent, Mouse, Grid, Level, Shop, Bus } from "./ECS/Components";
+import { Input, CameraComponent, Mouse, Grid, Level, Shop, Bus, AddHealth } from "./ECS/Components";
 import { initWorld } from "./ECS/Initializer";
 import { InputManager } from "./InputManager";
 import { ModelManager } from "./ModelManager";
@@ -109,10 +109,16 @@ export class Engine {
       grid[i] = column;
     }
 
+
     const entity = world.createEntity();
     entity
       .addComponent(Grid, { cells: grid, bounds: bounds })
       .addComponent(Shop);
+
+    for (let i = 0; i < this.level; i++) {
+      const position = { x: this.level + 2, y: this.level + 2 }
+      entityGenerator.createHealth(entity, position)
+    }
 
     this.addLight([5, 5, 2], scene);
     this.addLight([-5, 5, 2], scene);

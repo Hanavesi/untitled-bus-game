@@ -1,6 +1,6 @@
 import { FiniteStateMachine } from "../FSM";
 import { SkinInstance } from "../SkinInstance";
-import { Object3D, Playable, Vectors, HitBox, StateMachine, Enemy, Health, Bullet, Gun, TimeToLive, Tile, Sleeping, SpawnPoint } from "../ECS/Components";
+import { Object3D, Playable, Vectors, HitBox, StateMachine, Enemy, Health, Bullet, Gun, TimeToLive, Tile, Sleeping, SpawnPoint, AddHealth } from "../ECS/Components";
 import * as THREE from 'three';
 
 export class EntityGenerator {
@@ -132,5 +132,17 @@ export class EntityGenerator {
       entity.addComponent(SpawnPoint);
     };
     return entity;
+  }
+
+  createHealth(entity, position) {
+    const healthMaterial = new THREE.SpriteMaterial({ color: 0xff0000 });
+    const health = new THREE.Sprite(healthMaterial);
+    health.scale.set(1.5, 1.5, 1);
+    health.position.set(position.x, position.y, 1);
+    this.scene.add(health);
+    entity
+      .addComponent(Object3D, { object: { moveRoot: health } })
+      .addComponent(HitBox, { size: new THREE.Vector2(0.5, 0.5), offset: new THREE.Vector2() })
+      .addComponent(AddHealth)
   }
 }

@@ -9,6 +9,7 @@ export class Dead extends TagComponent { }
 export class Shop extends TagComponent { }
 export class Bus extends TagComponent { }
 export class SpawnPoint extends TagComponent { }
+export class AddHealth extends TagComponent { }
 
 
 
@@ -110,3 +111,6 @@ Level.schema = {
     maxEnemies: { type: Types.Number },
     enemiesSpawned: { type: Types.Number }
 }
+
+
+

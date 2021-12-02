@@ -127,7 +127,12 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
       newBus.lastUpdate = timeStamp;
       newBus.drst = drst;
       const marker = newBus.marker;
-      marker.setLatLng([lat, long]);
+      try {
+        marker.setLatLng([lat, long]);
+      } catch (e) {
+        console.log(e);
+        alert(`${lat}, ${long}`)
+      }
     } else {
       const marker = new L.Marker([lat, long], { icon: busIcon }).addTo(map).bindPopup('no data');
       newBus = {

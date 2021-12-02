@@ -1,4 +1,4 @@
-import { Bullet, Dead, Health, Playable, Tile } from "../ECS/Components";
+import { AddHealth, Bullet, Dead, Health, Playable, Tile } from "../ECS/Components";
 
 /**
  * updates entities' statuses according to entity types
@@ -19,6 +19,16 @@ export const checkCollisionCase = (entity1, entity2, world) => {
     }
 
     return false;
+  }
+
+  if (entity2.hasComponent(Playable)) {
+    if (entity1.hasComponent(AddHealth)) {
+      console.log('pelaaja entity2, healtti entity1');
+      const health = entity2.getMutableComponent(Health);
+      health.current += 20;
+      console.log((health.current));
+      return false;
+    }
   }
   return true;
 }

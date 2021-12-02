@@ -1,5 +1,5 @@
 import { System } from "ecsy";
-import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, Gun, Grid, Tile, Dead, Level, Sleeping, TimeToLive, Shop, Bus, SpawnPoint } from "./Components";
+import { Object3D, Playable, Vectors, Input, HitBox, StateMachine, CameraComponent, Enemy, Health, Mouse, Bullet, Gun, Grid, Tile, Dead, Level, Sleeping, TimeToLive, Shop, Bus, SpawnPoint, AddHealth } from "./Components";
 import { Vector3, Vector2 } from "three";
 import { DynamicRectToRect, ResolveDynamicRectToRect, getGridPosition } from "../Util/Collisions";
 import { checkCollisionCase } from "../Util/CollisionCases";
@@ -402,6 +402,8 @@ export class CollisionSystem extends System {
             if (entity1.hasComponent(Bullet) && entity2.hasComponent(Bullet)) continue collision;
             if (entity1.hasComponent(Bullet) && entity2.hasComponent(SpawnPoint)) continue collision;
             if (entity2.hasComponent(Dead)) continue collision;
+            if (entity1.hasComponent(AddHealth)) continue cellEntities;
+
 
             // temp skip when target is not tile
             //if (!entity2.hasComponent(Tile)) continue collision;
