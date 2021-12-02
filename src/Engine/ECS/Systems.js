@@ -91,13 +91,19 @@ export class HealthSystem extends System {
       const scale = (current / max);
       healthBar.bar.scale.set(scale * 5, 0.2, 1);
       healthBar.bar.position.x = (scale * 5 - 5) / 2;
-      if (healthBar.current < 0) {
+      if (current < 0) {
         healthBar.current = 0;
         entity.addComponent(Dead);
         if (entity.hasComponent(Playable)) {
           this.world.stop()
         }
       };
+      if (entity.hasComponent(Playable)) {
+        if (scale < 0.3)
+          !this.world.sounds.isPlaying('lowHp') && this.world.sounds.playSound('lowHp');
+        else
+          this.world.sounds.stopSound('lowHp');
+      }
     }
   }
 }
@@ -235,40 +241,40 @@ ControlEnemySystem.queries = {
 
 export class EnemySpawnerSystem extends System {
 
-  execute() {
+  execute(delta) {
     const stage = this.queries.stages.results[0];
+    if (stage === undefined) return;
+    const level = stage.getMutableComponent(Level);
     const enemies = this.queries.enemies.results;
     const spawnPoints = this.queries.spawnPoints.results;
     const num = spawnPoints.length;
 
     if (num === 0) return;
 
-    if (stage.hasComponent(Bus)) {
-      const level = stage.getComponent(Level).stageNumber;
-      //console.log(level);
-      //console.log('on bussissa');
+    if (level.enemiesSpawned >= level.maxEnemies) return;
 
-      // Adds more enemies if count drops to less than 2
-      if (enemies.length < 2) {
-        // Adds enemies based on level and multiplies it with 2 to make levels 
-        // exponentially harder for now
-        for (let i = 0; i < (level * 2); i++) {
-          const spawn = Math.floor(Math.random() * num);
-          const tile = spawnPoints[spawn];
-          const pos = tile.getComponent(Object3D).object.moveRoot.position;
-          const x = pos.x;
-          const y = pos.y;
-          let entity = this.world.createEntity();
-          this.world.generator.createSoldier(entity, new Vector2(x, y));
-        }
-      }
+    level.lastSpawn += delta;
+
+    // Adds more enemies if count drops to less than 2
+    if (enemies.length < level.spawnLimit && level.lastSpawn >= level.spawnRate) {
+      level.lastSpawn = 0;
+      level.enemiesSpawned++;
+
+      const rand = Math.random();
+      const spawn = Math.floor(rand * num);
+      const tile = spawnPoints[spawn];
+      const pos = tile.getComponent(Object3D).object.moveRoot.position;
+      const x = pos.x;
+      const y = pos.y;
+      let entity = this.world.createEntity();
+      this.world.generator.createSoldier(entity, new Vector2(x, y), 5);
     }
   }
 }
 
 EnemySpawnerSystem.queries = {
   enemies: { components: [Enemy] },
-  stages: { components: [Grid] },
+  stages: { components: [Bus] },
   spawnPoints: { components: [SpawnPoint] }
 }
 

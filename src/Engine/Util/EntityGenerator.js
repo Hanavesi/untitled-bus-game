@@ -60,7 +60,7 @@ export class EntityGenerator {
       .addComponent(Sleeping, { tts: 30, time: 0 });
   }
 
-  createSoldier(entity, position) {
+  createSoldier(entity, position, sleep = 60) {
     const object = new SkinInstance(this.modelManager.models['soldier'], this.scene);
     const barrel = object.moveRoot.getObjectByName('barrel');
     object.moveRoot.position.x = position.x;
@@ -102,7 +102,7 @@ export class EntityGenerator {
       .addComponent(Enemy)
       .addComponent(Health, { max: 100, current: 100, bar: health })
       .addComponent(Gun, { barrel: barrel, cooldown: 0.2, lastShot: 0 })
-      .addComponent(Sleeping, { tts: 60, time: 0 });
+      .addComponent(Sleeping, { tts: sleep, time: 0 });
   }
 
   createBullet(entity, position, direction, speed, launchVelocity) {
