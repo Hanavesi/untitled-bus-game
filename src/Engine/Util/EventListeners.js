@@ -25,6 +25,7 @@ export const getEventListeners = (engine) => {
       'resize',
       () => {
         const canvas = document.getElementById("gameCanvas");
+        if (!canvas) return;
         const width = canvas.clientWidth;
         const height = canvas.clientHeight;
         engine.onWindowResize(width, height);

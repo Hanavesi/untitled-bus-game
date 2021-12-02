@@ -136,7 +136,11 @@ export class Engine {
 
 
     for (let i = 0; i < this.level; i++) {
-      const position = { x: this.level + 2, y: this.level + 2 }
+      const x = Math.ceil(Math.random() * 5) * (Math.round(Math.random()) ? 1 : -1)
+      const y = Math.ceil(Math.random() * 5) * (Math.round(Math.random()) ? 1 : -1)
+
+      const position = { x: x, y: y }
+
       entityGenerator.createHealth(world.createEntity(), position)
     }
 
