@@ -26,7 +26,7 @@ const CELLSIZE = 12.1;
 
 export class Engine {
 
-  constructor(canvas, width, height, onReady, setScore, endGame) {
+  constructor(canvas, width, height, onReady, setScore, setLevel, endGame) {
     this.sounds = new SoundController();
     this.sounds.registerSound(busMusic, true, 0.05);
     this.sounds.registerSound(lowhp, true, 0.3);
@@ -61,6 +61,7 @@ export class Engine {
     this.level = 1;
     this.score = 0;
     this.setScore = setScore;
+    this.setLevel = setLevel;
     this.endGame = endGame;
     this.players = [];
 
@@ -232,6 +233,7 @@ export class Engine {
     if (this.currentStage === 0) return;
     this.stages = [];
     this.level += 1;
+    this.setLevel(this.level);
     this.init()
   }
 

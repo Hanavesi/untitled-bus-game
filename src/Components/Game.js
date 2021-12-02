@@ -13,6 +13,7 @@ export function Game({ mqttHandler }) {
   const [ready, setReady] = useState(false);
   const [showGame, setShowGame] = useState(false);
   const [score, setScore] = useState(0);
+  const [level, setLevel] = useState(1);
   const engine = useRef(null);
   const visible = { visibility: 'visible' };
   const hidden = { visibility: 'hidden' };
@@ -22,7 +23,7 @@ export function Game({ mqttHandler }) {
     const canvas = document.getElementById("gameCanvas");
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
-    engine.current = new Engine(canvas, width, height, setReady, setScore, setGameStatus);
+    engine.current = new Engine(canvas, width, height, setReady, setScore, setLevel, setGameStatus);
     const eventListeners = getEventListeners(engine.current);
     addEventListeners(eventListeners);
 
@@ -86,7 +87,7 @@ export function Game({ mqttHandler }) {
     <div id="gameContainer">
       <div className="score">
       <canvas id="gameCanvas" style={showGame ? visible : hidden} />
-      <GameStats score={score} style={showGame ? visible : hidden} />
+      <GameStats score={score} level={level} style={showGame ? visible : hidden} />
       </div>
       {
         ready ?
