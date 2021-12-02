@@ -166,8 +166,8 @@ export class Engine {
     world.updateScore = () => this.updateScore();
 
     const playerEntity = world.createEntity();
-    if (this.players[0]) {
-      const health = this.players[0].getComponent(Health).current;
+    if (this.players[1]) {
+      const health = this.players[1].getComponent(Health).current;
       entityGenerator.createPlayer(playerEntity, { x: 0, y: 0 }, health);
     } else {
       entityGenerator.createPlayer(playerEntity, { x: 0, y: 0 });
