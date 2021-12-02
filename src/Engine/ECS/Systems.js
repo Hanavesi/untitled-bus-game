@@ -113,11 +113,11 @@ HealthSystem.queries = {
 }
 
 export class SleepingSystem extends System {
-  execute() {
+  execute(delta) {
     const entities = this.queries.entities.results;
     for (const entity of entities) {
       const sleep = entity.getMutableComponent(Sleeping);
-      sleep.time += 1;
+      sleep.time += delta;
       if (sleep.time > sleep.tts) {
         entity.removeComponent(Sleeping);
       }
@@ -265,9 +265,9 @@ export class EnemySpawnerSystem extends System {
       const tile = spawnPoints[spawn];
       const pos = tile.getComponent(Object3D).object.moveRoot.position;
       const x = pos.x;
-      const y = pos.y;
+      const y = pos.y - 1;
       let entity = this.world.createEntity();
-      this.world.generator.createSoldier(entity, new Vector2(x, y), 5);
+      this.world.generator.createSoldier(entity, new Vector2(x, y), level.spawnRate / 2);
     }
   }
 }

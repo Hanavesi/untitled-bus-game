@@ -67,12 +67,16 @@ export function Game({ mqttHandler }) {
   }
 
   if (gameStatus === 'won') {
+    engine.current.sounds.stop();
+    engine.current.sounds.playSound('win');
     return (
       <YouWon score={score} />
     )
   }
 
   if (gameStatus === 'lost') {
+    engine.current.sounds.stop();
+    engine.current.sounds.playSound('lose');
     return (
       <GameOver score={score} />
     )

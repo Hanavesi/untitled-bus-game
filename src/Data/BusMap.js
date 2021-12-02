@@ -117,17 +117,17 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
     const busId = vehicleNumber + operatorId;
     const busTopic = `/hfp/v2/journey/ongoing/+/bus/${oper}/${vehicleNumber}/#`;
 
+    if (isNaN(lat) || isNaN(long)) {
+      return;
+    }
+
     let newBus;
     if (busId in buses) {
       newBus = buses[busId];
       newBus.lastUpdate = timeStamp;
       newBus.drst = drst;
       const marker = newBus.marker;
-      if (lat === undefined || long === undefined) {
-        return;
-      } else {
-        marker.setLatLng([lat, long]);
-      }
+      marker.setLatLng([lat, long]);
     } else {
       const marker = new L.Marker([lat, long], { icon: busIcon }).addTo(map).bindPopup('no data');
       newBus = {
@@ -160,7 +160,8 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
       dragging: false,
       zoomControl: false,
       scrollWheelZoom: false,
-      doubleClickZoom: false })
+      doubleClickZoom: false
+    })
       .setView([current_lat, current_long], 14);
 
     L.tileLayer("http://a.tile.stamen.com/toner/{z}/{x}/{y}@2x.png", {

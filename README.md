@@ -60,8 +60,8 @@
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <!-- <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li> -->
   </ol>
 </details>
 
@@ -200,10 +200,10 @@ Three.js is used to draw everything on the screen except the map. It allows easy
   - Leaflet map
 - [x] Adding Entity-Component-System
   - components, systems, initializer etc.
-- [ ] Collisions
+- [x] Collisions
   - [x] Bullets-to-any
-  - [ ] Player-to-Enemy
-  - [ ] Enemy-to-Enemy
+  - [x] Player-to-Enemy
+  - [x] Enemy-to-Enemy
 - [x] Health & Damage system
   - Health bar and damage loss
 - [ ] Bus messages determines the stages
@@ -216,9 +216,9 @@ Three.js is used to draw everything on the screen except the map. It allows easy
 - [ ] Stages
   - [x] Randomize tiles
     - [ ] Randomize shape
-  - [ ] Enemy spawn system
-- [ ] Score system
-  - Get scores by beating levels and/or defeating enemies
+  - [x] Enemy spawn system
+- [x] Score system
+  - [ ] Get scores by beating levels and/or defeating enemies
 - [ ] Shop
   - [x] Tiles created
   - Safe haven between stages
@@ -259,13 +259,13 @@ Don't forget to give the project a star! Thanks again!
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See ![LICENSE.txt](https://github.com/Hanavesi/untitled-bus-game/blob/main/LICENSE.txt) for more information.
+Distributed under the MIT License. See [LICENSE](LICENSE.txt) for more information.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
 
-<!-- CONTACT -->
+<!-- CONTACT 
 ## Contact
 
 - Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
@@ -273,10 +273,10 @@ Distributed under the MIT License. See ![LICENSE.txt](https://github.com/Hanaves
 Project Link: [https://github.com/Hanavesi/untitled-bus-game](https://github.com/Hanavesi/untitled-bus-game)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+-->
 
 
-
-<!-- ACKNOWLEDGMENTS -->
+<!-- ACKNOWLEDGMENTS 
 ## Acknowledgments
 
 * []()
@@ -284,7 +284,7 @@ Project Link: [https://github.com/Hanavesi/untitled-bus-game](https://github.com
 * []()
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
+-->
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
