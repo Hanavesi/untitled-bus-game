@@ -1,7 +1,7 @@
 import { World } from "ecsy";
 import * as THREE from "three";
 import { Vector2 } from "three";
-import { Input, CameraComponent, Mouse, Grid, Level, Shop, Bus } from "./ECS/Components";
+import { Input, CameraComponent, Mouse, Grid, Level, Shop, Bus, Health } from "./ECS/Components";
 import { initWorld } from "./ECS/Initializer";
 import { InputManager } from "./InputManager";
 import { ModelManager } from "./ModelManager";
@@ -31,7 +31,7 @@ const CELLSIZE = 12.1;
 
 export class Engine {
 
-  constructor(canvas, width, height, onReady, setScore, endGame) {
+  constructor(canvas, width, height, onReady, setScore, setLevel, endGame) {
     this.sounds = new SoundController();
     this.sounds.registerSound(busMusic, true, 0.05);
     this.sounds.registerSound(lowhp, true, 0.3);
@@ -71,7 +71,9 @@ export class Engine {
     this.level = 1;
     this.score = 0;
     this.setScore = setScore;
+    this.setLevel = setLevel;
     this.endGame = endGame;
+    this.players = [];
 
     this.modelManager = new ModelManager();
     this.modelManager.setModels(['knight', 'soldier', 'uzi']);
@@ -93,7 +95,14 @@ export class Engine {
     world.sounds = this.sounds;
     world.updateScore = () => this.updateScore();
 
-    entityGenerator.createPlayer(world.createEntity(), { x: 0, y: 0 });
+    const playerEntity = world.createEntity();
+    if (this.players[1]) {
+      const health = this.players[1].getComponent(Health).current;
+      entityGenerator.createPlayer(playerEntity, { x: 0, y: 0 }, health);
+    } else {
+      entityGenerator.createPlayer(playerEntity, { x: 0, y: 0 });
+    }
+    this.players[1] = playerEntity;
 
     const { meshes, bounds } = mapToMeshes(SHOP_MAP);
     for (const tile of meshes) {
@@ -145,7 +154,14 @@ export class Engine {
     world.sounds = this.sounds;
     world.updateScore = () => this.updateScore();
 
-    entityGenerator.createPlayer(world.createEntity(), { x: 0, y: 0 });
+    const playerEntity = world.createEntity();
+    if (this.players[0]) {
+      const health = this.players[0].getComponent(Health).current;
+      entityGenerator.createPlayer(playerEntity, { x: 0, y: 0 }, health);
+    } else {
+      entityGenerator.createPlayer(playerEntity, { x: 0, y: 0 });
+    }
+    this.players[0] = playerEntity;
 
     const { meshes, bounds } = mapToMeshes(MAP_TEST);
     for (const tile of meshes) {
@@ -236,6 +252,7 @@ export class Engine {
     if (this.currentStage === 0) return;
     this.stages = [];
     this.level += 1;
+    this.setLevel(this.level);
     this.init()
   }
 
@@ -301,6 +318,9 @@ export class Engine {
     this.sounds.stopSound('bus');
     if (!this.sounds.isPlaying('shop'))
       this.sounds.playSound('shop');
+
+    const currentHealth = this.players[0].getComponent(Health).current;
+    this.players[1].getMutableComponent(Health).current = currentHealth;
   }
 
   enterBus() {
@@ -309,6 +329,9 @@ export class Engine {
     this.sounds.stopSound('shop');
     if (!this.sounds.isPlaying('bus'))
       this.sounds.playSound('bus');
+
+    const currentHealth = this.players[0].getComponent(Health).current;
+    this.players[1].getMutableComponent(Health).current = currentHealth;
   }
 
   addLight(pos, scene) {
