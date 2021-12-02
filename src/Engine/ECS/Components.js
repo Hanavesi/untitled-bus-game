@@ -104,5 +104,9 @@ Sleeping.schema = {
 export class Level extends Component { }
 
 Level.schema = {
-    stageNumber: { type: Types.Number }
+    spawnRate: { type: Types.Number },
+    lastSpawn: { type: Types.Number },
+    spawnLimit: { type: Types.Number },
+    maxEnemies: { type: Types.Number },
+    enemiesSpawned: { type: Types.Number }
 }

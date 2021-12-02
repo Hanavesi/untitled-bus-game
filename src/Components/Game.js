@@ -29,8 +29,8 @@ export function Game({ mqttHandler }) {
     return (() => {
       mqttHandler.disconnect();
       removeEventListeners(eventListeners);
-      engine.current.sounds.stop();
       engine.current.running = false;
+      engine.current.sounds.stop();
     });
   }, []);
 
@@ -62,7 +62,7 @@ export function Game({ mqttHandler }) {
       console.log('bussi saapui PÄÄTTÄRILLE');
       mqttHandler.unsubscribeAll();
       mqttHandler.disconnect();
-      setGameStatus('won')
+      setGameStatus('won');
     }
   }
 
@@ -99,11 +99,6 @@ export function Game({ mqttHandler }) {
       }
     </div>
   );
-
-
-
-
-
 }
 
 export default Game;

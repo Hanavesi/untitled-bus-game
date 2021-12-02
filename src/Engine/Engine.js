@@ -17,6 +17,7 @@ import busMusic from '../Assets/sounds/bus.mp3';
 import hurt from '../Assets/sounds/hurt.wav';
 import piu from '../Assets/sounds/piu.mp3';
 import shopMusic from '../Assets/sounds/shop.mp3';
+import lowhp from '../Assets/sounds/lowHp.mp3';
 
 
 const CELLSIZE = 12.1;
@@ -26,6 +27,7 @@ export class Engine {
   constructor(canvas, width, height, onReady, setScore, endGame) {
     this.sounds = new SoundController();
     this.sounds.registerSound(busMusic, true, 0.05);
+    this.sounds.registerSound(lowhp, true, 0.3);
     this.sounds.registerSound(shopMusic, true);
     this.sounds.registerSound(piu, false, 0.05);
     this.sounds.registerSound(hurt, false, 0.3);
@@ -158,7 +160,7 @@ export class Engine {
     const entity = world.createEntity();
     entity
       .addComponent(Grid, { cells: grid, bounds: bounds })
-      .addComponent(Level, { stageNumber: this.level })
+      .addComponent(Level, { spawnRate: 2 / (1 + this.level), lastSpawn: 0, spawnLimit: this.level * 2, maxEnemies: this.level * 15, enemiesSpawned: 0 })
       .addComponent(Bus);
 
     this.addLight([5, 5, 2], scene);
@@ -206,6 +208,7 @@ export class Engine {
   }
 
   prepareNextStage() {
+    if (this.currentStage === 0) return;
     this.stages = [];
     this.level += 1;
     this.init()
