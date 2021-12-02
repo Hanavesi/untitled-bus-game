@@ -86,8 +86,8 @@ export function Game({ mqttHandler }) {
   return (
     <div id="gameContainer">
       <div className="score">
-      <canvas id="gameCanvas" style={showGame ? visible : hidden} />
-      <GameStats score={score} level={level} style={showGame ? visible : hidden} />
+      <canvas id="gameCanvas" style={showGame ? visible : visible} />
+      <GameStats score={score} level={level} style={showGame ? visible : visible} />
       </div>
       {
         ready ?
