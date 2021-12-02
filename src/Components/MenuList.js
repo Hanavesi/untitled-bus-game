@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 export default function MenuList() {
   return (
     <div>
+      
+        <h1 className="otsikko">UNTITLED BUS GAME</h1>
+      
       <Link className="text-link" to="/Game">
         <button className="menuButton">Game</button>
       </Link>{' '}

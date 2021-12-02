@@ -29,8 +29,8 @@ export function Game({ mqttHandler }) {
     return (() => {
       mqttHandler.disconnect();
       removeEventListeners(eventListeners);
-      engine.current.running = false;
       engine.current.sounds.stop();
+      engine.current.running = false;
     });
   }, []);
 
@@ -62,7 +62,7 @@ export function Game({ mqttHandler }) {
       console.log('bussi saapui PÄÄTTÄRILLE');
       mqttHandler.unsubscribeAll();
       mqttHandler.disconnect();
-      setGameStatus('won');
+      setGameStatus('won')
     }
   }
 
@@ -80,9 +80,10 @@ export function Game({ mqttHandler }) {
 
   return (
     <div id="gameContainer">
-      <canvas id="gameCanvas" style={showGame ? visible : visible} />
-      <GameStats score={score} style={showGame ? visible : visible} />
-     
+      <div className="score">
+      <canvas id="gameCanvas" style={showGame ? visible : hidden} />
+      <GameStats score={score} style={showGame ? visible : hidden} />
+      </div>
       {
         ready ?
           <div>
@@ -100,6 +101,11 @@ export function Game({ mqttHandler }) {
       }
     </div>
   );
+
+
+
+
+
 }
 
 export default Game;

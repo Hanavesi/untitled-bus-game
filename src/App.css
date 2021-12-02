@@ -7,6 +7,15 @@ body {
   user-select: none;
 }
 
+.otsikko{
+  font-size: 75px;
+  margin-left: -175px;
+  margin-bottom: 100px;
+  color: #ffffff;
+  font-family: 'Games', sans-serif;
+  text-align: center;
+ }
+
 .menuButton {
   width: 380px;
   height: 86px;
@@ -20,6 +29,7 @@ body {
   line-height: 88px;
   outline: transparent;
   position: relative;
+  justify-content: center;
 }
 .backButton {
   font-size: 40px;
@@ -62,6 +72,9 @@ body {
   letter-spacing: 5px;
   text-align: center;
 }
+
+
+
 .Juuso {
   color: gold;
 }
