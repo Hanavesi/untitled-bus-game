@@ -18,6 +18,7 @@ import hurt from '../Assets/sounds/hurt.wav';
 import piu from '../Assets/sounds/piu.mp3';
 import shopMusic from '../Assets/sounds/shop.mp3';
 import lowhp from '../Assets/sounds/lowHp.mp3';
+import win from '../Assets/sounds/win.mp3';
 
 
 const CELLSIZE = 12.1;
@@ -31,6 +32,7 @@ export class Engine {
     this.sounds.registerSound(shopMusic, true);
     this.sounds.registerSound(piu, false, 0.05);
     this.sounds.registerSound(hurt, false, 0.3);
+    this.sounds.registerSound(win, false, 0.5);
     this.sounds.setVolume(0.5);
 
     this.inputManager = new InputManager();
