@@ -75,6 +75,8 @@ export function Game({ mqttHandler }) {
   }
 
   if (gameStatus === 'lost') {
+    engine.current.sounds.stop();
+    engine.current.sounds.playSound('lose');
     return (
       <GameOver score={score} />
     )
