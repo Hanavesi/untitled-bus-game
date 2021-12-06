@@ -204,6 +204,7 @@ Three.js is used to draw everything on the screen except the map. It allows easy
   - [x] Bullets-to-any
   - [x] Player-to-Enemy
   - [x] Enemy-to-Enemy
+  - [ ] Enemy bullets don't hit enemies
 - [x] Health & Damage system
   - Health bar and damage loss
 - [ ] Bus messages determines the stages
@@ -224,8 +225,8 @@ Three.js is used to draw everything on the screen except the map. It allows easy
   - Safe haven between stages
   - [x] Items to buy/get
     - Health
-    Guns
-    More items
+    - Guns
+    - More items
 - [x] Game over
 - [x] Game win
 - [ ] Different kind of enemies
