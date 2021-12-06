@@ -113,6 +113,8 @@ The game's course is based on [HSL](https://www.hsl.fi/) bus data gathered from 
 <!-- This is an example of how you may give instructions on setting up your project locally. -->
 To get a local copy up and running follow these simple example steps.
 
+We recommend using a Chromium-based browser for optimal performance when trying out the game.
+
 ### Prerequisites
 
 * npm
