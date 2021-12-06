@@ -119,7 +119,7 @@ export class EntityGenerator {
       .addComponent(Vectors, { direction: dir, speed: speed, velocity: vel })
       .addComponent(HitBox, { size: new THREE.Vector2(0.3, 0.3), offset: new THREE.Vector2() })
       .addComponent(Bullet)
-      .addComponent(TimeToLive, { age: 0, max: 0.5 });
+      .addComponent(TimeToLive, { age: 0, max: 1.2 });
   }
 
   createTile(entity, tile, size, spawnPoint = false) {
