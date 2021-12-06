@@ -148,7 +148,7 @@ To get a local copy up and running follow these simple example steps.
 
 ![bus map](/src/Assets/images/busmap.png)
 
-8. Click `press me` and game begins, have fun :)
+8. Click `Protect this bus!` and game begins, have fun :)
 
 ![stage](/src/Assets/images/stage.png)
 
