@@ -30,7 +30,7 @@ export class MqttHandler {
     setMessageCallback = (messageCallback) => {
         this.client.on("message", (topic, message) => {
             const payload = { topic, message: message.toString() };
-            if (payload.topic) {
+            if (payload.topic && payload.message) {
                 messageCallback(payload.message, payload.topic);
             }
         });

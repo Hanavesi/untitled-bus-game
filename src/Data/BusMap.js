@@ -34,7 +34,7 @@ const busIcon = new L.Icon({
 
   iconSize: [40, 40],
   iconAnchor: [20, 30],
-  popupAnchor: [5, -25]
+  popupAnchor: [0, -20]
 
 });
 
@@ -96,7 +96,7 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
     });
   }
 
-  const onMessage = (message, topic) => {
+  const onMessage = async (message, topic) => {
     const timeStamp = Date.now();
     const topicData = topic.split('/');
     const destination = topicData[11];
@@ -128,10 +128,13 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
       newBus.drst = drst;
       const marker = newBus.marker;
       try {
-        marker.setLatLng([lat, long]);
+        await marker.setLatLng([lat, long]);
       } catch (e) {
-        console.log(e);
-        alert(`${lat}, ${long}`)
+        console.log(e.message);
+        //alert(`${lat}, ${long}`)
+        if (lat === null && long === null) {
+          marker.setLatLng([newBus.lat, newBus.long])
+        }
       }
     } else {
       const marker = new L.Marker([lat, long], { icon: busIcon }).addTo(map).bindPopup('no data');
