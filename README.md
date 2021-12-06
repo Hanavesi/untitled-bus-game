@@ -81,7 +81,7 @@ This is the repository for the frontend solution of a group project that is a pa
 - Niko Lindgren
 
 ## Game concept
-The player plays as the character Pepe and is living in a post-apocalytpic world where monsters are everywhere. There are only a few places that are safe from these monsters and the transport system between them, which the player traverses.
+The player plays as the character Pepe and is living in a post-apocalytpic world where monsters are everywhere. There are only a few places that are safe from these monsters and the transport system between them, which the player traverses. Get on to the bus and survive!
 
 The game's course is based on [HSL](https://www.hsl.fi/) bus data gathered from [Digitransit](https://digitransit.fi/) with mqtt and possibly other to be decided methods. The player is put into a bus and while the bus is travelling, he must fight off monsters. When the bus stops, the player gets to rest and gather/buy power-ups.
 
@@ -144,7 +144,7 @@ To get a local copy up and running follow these simple example steps.
 
 6. Start the game via `Game`
 
-7. Choose  your bus
+7. Choose your bus
 
 ![bus map](/src/Assets/images/busmap.png)
 
