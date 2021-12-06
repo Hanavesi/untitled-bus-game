@@ -22,7 +22,7 @@ export default function GameStats(props) {
           left: '30%',
           width: '10vw',
           minWidth: '200px',
-          height: '65px',
+          height: '60px',
           margin: 'auto',
           zIndex: 2,
           backgroundColor: 'black',
@@ -31,8 +31,8 @@ export default function GameStats(props) {
           borderTopRightRadius: '40px', //makes the round effect
           ...props.style
         }}>
-        <p style={{ flex: 3, textAlign: 'center' }}>Score</p>
-        <p style={{ flex: 1 }} id='score'>{score}</p>
+        <p style={{ flex: 4, textAlign: 'center' }}>Score</p>
+        <p style={{ flex: 2, textAlign: 'left' }} id='score'>{score}</p>
       </div>
       <div
         style={{
@@ -44,7 +44,7 @@ export default function GameStats(props) {
           right: '30%',
           width: '10vw',
           minWidth: '200px',
-          height: '65px',
+          height: '60px',
           margin: 'auto',
           zIndex: 2,
           backgroundColor: 'black',
@@ -53,8 +53,8 @@ export default function GameStats(props) {
           borderTopRightRadius: '40px', //makes the round effect
           ...props.style
         }}>
-        <p style={{ flex: 3, textAlign: 'center' }}>Level</p>
-        <p style={{ flex: 1 }} id='score'>{level}</p>
+        <p style={{ flex: 4, textAlign: 'center' }}>Level</p>
+        <p style={{ flex: 2, textAlign: 'left' }} id='score'>{level}</p>
       </div>
     </div>
   );

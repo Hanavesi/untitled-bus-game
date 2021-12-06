@@ -81,9 +81,9 @@ This is the repository for the frontend solution of a group project that is a pa
 - Niko Lindgren
 
 ## Game concept
-The player plays as the character Pepe and is living in a post-apocalytpic world where monsters are everywhere. There are only a few places that are safe from these monsters and the transport system between them, which the player traverses.
+The player plays as the character Pepe and is living in a post-apocalytpic world where monsters are everywhere. There are only a few places that are safe from these monsters and the transport system between them, which the player traverses. Get on to the bus and survive!
 
-The game's course is based on [HSL](https://www.hsl.fi/) bus data gathered from [Digitransit](https://digitransit.fi/) with mqtt and possibly other to be decided methods. The player is put into a bus and while the bus is travelling, he must fight off monsters. When the bus stops, the player gets to rest and gather/buy power-ups.
+The game's course is based on [HSL](https://www.hsl.fi/) bus data gathered from [Digitransit](https://digitransit.fi/) with mqtt and possibly other to be decided methods. The player is put into a bus and while the bus is travelling, he must fight off monsters. When the bus stops, the player gets to rest and gather health when offered.
 
 ![Product Menu Screen Shot](/src/Assets/images/stage.png)
 
@@ -144,11 +144,11 @@ To get a local copy up and running follow these simple example steps.
 
 6. Start the game via `Game`
 
-7. Choose  your bus
+7. Choose your bus
 
 ![bus map](/src/Assets/images/busmap.png)
 
-8. Click `press me` and game begins, have fun :)
+8. Click `Protect this bus!` and game begins, have fun :)
 
 ![stage](/src/Assets/images/stage.png)
 
@@ -218,16 +218,16 @@ Three.js is used to draw everything on the screen except the map. It allows easy
     - [ ] Randomize shape
   - [x] Enemy spawn system
 - [x] Score system
-  - [ ] Get scores by beating levels and/or defeating enemies
+  - [x] Get scores by beating levels and/or defeating enemies
 - [ ] Shop
   - [x] Tiles created
   - Safe haven between stages
-  - [ ] Items to buy/get
+  - [x] Items to buy/get
     - Health
-    - Guns
-    - More items
-- [ ] Game over
-- [ ] Game win
+    Guns
+    More items
+- [x] Game over
+- [x] Game win
 - [ ] Different kind of enemies
 - [ ] Different kind of weapons
 - [ ] Different kind of items

@@ -18,9 +18,6 @@ function HowToPlay() {
             <br />
             <h3>Pick a bus you want to get in, to start the game</h3>
             <br />
-            <h3>While the bus is on bus-stop, you are transferred to store</h3>
-            <br />
-            <h3>You will win if you make it to the final stop</h3>
             <h3>Use
                 <img src={wasdnew}
                     style={{
@@ -35,6 +32,12 @@ function HowToPlay() {
             <br />
             <h3>Use mouse to aim and left-click to shoot</h3>
             <br />
+            <h3>While the bus is on bus-stop, you are transferred to store</h3>
+            <br />
+            <h3>You will win if you make it to the final stop</h3>
+            <br/>
+            <h3>Please use sounds for best gameplay experience</h3>
+            <br/>
             <button onClick={handleRoute} className="backButton">Back</button>
         </div>
     )
