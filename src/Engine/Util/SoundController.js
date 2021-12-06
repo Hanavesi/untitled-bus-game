@@ -1,7 +1,7 @@
 import { Howl, Howler } from 'howler';
 
 export class SoundController {
-  contructor() {
+  constructor() {
     this.sounds = {};
   }
 
@@ -19,26 +19,44 @@ export class SoundController {
     const name = parts[parts.length - 1].split('.')[0];
     this.sounds = {
       ...this.sounds,
-      [name]: howl
+      [name]: {
+        howl: howl,
+        baseVol: volume
+      }
     }
   }
 
   playSound(name) {
     if (this.sounds[name] !== undefined) {
-      this.sounds[name].play();
+      this.sounds[name].howl.play();
+    }
+  }
+
+  focus(focus) {
+    for (const name of Object.keys(this.sounds)) {
+      if (name === focus) continue;
+      const sound = this.sounds[name];
+      sound.howl.volume(0.01);
+    }
+  }
+
+  unfocus() {
+    for (const name of Object.keys(this.sounds)) {
+      const sound = this.sounds[name];
+      sound.howl.volume(sound.baseVol);
     }
   }
 
   isPlaying(name) {
     if (this.sounds[name] !== undefined) {
-      return this.sounds[name].playing();
+      return this.sounds[name].howl.playing();
     }
     return false;
   }
 
   stopSound(name) {
     if (this.sounds[name] !== undefined) {
-      this.sounds[name].stop();
+      this.sounds[name].howl.stop();
     }
   }
 

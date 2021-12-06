@@ -100,12 +100,22 @@ export class HealthSystem extends System {
       };
       if (entity.hasComponent(Playable)) {
         if (scale < 0.3) {
+<<<<<<< HEAD
           !this.world.sounds.isPlaying('lowHp') && this.world.sounds.playSound('lowHp');
           this.world.sounds.stopSound('bus');
           this.world.sounds.stopSound('shop');
+=======
+          if (!this.world.sounds.isPlaying('lowHp')) {
+            this.world.sounds.focus('lowHp');
+            this.world.sounds.playSound('lowHp');
+          }
+        } else {
+          if (this.world.sounds.isPlaying('lowHp')) {
+            this.world.sounds.stopSound('lowHp');
+            this.world.sounds.unfocus();
+          }
+>>>>>>> ea127a11353e19dfcf093357078363975aab7aec
         }
-        else
-          this.world.sounds.stopSound('lowHp');
       }
     }
   }
