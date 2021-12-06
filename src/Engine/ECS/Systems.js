@@ -99,8 +99,11 @@ export class HealthSystem extends System {
         }
       };
       if (entity.hasComponent(Playable)) {
-        if (scale < 0.3)
+        if (scale < 0.3){
           !this.world.sounds.isPlaying('lowHp') && this.world.sounds.playSound('lowHp');
+          this.world.sounds.stopSound('bus');
+          this.world.sounds.stopSound('shop');
+        }
         else
           this.world.sounds.stopSound('lowHp');
       }
