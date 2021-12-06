@@ -168,8 +168,9 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
     })
       .setView([current_lat, current_long], 14);
 
-    L.tileLayer("https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}@2x.png", {
-      attribution: `&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors`,
+    L.tileLayer("https://{s}.tile.thunderforest.com/spinal-map/{z}/{x}/{y}@2x.png?apikey={apikey}", {
+      attribution: `&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`,
+      apikey: '',
       maxZoom: 19,
       tileSize: 512,
       zoomOffset: -1,
