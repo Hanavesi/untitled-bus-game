@@ -168,8 +168,8 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
     })
       .setView([current_lat, current_long], 14);
 
-    L.tileLayer("http://a.tile.stamen.com/toner/{z}/{x}/{y}@2x.png", {
-      attribution: `Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap"</a>`,
+    L.tileLayer("https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}@2x.png", {
+      attribution: `&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors`,
       maxZoom: 19,
       tileSize: 512,
       zoomOffset: -1,
