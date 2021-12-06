@@ -218,16 +218,16 @@ Three.js is used to draw everything on the screen except the map. It allows easy
     - [ ] Randomize shape
   - [x] Enemy spawn system
 - [x] Score system
-  - [ ] Get scores by beating levels and/or defeating enemies
+  - [x] Get scores by beating levels and/or defeating enemies
 - [ ] Shop
   - [x] Tiles created
   - Safe haven between stages
-  - [ ] Items to buy/get
-    - Health
+  - [x] Items to buy/get
+      Health
     - Guns
     - More items
-- [ ] Game over
-- [ ] Game win
+- [x] Game over
+- [x] Game win
 - [ ] Different kind of enemies
 - [ ] Different kind of weapons
 - [ ] Different kind of items
