@@ -90,7 +90,7 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
       if (eventType !== 'VP') return;
       const subData = data[eventType];
       const { long, lat } = subData;
-      if (long !== undefined && lat !== undefined) {
+      if (!(isNaN(lat) || isNaN(long) || lat === null || long === null)) {
         map.setView([lat, long], 16);
       }
     });
@@ -117,7 +117,7 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
     const busId = vehicleNumber + operatorId;
     const busTopic = `/hfp/v2/journey/ongoing/+/bus/${oper}/${vehicleNumber}/#`;
 
-    if (isNaN(lat) || isNaN(long)) {
+    if (isNaN(lat) || isNaN(long) || lat === null || long === null) {
       return;
     }
 
@@ -131,10 +131,6 @@ const BusMap = ({ mqttHandler, gameMessageHandler, initGame }) => {
         await marker.setLatLng([lat, long]);
       } catch (e) {
         console.log(e.message);
-        //alert(`${lat}, ${long}`)
-        if (lat === null && long === null) {
-          marker.setLatLng([newBus.lat, newBus.long])
-        }
       }
     } else {
       const marker = new L.Marker([lat, long], { icon: busIcon }).addTo(map).bindPopup('no data');
