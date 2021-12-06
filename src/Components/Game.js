@@ -47,7 +47,6 @@ export function Game({ mqttHandler }) {
     const data = JSON.parse(message);
     const eventType = Object.keys(data)[0];
     // change room when bus arrives or leaves stop, or comes to endstop
-    if (eventType === 'VP') return;
     if (eventType === 'ARS') {
       console.log('bussi saapui pysäkille');
       // todo: function to switch to shop
