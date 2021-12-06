@@ -201,7 +201,7 @@ export class Engine {
     const entity = world.createEntity();
     entity
       .addComponent(Grid, { cells: grid, bounds: bounds })
-      .addComponent(Level, { spawnRate: 2 / (1 + this.level), lastSpawn: 0, spawnLimit: this.level * 2, maxEnemies: this.level * 15, enemiesSpawned: 0 })
+      .addComponent(Level, { spawnRate: 4 / (1 + this.level), lastSpawn: 0, spawnLimit: this.level * 2, maxEnemies: this.level * 15, enemiesSpawned: 0 })
       .addComponent(Bus);
 
     this.addLight([5, 5, 2], scene);

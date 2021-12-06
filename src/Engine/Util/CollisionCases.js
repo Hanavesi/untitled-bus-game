@@ -15,7 +15,7 @@ export const checkCollisionCase = (entity1, entity2, world) => {
         world.sounds.playSound("hurt")
       }
       const health = entity2.getMutableComponent(Health);
-      health.current -= 0;
+      health.current -= 5;
     }
 
     return false;

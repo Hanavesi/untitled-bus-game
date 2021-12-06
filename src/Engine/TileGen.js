@@ -74,11 +74,16 @@ const idToSrc = (id, spawnRatio) => {
             if (rand < 0.8) {
                 return "images/floor.png";
             };
-            if (rand + spawnRatio > 1.24) {
+            if (rand + spawnRatio > 1.15) {
                 return "images/hole.png";
             }
             return "images/bench.png";
-
+        case 8:
+            const random = Math.random();
+            if (random < 0.8) {
+                return "images/floor.png";
+            };
+            return "images/bench.png";
         default:
             return "images/floor.png";
     }
