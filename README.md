@@ -223,9 +223,9 @@ Three.js is used to draw everything on the screen except the map. It allows easy
   - [x] Tiles created
   - Safe haven between stages
   - [x] Items to buy/get
-      Health
-    - Guns
-    - More items
+    - Health
+    Guns
+    More items
 - [x] Game over
 - [x] Game win
 - [ ] Different kind of enemies
